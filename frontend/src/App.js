@@ -81,6 +81,19 @@ function App() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  const createDemoUser = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/demo/create`, {
+        method: 'POST'
+      });
+      if (!response.ok) {
+        throw new Error('Failed to create demo user');
+      }
+    } catch (error) {
+      console.error('Error creating demo user:', error);
+    }
+  };
+
   const fetchUserProfile = async (userId) => {
     try {
       const response = await fetch(`${API_BASE_URL}/api/user/${userId}`);
