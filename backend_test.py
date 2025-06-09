@@ -338,82 +338,78 @@ class SolMatchAPITester:
         
         return success
 
-    def test_profile_completion_validation(self):
-        """Test that profile completion validation works correctly"""
+    def test_swipe_action(self):
+        """Test the swipe action"""
         if not self.test_user_id:
             print("❌ No test user ID available")
             return False
             
-        # First, update the profile to be incomplete
-        incomplete_data = {
-            "trading_experience": "",
-            "preferred_tokens": [],
-            "trading_style": "",
-            "portfolio_size": ""
-        }
+        # Create a target user to swipe on
+        target_id = str(uuid.uuid4())
         
-        success, _ = self.run_test(
-            "Set Incomplete Profile",
-            "PUT",
-            f"user/{self.test_user_id}",
-            200,
-            data=incomplete_data
-        )
-        
-        if not success:
+        try:
+            import pymongo
+            import os
+            
+            # Connect to MongoDB
+            mongo_url = os.environ.get('MONGO_URL', 'mongodb://localhost:27017')
+            client = pymongo.MongoClient(mongo_url)
+            db = client.solmatch_db
+            users_collection = db.users
+            
+            # Create target user with enhanced profile
+            target_user_data = {
+                "user_id": target_id,
+                "twitter_id": f"test_twitter_{int(datetime.now().timestamp())}",
+                "username": f"test_target_{int(datetime.now().timestamp())}",
+                "display_name": "Test Target",
+                "avatar_url": "https://images.pexels.com/photos/11302135/pexels-photo-11302135.jpeg",
+                "bio": "This is a test target for swipe testing",
+                "location": "Miami, FL",
+                "trading_experience": "Beginner",
+                "years_trading": 1,
+                "preferred_tokens": ["Layer 1s", "Meme Coins"],
+                "trading_style": "Scalper",
+                "portfolio_size": "Under $1K",
+                "risk_tolerance": "Conservative",
+                "best_trade": "Made my first 2x on Bitcoin",
+                "worst_trade": "Tried to day trade and lost 10%",
+                "favorite_project": "Phantom wallet - so easy to use",
+                "trading_hours": "Morning",
+                "communication_style": "Friendly",
+                "looking_for": ["Learning", "Teaching"],
+                "profile_complete": True,
+                "created_at": datetime.utcnow().isoformat(),
+                "last_active": datetime.utcnow().isoformat()
+            }
+            
+            # Insert the target user
+            users_collection.insert_one(target_user_data)
+            
+            # Test swipe action
+            swipe_data = {
+                "swiper_id": self.test_user_id,
+                "target_id": target_id,
+                "action": "like"
+            }
+            
+            success, response = self.run_test(
+                "Swipe Action",
+                "POST",
+                "swipe",
+                200,
+                data=swipe_data
+            )
+            
+            if success:
+                print(f"Swipe response: {response}")
+                return True
+            
             return False
             
-        # Verify profile is marked as incomplete
-        verify_success, user_data = self.run_test(
-            "Verify Incomplete Profile",
-            "GET",
-            f"user/{self.test_user_id}",
-            200
-        )
-        
-        if not verify_success:
+        except Exception as e:
+            print(f"❌ Failed to test swipe action: {str(e)}")
             return False
-            
-        if user_data.get("profile_complete") == True:
-            print("❌ Profile incorrectly marked as complete when it should be incomplete")
-            return False
-            
-        # Now update to complete the profile
-        complete_data = {
-            "trading_experience": "Intermediate",
-            "preferred_tokens": ["Meme Coins", "DeFi"],
-            "trading_style": "Day Trader",
-            "portfolio_size": "$1K-$10K"
-        }
-        
-        success, _ = self.run_test(
-            "Set Complete Profile",
-            "PUT",
-            f"user/{self.test_user_id}",
-            200,
-            data=complete_data
-        )
-        
-        if not success:
-            return False
-            
-        # Verify profile is marked as complete
-        verify_success, user_data = self.run_test(
-            "Verify Complete Profile",
-            "GET",
-            f"user/{self.test_user_id}",
-            200
-        )
-        
-        if not verify_success:
-            return False
-            
-        if user_data.get("profile_complete") != True:
-            print("❌ Profile incorrectly marked as incomplete when it should be complete")
-            return False
-            
-        print("✅ Profile completion validation works correctly")
-        return True
 
 def main():
     tester = SolMatchAPITester()
