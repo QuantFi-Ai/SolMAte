@@ -1,6 +1,5 @@
 import requests
-import json
-import sys
+import unittest
 import uuid
 from datetime import datetime
 
@@ -9,42 +8,40 @@ class SolMatchAPITester:
         self.base_url = base_url
         self.tests_run = 0
         self.tests_passed = 0
-        self.test_user_id = None
-        self.test_match_id = None
+        self.demo_user = None
 
-    def run_test(self, name, method, endpoint, expected_status, data=None, params=None):
+    def run_test(self, name, method, endpoint, expected_status, data=None, headers=None):
         """Run a single API test"""
         url = f"{self.base_url}/api/{endpoint}"
-        headers = {'Content-Type': 'application/json'}
+        default_headers = {'Content-Type': 'application/json'}
+        if headers:
+            default_headers.update(headers)
         
         self.tests_run += 1
         print(f"\n🔍 Testing {name}...")
-        print(f"URL: {url}")
         
         try:
             if method == 'GET':
-                response = requests.get(url, headers=headers, params=params)
+                response = requests.get(url, headers=default_headers)
             elif method == 'POST':
-                response = requests.post(url, json=data, headers=headers)
+                response = requests.post(url, json=data, headers=default_headers)
             elif method == 'PUT':
-                response = requests.put(url, json=data, headers=headers)
-            
-            print(f"Status Code: {response.status_code}")
+                response = requests.put(url, json=data, headers=default_headers)
             
             success = response.status_code == expected_status
             if success:
                 self.tests_passed += 1
                 print(f"✅ Passed - Status: {response.status_code}")
                 try:
-                    return success, response.json()
+                    return True, response.json()
                 except:
-                    return success, {}
+                    return True, {}
             else:
                 print(f"❌ Failed - Expected {expected_status}, got {response.status_code}")
                 try:
-                    print(f"Response: {response.text}")
+                    print(f"Response: {response.json()}")
                 except:
-                    pass
+                    print(f"Response: {response.text}")
                 return False, {}
 
         except Exception as e:
@@ -53,573 +50,164 @@ class SolMatchAPITester:
 
     def test_health_check(self):
         """Test the health check endpoint"""
-        success, response = self.run_test(
+        return self.run_test(
             "Health Check",
             "GET",
             "health",
             200
         )
-        if success:
-            print(f"Health check response: {response}")
-        return success
 
-    def test_twitter_login_redirect(self):
-        """Test the Twitter login redirect"""
-        print("\n🔍 Testing Twitter Login Redirect...")
-        url = f"{self.base_url}/api/login/twitter"
-        
-        try:
-            response = requests.get(url, allow_redirects=False)
-            # We expect a redirect (302, 303, or 307)
-            if response.status_code in [302, 303, 307]:
-                self.tests_passed += 1
-                print(f"✅ Passed - Status: {response.status_code}")
-                print(f"Redirect URL: {response.headers.get('Location')}")
-                return True
-            else:
-                print(f"❌ Failed - Expected redirect status, got {response.status_code}")
-                return False
-        except Exception as e:
-            print(f"❌ Failed - Error: {str(e)}")
-            return False
-
-    def create_test_user(self):
-        """Create a test user for further testing"""
-        print("\n🔍 Creating test user for API testing...")
-        
-        # Generate a unique user ID
-        user_id = str(uuid.uuid4())
-        twitter_id = f"test_twitter_{int(datetime.now().timestamp())}"
-        
-        # Create user data with enhanced profile fields
-        user_data = {
-            "user_id": user_id,
-            "twitter_id": twitter_id,
-            "username": f"test_user_{int(datetime.now().timestamp())}",
-            "display_name": "Test User",
-            "avatar_url": "https://images.pexels.com/photos/31610834/pexels-photo-31610834.jpeg",
-            "bio": "This is a test user for API testing",
-            "location": "San Francisco, CA",
-            "trading_experience": "Intermediate",
-            "years_trading": 3,
-            "preferred_tokens": ["Meme Coins", "DeFi"],
-            "trading_style": "Day Trader",
-            "portfolio_size": "$1K-$10K",
-            "risk_tolerance": "Moderate",
-            "best_trade": "Bought SOL at $20, sold at $200",
-            "worst_trade": "Lost 50% on a meme coin rugpull",
-            "favorite_project": "Jupiter - best DEX aggregator",
-            "trading_hours": "Evening",
-            "communication_style": "Technical",
-            "preferred_communication_platform": "Discord",
-            "preferred_trading_platform": "Jupiter",
-            "looking_for": ["Alpha Sharing", "Research Partner"],
-            "profile_complete": True,
-            "created_at": datetime.utcnow().isoformat(),
-            "last_active": datetime.utcnow().isoformat()
-        }
-        
-        # Try to insert directly into MongoDB
-        try:
-            import pymongo
-            import os
-            
-            # Connect to MongoDB
-            mongo_url = os.environ.get('MONGO_URL', 'mongodb://localhost:27017')
-            client = pymongo.MongoClient(mongo_url)
-            db = client.solmatch_db
-            users_collection = db.users
-            
-            # Insert the test user
-            users_collection.insert_one(user_data)
-            print(f"✅ Created test user with ID: {user_id}")
-            self.test_user_id = user_id
-            return user_id
-            
-        except Exception as e:
-            print(f"❌ Failed to create test user: {str(e)}")
-            return None
-
-    def test_get_user(self):
-        """Test getting a user profile"""
-        if not self.test_user_id:
-            print("❌ No test user ID available")
-            return False
-            
+    def test_create_demo_user(self):
+        """Test creating a demo user"""
         success, response = self.run_test(
+            "Create Demo User",
+            "POST",
+            "create-demo-user",
+            200
+        )
+        if success:
+            self.demo_user = response
+            print(f"Created demo user: {self.demo_user['username']}")
+        return success, response
+
+    def test_get_user(self, user_id):
+        """Test getting a user profile"""
+        return self.run_test(
             "Get User Profile",
             "GET",
-            f"user/{self.test_user_id}",
+            f"user/{user_id}",
             200
         )
-        if success:
-            print(f"User profile: {json.dumps(response, indent=2)}")
-        return success
 
-    def test_update_user(self):
+    def test_update_user_profile(self, user_id, profile_data):
         """Test updating a user profile"""
-        if not self.test_user_id:
-            print("❌ No test user ID available")
-            return False
-            
-        update_data = {
-            "bio": "Updated bio for testing",
-            "location": "New York, NY",
-            "trading_experience": "Expert",
-            "years_trading": 5,
-            "preferred_tokens": ["Blue Chips", "NFTs", "AI Tokens"],
-            "trading_style": "HODLer",
-            "portfolio_size": "$100K+",
-            "risk_tolerance": "Aggressive",
-            "best_trade": "Updated best trade story",
-            "worst_trade": "Updated worst trade story",
-            "favorite_project": "Magic Eden - best NFT marketplace",
-            "trading_hours": "Night Owl",
-            "communication_style": "Professional",
-            "preferred_communication_platform": "Telegram",
-            "preferred_trading_platform": "Raydium",
-            "looking_for": ["Teaching", "Risk Management"]
-        }
-        
-        success, response = self.run_test(
+        return self.run_test(
             "Update User Profile",
             "PUT",
-            f"user/{self.test_user_id}",
+            f"user/{user_id}",
             200,
-            data=update_data
+            data=profile_data
         )
-        
-        if success:
-            # Verify the update by getting the user again
-            verify_success, user_data = self.run_test(
-                "Verify User Update",
-                "GET",
-                f"user/{self.test_user_id}",
-                200
-            )
-            
-            if verify_success:
-                # Check if the update was applied
-                update_successful = True
-                for key, value in update_data.items():
-                    if user_data.get(key) != value:
-                        update_successful = False
-                        print(f"❌ Update verification failed for {key}: expected {value}, got {user_data.get(key)}")
-                
-                if update_successful:
-                    print("✅ User update verified successfully")
-                    return True
-                else:
-                    return False
-        
-        return success
 
-    def test_discover_users(self):
+    def test_discover_users(self, user_id):
         """Test discovering potential matches"""
-        if not self.test_user_id:
-            print("❌ No test user ID available")
-            return False
-            
-        success, response = self.run_test(
+        return self.run_test(
             "Discover Users",
             "GET",
-            f"discover/{self.test_user_id}",
+            f"discover/{user_id}",
             200
         )
-        
-        if success:
-            print(f"Found {len(response)} potential matches")
-            if len(response) > 0:
-                print(f"First match: {json.dumps(response[0], indent=2)}")
-        
-        return success
 
-    def create_test_match(self):
-        """Create a test match for further testing"""
-        if not self.test_user_id:
-            print("❌ No test user ID available")
-            return False
-            
-        print("\n🔍 Creating test match for API testing...")
-        
-        try:
-            import pymongo
-            import os
-            
-            # Connect to MongoDB
-            mongo_url = os.environ.get('MONGO_URL', 'mongodb://localhost:27017')
-            client = pymongo.MongoClient(mongo_url)
-            db = client.solmatch_db
-            users_collection = db.users
-            matches_collection = db.matches
-            
-            # Create another test user with enhanced profile
-            other_user_id = str(uuid.uuid4())
-            twitter_id = f"test_twitter_{int(datetime.now().timestamp())}"
-            
-            other_user_data = {
-                "user_id": other_user_id,
-                "twitter_id": twitter_id,
-                "username": f"test_match_{int(datetime.now().timestamp())}",
-                "display_name": "Test Match",
-                "avatar_url": "https://images.pexels.com/photos/31630004/pexels-photo-31630004.jpeg",
-                "bio": "This is a test match for API testing",
-                "location": "Austin, TX",
-                "trading_experience": "Advanced",
-                "years_trading": 4,
-                "preferred_tokens": ["GameFi", "AI Tokens"],
-                "trading_style": "Swing Trader",
-                "portfolio_size": "$10K-$100K",
-                "risk_tolerance": "YOLO",
-                "best_trade": "Made 20x on a GameFi token",
-                "worst_trade": "Bought the top of a bull market",
-                "favorite_project": "Tensor - best NFT trading platform",
-                "trading_hours": "24/7",
-                "communication_style": "Casual",
-                "preferred_communication_platform": "Twitter DM",
-                "preferred_trading_platform": "Birdeye",
-                "looking_for": ["Learning", "Networking"],
-                "profile_complete": True,
-                "created_at": datetime.utcnow().isoformat(),
-                "last_active": datetime.utcnow().isoformat()
-            }
-            
-            # Insert the other test user
-            users_collection.insert_one(other_user_data)
-            
-            # Create a match between the two users
-            match_id = str(uuid.uuid4())
-            match_data = {
-                "match_id": match_id,
-                "user1_id": self.test_user_id,
-                "user2_id": other_user_id,
-                "created_at": datetime.utcnow(),
-                "last_message_at": datetime.utcnow()
-            }
-            
-            matches_collection.insert_one(match_data)
-            print(f"✅ Created test match with ID: {match_id}")
-            self.test_match_id = match_id
-            return match_id
-            
-        except Exception as e:
-            print(f"❌ Failed to create test match: {str(e)}")
-            return None
-
-    def test_get_matches(self):
-        """Test getting user matches"""
-        if not self.test_user_id:
-            print("❌ No test user ID available")
-            return False
-            
-        success, response = self.run_test(
-            "Get User Matches",
-            "GET",
-            f"matches/{self.test_user_id}",
-            200
-        )
-        
-        if success:
-            print(f"Found {len(response)} matches")
-            if len(response) > 0:
-                print(f"First match: {json.dumps(response[0], indent=2)}")
-        
-        return success
-
-    def test_get_messages(self):
-        """Test getting match messages"""
-        if not self.test_match_id:
-            print("❌ No test match ID available")
-            return False
-            
-        success, response = self.run_test(
-            "Get Match Messages",
-            "GET",
-            f"messages/{self.test_match_id}",
-            200
-        )
-        
-        if success:
-            print(f"Found {len(response)} messages")
-        
-        return success
-
-    def test_swipe_action(self):
-        """Test the swipe action"""
-        if not self.test_user_id:
-            print("❌ No test user ID available")
-            return False
-            
-        # Create a target user to swipe on
-        target_id = str(uuid.uuid4())
-        
-        try:
-            import pymongo
-            import os
-            
-            # Connect to MongoDB
-            mongo_url = os.environ.get('MONGO_URL', 'mongodb://localhost:27017')
-            client = pymongo.MongoClient(mongo_url)
-            db = client.solmatch_db
-            users_collection = db.users
-            
-            # Create target user with enhanced profile
-            target_user_data = {
-                "user_id": target_id,
-                "twitter_id": f"test_twitter_{int(datetime.now().timestamp())}",
-                "username": f"test_target_{int(datetime.now().timestamp())}",
-                "display_name": "Test Target",
-                "avatar_url": "https://images.pexels.com/photos/11302135/pexels-photo-11302135.jpeg",
-                "bio": "This is a test target for swipe testing",
-                "location": "Miami, FL",
-                "trading_experience": "Beginner",
-                "years_trading": 1,
-                "preferred_tokens": ["Layer 1s", "Meme Coins"],
-                "trading_style": "Scalper",
-                "portfolio_size": "Under $1K",
-                "risk_tolerance": "Conservative",
-                "best_trade": "Made my first 2x on Bitcoin",
-                "worst_trade": "Tried to day trade and lost 10%",
-                "favorite_project": "Phantom wallet - so easy to use",
-                "trading_hours": "Morning",
-                "communication_style": "Friendly",
-                "preferred_communication_platform": "WhatsApp",
-                "preferred_trading_platform": "Photon",
-                "looking_for": ["Learning", "Teaching"],
-                "profile_complete": True,
-                "created_at": datetime.utcnow().isoformat(),
-                "last_active": datetime.utcnow().isoformat()
-            }
-            
-            # Insert the target user
-            users_collection.insert_one(target_user_data)
-            
-            # Test swipe action
-            swipe_data = {
-                "swiper_id": self.test_user_id,
+    def test_swipe_action(self, swiper_id, target_id, action):
+        """Test swiping on a user"""
+        return self.run_test(
+            f"Swipe {action.capitalize()}",
+            "POST",
+            "swipe",
+            200,
+            data={
+                "swiper_id": swiper_id,
                 "target_id": target_id,
-                "action": "like"
+                "action": action
             }
-            
-            success, response = self.run_test(
-                "Swipe Action",
-                "POST",
-                "swipe",
-                200,
-                data=swipe_data
-            )
-            
-            if success:
-                print(f"Swipe response: {response}")
-                return True
-            
-            return False
-            
-        except Exception as e:
-            print(f"❌ Failed to test swipe action: {str(e)}")
-            return False
-            
-    def test_communication_platform_preferences(self):
-        """Test that communication platform preferences are saved and retrieved correctly"""
-        if not self.test_user_id:
-            print("❌ No test user ID available")
-            return False
-            
-        # Update with communication platform preferences
-        update_data = {
-            "preferred_communication_platform": "Signal"
-        }
-        
-        success, _ = self.run_test(
-            "Update Communication Platform",
-            "PUT",
-            f"user/{self.test_user_id}",
-            200,
-            data=update_data
         )
-        
-        if not success:
-            return False
-            
-        # Verify the update
-        verify_success, user_data = self.run_test(
-            "Verify Communication Platform",
-            "GET",
-            f"user/{self.test_user_id}",
-            200
-        )
-        
-        if not verify_success:
-            return False
-            
-        if user_data.get("preferred_communication_platform") != "Signal":
-            print("❌ Communication platform preference not updated correctly")
-            return False
-            
-        print("✅ Communication platform preferences work correctly")
-        return True
-        
-    def test_trading_platform_preferences(self):
-        """Test that trading platform preferences are saved and retrieved correctly"""
-        if not self.test_user_id:
-            print("❌ No test user ID available")
-            return False
-            
-        # Update with trading platform preferences
-        update_data = {
-            "preferred_trading_platform": "DexScreener"
-        }
-        
-        success, _ = self.run_test(
-            "Update Trading Platform",
-            "PUT",
-            f"user/{self.test_user_id}",
-            200,
-            data=update_data
-        )
-        
-        if not success:
-            return False
-            
-        # Verify the update
-        verify_success, user_data = self.run_test(
-            "Verify Trading Platform",
-            "GET",
-            f"user/{self.test_user_id}",
-            200
-        )
-        
-        if not verify_success:
-            return False
-            
-        if user_data.get("preferred_trading_platform") != "DexScreener":
-            print("❌ Trading platform preference not updated correctly")
-            return False
-            
-        print("✅ Trading platform preferences work correctly")
-        return True
-        
-    def test_profile_completion_validation(self):
-        """Test that profile completion validation works correctly"""
-        if not self.test_user_id:
-            print("❌ No test user ID available")
-            return False
-            
-        # First, update the profile to be incomplete
-        incomplete_data = {
-            "trading_experience": "",
-            "preferred_tokens": [],
-            "trading_style": "",
-            "portfolio_size": ""
-        }
-        
-        success, _ = self.run_test(
-            "Set Incomplete Profile",
-            "PUT",
-            f"user/{self.test_user_id}",
-            200,
-            data=incomplete_data
-        )
-        
-        if not success:
-            return False
-            
-        # Verify profile is marked as incomplete
-        verify_success, user_data = self.run_test(
-            "Verify Incomplete Profile",
-            "GET",
-            f"user/{self.test_user_id}",
-            200
-        )
-        
-        if not verify_success:
-            return False
-            
-        if user_data.get("profile_complete") == True:
-            print("❌ Profile incorrectly marked as complete when it should be incomplete")
-            return False
-            
-        # Now update to complete the profile
-        complete_data = {
-            "trading_experience": "Intermediate",
-            "preferred_tokens": ["Meme Coins", "DeFi"],
-            "trading_style": "Day Trader",
-            "portfolio_size": "$1K-$10K"
-        }
-        
-        success, _ = self.run_test(
-            "Set Complete Profile",
-            "PUT",
-            f"user/{self.test_user_id}",
-            200,
-            data=complete_data
-        )
-        
-        if not success:
-            return False
-            
-        # Verify profile is marked as complete
-        verify_success, user_data = self.run_test(
-            "Verify Complete Profile",
-            "GET",
-            f"user/{self.test_user_id}",
-            200
-        )
-        
-        if not verify_success:
-            return False
-            
-        if user_data.get("profile_complete") != True:
-            print("❌ Profile incorrectly marked as incomplete when it should be complete")
-            return False
-            
-        print("✅ Profile completion validation works correctly")
-        return True
 
-def main():
-    tester = SolMatchAPITester()
-    
-    # Test health check
-    health_check_success = tester.test_health_check()
-    
-    # Test Twitter login redirect
-    twitter_login_success = tester.test_twitter_login_redirect()
-    
-    # Test demo user creation
-    success, response = tester.run_test(
-        "Create Demo User",
-        "POST",
-        "create-demo-user",
-        200
-    )
-    
-    if success and "user_id" in response:
-        print(f"Created demo user with ID: {response['user_id']}")
-    
-    # Create a test user for further testing
-    tester.create_test_user()
-    
-    # Test user endpoints
-    if tester.test_user_id:
-        tester.test_get_user()
-        tester.test_update_user()
-        tester.test_profile_completion_validation()
-        tester.test_communication_platform_preferences()
-        tester.test_trading_platform_preferences()
-        tester.test_discover_users()
-        tester.test_swipe_action()
+    def test_get_matches(self, user_id):
+        """Test getting user matches"""
+        return self.run_test(
+            "Get Matches",
+            "GET",
+            f"matches/{user_id}",
+            200
+        )
+
+    def test_get_messages(self, match_id):
+        """Test getting match messages"""
+        return self.run_test(
+            "Get Messages",
+            "GET",
+            f"messages/{match_id}",
+            200
+        )
+
+    def run_all_tests(self):
+        """Run all API tests in sequence"""
+        print("🚀 Starting SolMatch API Tests")
         
-        # Create a test match
-        tester.create_test_match()
+        # Test health check
+        self.test_health_check()
         
-        # Test match endpoints
-        if tester.test_match_id:
-            tester.test_get_matches()
-            tester.test_get_messages()
-    
-    # Print results
-    print(f"\n📊 Tests passed: {tester.tests_passed}/{tester.tests_run}")
-    return 0 if tester.tests_passed == tester.tests_run else 1
+        # Create demo user
+        success, user = self.test_create_demo_user()
+        if not success or not user:
+            print("❌ Demo user creation failed, stopping tests")
+            return False
+        
+        user_id = user['user_id']
+        
+        # Test getting user profile
+        success, _ = self.test_get_user(user_id)
+        if not success:
+            print("❌ Get user profile failed, stopping tests")
+            return False
+        
+        # Test updating user profile
+        profile_data = {
+            "bio": "Test bio for API testing",
+            "location": "Test Location",
+            "trading_experience": "Intermediate",
+            "years_trading": 3,
+            "preferred_tokens": ["Meme Coins", "DeFi", "NFTs"],
+            "trading_style": "Day Trader",
+            "portfolio_size": "$10K-$100K",
+            "risk_tolerance": "Moderate",
+            "best_trade": "Test best trade",
+            "worst_trade": "Test worst trade",
+            "favorite_project": "Jupiter",
+            "trading_hours": "Morning",
+            "communication_style": "Technical",
+            "preferred_communication_platform": "Discord",
+            "preferred_trading_platform": "Axiom",
+            "looking_for": ["Alpha Sharing", "Research Partner"]
+        }
+        
+        success, _ = self.test_update_user_profile(user_id, profile_data)
+        if not success:
+            print("❌ Update user profile failed, stopping tests")
+            return False
+        
+        # Test discovering users
+        success, discover_response = self.test_discover_users(user_id)
+        if not success:
+            print("❌ Discover users failed, stopping tests")
+            return False
+        
+        # Test swiping if there are users to discover
+        if discover_response and len(discover_response) > 0:
+            target_id = discover_response[0]['user_id']
+            success, swipe_response = self.test_swipe_action(user_id, target_id, "like")
+            if not success:
+                print("❌ Swipe action failed, stopping tests")
+                return False
+            
+            # Test getting matches
+            success, matches_response = self.test_get_matches(user_id)
+            if not success:
+                print("❌ Get matches failed, stopping tests")
+                return False
+            
+            # Test getting messages if there are matches
+            if matches_response and len(matches_response) > 0:
+                match_id = matches_response[0]['match_id']
+                success, _ = self.test_get_messages(match_id)
+                if not success:
+                    print("❌ Get messages failed, stopping tests")
+                    return False
+        
+        # Print results
+        print(f"\n📊 Tests passed: {self.tests_passed}/{self.tests_run}")
+        return self.tests_passed == self.tests_run
 
 if __name__ == "__main__":
-    sys.exit(main())
+    tester = SolMatchAPITester()
+    tester.run_all_tests()
