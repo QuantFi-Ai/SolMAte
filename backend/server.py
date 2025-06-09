@@ -53,7 +53,7 @@ oauth.register(
     }
 )
 
-# Pydantic models
+# Enhanced Pydantic models
 class UserProfile(BaseModel):
     user_id: str
     twitter_id: str
@@ -61,10 +61,24 @@ class UserProfile(BaseModel):
     display_name: str
     avatar_url: str
     bio: str = ""
+    location: str = ""
+    # Trading experience
     trading_experience: str  # "Beginner", "Intermediate", "Advanced", "Expert"
+    years_trading: int = 0
     preferred_tokens: List[str]  # ["Meme Coins", "DeFi", "GameFi", "NFTs", "Blue Chips"]
     trading_style: str  # "Day Trader", "Swing Trader", "HODLer", "Scalper"
     portfolio_size: str  # "Under $1K", "$1K-$10K", "$10K-$100K", "$100K+", "Prefer not to say"
+    risk_tolerance: str  # "Conservative", "Moderate", "Aggressive", "YOLO"
+    # Trading history
+    best_trade: str = ""
+    worst_trade: str = ""
+    favorite_project: str = ""
+    # Social & preferences
+    trading_hours: str = ""  # "Early Morning", "Morning", "Afternoon", "Evening", "Night Owl", "24/7"
+    communication_style: str = ""  # "Casual", "Professional", "Technical", "Friendly"
+    looking_for: List[str] = []  # ["Learning", "Teaching", "Alpha Sharing", "Research Partner", "Risk Management"]
+    # Profile completion
+    profile_complete: bool = False
     created_at: datetime
     last_active: datetime
 
@@ -151,10 +165,20 @@ async def twitter_callback(request: Request):
                 "display_name": twitter_user['name'],
                 "avatar_url": twitter_user['profile_image_url_https'].replace('_normal', '_400x400'),
                 "bio": twitter_user.get('description', ''),
+                "location": "",
                 "trading_experience": "",
+                "years_trading": 0,
                 "preferred_tokens": [],
                 "trading_style": "",
                 "portfolio_size": "",
+                "risk_tolerance": "",
+                "best_trade": "",
+                "worst_trade": "",
+                "favorite_project": "",
+                "trading_hours": "",
+                "communication_style": "",
+                "looking_for": [],
+                "profile_complete": False,
                 "created_at": datetime.utcnow(),
                 "last_active": datetime.utcnow()
             }
@@ -170,17 +194,36 @@ async def twitter_callback(request: Request):
 @app.post("/api/create-demo-user")
 async def create_demo_user():
     """Create a demo user for testing purposes"""
+    demo_avatars = [
+        "https://images.pexels.com/photos/31610834/pexels-photo-31610834.jpeg",
+        "https://images.pexels.com/photos/31630004/pexels-photo-31630004.jpeg",
+        "https://images.pexels.com/photos/11302135/pexels-photo-11302135.jpeg",
+        "https://images.pexels.com/photos/2182970/pexels-photo-2182970.jpeg",
+        "https://images.pexels.com/photos/32465949/pexels-photo-32465949.jpeg",
+        "https://images.pexels.com/photos/31659353/pexels-photo-31659353.jpeg"
+    ]
+    
     demo_user_data = {
         "user_id": str(uuid.uuid4()),
         "twitter_id": f"demo_{int(datetime.utcnow().timestamp())}",
         "username": f"demo_trader_{int(datetime.utcnow().timestamp())}",
         "display_name": "Demo Solana Trader",
-        "avatar_url": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face",
+        "avatar_url": demo_avatars[0],
         "bio": "Demo trader looking for trenching buddies! 🚀",
+        "location": "",
         "trading_experience": "",
+        "years_trading": 0,
         "preferred_tokens": [],
         "trading_style": "",
         "portfolio_size": "",
+        "risk_tolerance": "",
+        "best_trade": "",
+        "worst_trade": "",
+        "favorite_project": "",
+        "trading_hours": "",
+        "communication_style": "",
+        "looking_for": [],
+        "profile_complete": False,
         "created_at": datetime.utcnow(),
         "last_active": datetime.utcnow()
     }
@@ -188,19 +231,29 @@ async def create_demo_user():
     # Insert demo user
     users_collection.insert_one(demo_user_data)
     
-    # Create some demo potential matches
+    # Create some demo potential matches with the new profile structure
     demo_matches = [
         {
             "user_id": str(uuid.uuid4()),
             "twitter_id": f"demo_match_1_{int(datetime.utcnow().timestamp())}",
             "username": "crypto_whale_2024",
             "display_name": "Alex Chen",
-            "avatar_url": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face",
+            "avatar_url": demo_avatars[1],
             "bio": "DeFi enthusiast and meme coin hunter. Let's find the next 100x together! 💎",
+            "location": "San Francisco, CA",
             "trading_experience": "Advanced",
+            "years_trading": 4,
             "preferred_tokens": ["Meme Coins", "DeFi", "Layer 1s"],
             "trading_style": "Day Trader",
             "portfolio_size": "$10K-$100K",
+            "risk_tolerance": "Aggressive",
+            "best_trade": "Bought SOL at $8, sold at $260. 32x return on DeFi play.",
+            "worst_trade": "FOMO'd into LUNA at $80 right before the crash. Lost 90%.",
+            "favorite_project": "Solana ecosystem - the speed and low fees are unmatched",
+            "trading_hours": "Morning",
+            "communication_style": "Technical",
+            "looking_for": ["Alpha Sharing", "Research Partner"],
+            "profile_complete": True,
             "created_at": datetime.utcnow(),
             "last_active": datetime.utcnow()
         },
@@ -209,12 +262,22 @@ async def create_demo_user():
             "twitter_id": f"demo_match_2_{int(datetime.utcnow().timestamp())}",
             "username": "sol_degen_pro",
             "display_name": "Sarah Johnson",
-            "avatar_url": "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop&crop=face",
+            "avatar_url": demo_avatars[2],
             "bio": "Solana maximalist and NFT collector. Looking for diamond hands only! 💪",
+            "location": "New York, NY",
             "trading_experience": "Expert",
+            "years_trading": 6,
             "preferred_tokens": ["NFTs", "GameFi", "Blue Chips"],
             "trading_style": "Swing Trader",
             "portfolio_size": "$100K+",
+            "risk_tolerance": "Moderate",
+            "best_trade": "Minted Okay Bears at 1.5 SOL, floor went to 180 SOL",
+            "worst_trade": "Held SQUID token during the rug pull. Complete loss.",
+            "favorite_project": "Magic Eden - revolutionizing NFT trading on Solana",
+            "trading_hours": "Evening",
+            "communication_style": "Professional",
+            "looking_for": ["Teaching", "Risk Management"],
+            "profile_complete": True,
             "created_at": datetime.utcnow(),
             "last_active": datetime.utcnow()
         },
@@ -223,12 +286,22 @@ async def create_demo_user():
             "twitter_id": f"demo_match_3_{int(datetime.utcnow().timestamp())}",
             "username": "moon_hunter_99",
             "display_name": "Mike Rodriguez",
-            "avatar_url": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face",
+            "avatar_url": demo_avatars[3],
             "bio": "Beginner trader learning the ropes. Let's grow together and share insights! 📈",
+            "location": "Austin, TX",
             "trading_experience": "Beginner",
+            "years_trading": 1,
             "preferred_tokens": ["Meme Coins", "AI Tokens"],
             "trading_style": "HODLer",
             "portfolio_size": "Under $1K",
+            "risk_tolerance": "Conservative",
+            "best_trade": "Bought BONK early, 10x return in 2 weeks",
+            "worst_trade": "Panic sold during a minor dip, lost 20%",
+            "favorite_project": "Jupiter - makes swapping so easy for beginners",
+            "trading_hours": "Night Owl",
+            "communication_style": "Casual",
+            "looking_for": ["Learning", "Research Partner"],
+            "profile_complete": True,
             "created_at": datetime.utcnow(),
             "last_active": datetime.utcnow()
         }
@@ -240,6 +313,7 @@ async def create_demo_user():
     
     demo_user_data.pop('_id', None)
     return demo_user_data
+
 @app.get("/api/user/{user_id}")
 async def get_user(user_id: str):
     """Get user profile"""
@@ -259,9 +333,19 @@ async def update_user_profile(user_id: str, profile_data: dict):
         raise HTTPException(status_code=404, detail="User not found")
     
     # Update allowed fields
-    allowed_fields = ["bio", "trading_experience", "preferred_tokens", "trading_style", "portfolio_size"]
+    allowed_fields = [
+        "bio", "location", "trading_experience", "years_trading", "preferred_tokens", 
+        "trading_style", "portfolio_size", "risk_tolerance", "best_trade", "worst_trade",
+        "favorite_project", "trading_hours", "communication_style", "looking_for"
+    ]
     update_data = {k: v for k, v in profile_data.items() if k in allowed_fields}
     update_data["last_active"] = datetime.utcnow()
+    
+    # Check if profile is complete
+    required_fields = ["trading_experience", "preferred_tokens", "trading_style", "portfolio_size"]
+    profile_complete = all(update_data.get(field) or user.get(field) for field in required_fields)
+    if profile_complete and update_data.get("preferred_tokens"):
+        update_data["profile_complete"] = True
     
     users_collection.update_one(
         {"user_id": user_id},
@@ -284,10 +368,7 @@ async def discover_users(user_id: str, limit: int = 10):
     # Find users not swiped on yet with complete profiles
     potential_matches = list(users_collection.find({
         "user_id": {"$nin": swiped_user_ids},
-        "trading_experience": {"$ne": ""},
-        "preferred_tokens": {"$ne": []},
-        "trading_style": {"$ne": ""},
-        "portfolio_size": {"$ne": ""}
+        "profile_complete": True
     }).limit(limit))
     
     # Remove MongoDB _id fields
