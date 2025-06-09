@@ -24,6 +24,8 @@ matches_collection = db.matches
 messages_collection = db.messages
 swipes_collection = db.swipes
 profile_images_collection = db.profile_images
+trading_highlights_collection = db.trading_highlights
+social_links_collection = db.social_links
 
 # FastAPI app
 app = FastAPI(title="SolMatch API", version="1.0.0")
