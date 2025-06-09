@@ -357,18 +357,28 @@ class SolMatchAPITester:
             db = client.solmatch_db
             users_collection = db.users
             
-            # Create target user
+            # Create target user with enhanced profile
             target_user_data = {
                 "user_id": target_id,
                 "twitter_id": f"test_twitter_{int(datetime.now().timestamp())}",
                 "username": f"test_target_{int(datetime.now().timestamp())}",
                 "display_name": "Test Target",
-                "avatar_url": "https://via.placeholder.com/400",
+                "avatar_url": "https://images.pexels.com/photos/11302135/pexels-photo-11302135.jpeg",
                 "bio": "This is a test target for swipe testing",
+                "location": "Miami, FL",
                 "trading_experience": "Beginner",
-                "preferred_tokens": ["Layer 1s"],
+                "years_trading": 1,
+                "preferred_tokens": ["Layer 1s", "Meme Coins"],
                 "trading_style": "Scalper",
                 "portfolio_size": "Under $1K",
+                "risk_tolerance": "Conservative",
+                "best_trade": "Made my first 2x on Bitcoin",
+                "worst_trade": "Tried to day trade and lost 10%",
+                "favorite_project": "Phantom wallet - so easy to use",
+                "trading_hours": "Morning",
+                "communication_style": "Friendly",
+                "looking_for": ["Learning", "Teaching"],
+                "profile_complete": True,
                 "created_at": datetime.utcnow().isoformat(),
                 "last_active": datetime.utcnow().isoformat()
             }
