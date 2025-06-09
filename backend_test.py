@@ -176,6 +176,8 @@ class SolMatchAPITester:
             "favorite_project": "Magic Eden - best NFT marketplace",
             "trading_hours": "Night Owl",
             "communication_style": "Professional",
+            "preferred_communication_platform": "Telegram",
+            "preferred_trading_platform": "Raydium",
             "looking_for": ["Teaching", "Risk Management"]
         }
         
