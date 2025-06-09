@@ -7,7 +7,9 @@ function App() {
   const [currentUser, setCurrentUser] = useState(null);
   const [currentView, setCurrentView] = useState('login');
   const [discoveryCards, setDiscoveryCards] = useState([]);
+  const [aiRecommendations, setAiRecommendations] = useState([]);
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
+  const [currentAiIndex, setCurrentAiIndex] = useState(0);
   const [matches, setMatches] = useState([]);
   const [selectedMatch, setSelectedMatch] = useState(null);
   const [messages, setMessages] = useState([]);
@@ -15,6 +17,7 @@ function App() {
   const [ws, setWs] = useState(null);
   const [showMatchModal, setShowMatchModal] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [discoveryMode, setDiscoveryMode] = useState('browse'); // 'browse' or 'ai'
   const [profileForm, setProfileForm] = useState({
     bio: '',
     location: '',
@@ -160,6 +163,7 @@ function App() {
       } else {
         setCurrentView('discover');
         fetchDiscoveryCards();
+        fetchAiRecommendations();
         fetchMatches();
       }
     } catch (error) {
@@ -175,6 +179,19 @@ function App() {
       setCurrentCardIndex(0);
     } catch (error) {
       console.error('Error fetching discovery cards:', error);
+    }
+  };
+
+  const fetchAiRecommendations = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/ai-recommendations/${currentUser.user_id}`);
+      if (response.ok) {
+        const recommendations = await response.json();
+        setAiRecommendations(recommendations);
+        setCurrentAiIndex(0);
+      }
+    } catch (error) {
+      console.error('Error fetching AI recommendations:', error);
     }
   };
 
@@ -283,10 +300,13 @@ function App() {
     }
   };
 
-  const handleSwipe = async (action) => {
-    if (currentCardIndex >= discoveryCards.length) return;
+  const handleSwipe = async (action, isAiRecommendation = false) => {
+    const currentCards = isAiRecommendation ? aiRecommendations : discoveryCards;
+    const currentIndex = isAiRecommendation ? currentAiIndex : currentCardIndex;
     
-    const currentCard = discoveryCards[currentCardIndex];
+    if (currentIndex >= currentCards.length) return;
+    
+    const currentCard = currentCards[currentIndex];
     
     try {
       const response = await fetch(`${API_BASE_URL}/api/swipe`, {
@@ -305,11 +325,19 @@ function App() {
         fetchMatches();
       }
       
-      setCurrentCardIndex(prev => prev + 1);
+      if (isAiRecommendation) {
+        setCurrentAiIndex(prev => prev + 1);
+      } else {
+        setCurrentCardIndex(prev => prev + 1);
+      }
       
       // Load more cards if running low
-      if (currentCardIndex >= discoveryCards.length - 2) {
-        fetchDiscoveryCards();
+      if (currentIndex >= currentCards.length - 2) {
+        if (isAiRecommendation) {
+          fetchAiRecommendations();
+        } else {
+          fetchDiscoveryCards();
+        }
       }
     } catch (error) {
       console.error('Error swiping:', error);
@@ -335,6 +363,7 @@ function App() {
       } else {
         setCurrentView('discover'); // First time setup
         fetchDiscoveryCards();
+        fetchAiRecommendations();
         fetchMatches();
       }
     } catch (error) {
@@ -398,6 +427,23 @@ function App() {
     }));
   };
 
+  // Get current card data based on discovery mode
+  const getCurrentCard = () => {
+    if (discoveryMode === 'ai') {
+      return aiRecommendations[currentAiIndex];
+    } else {
+      return discoveryCards[currentCardIndex];
+    }
+  };
+
+  const getCurrentIndex = () => {
+    return discoveryMode === 'ai' ? currentAiIndex : currentCardIndex;
+  };
+
+  const getCurrentCards = () => {
+    return discoveryMode === 'ai' ? aiRecommendations : discoveryCards;
+  };
+
   // Login View
   if (currentView === 'login') {
     return (
@@ -433,7 +479,7 @@ function App() {
     );
   }
 
-  // Profile Setup/Edit View
+  // Profile Setup/Edit View (keeping same as before)
   if (currentView === 'profile-setup' || currentView === 'profile-edit') {
     const isEditing = currentView === 'profile-edit';
     
@@ -495,6 +541,7 @@ function App() {
             </div>
             
             <form onSubmit={handleProfileUpdate} className="space-y-8">
+              {/* Same form content as before - all the profile fields */}
               {/* Basic Info */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
@@ -835,47 +882,88 @@ function App() {
       {/* Discover View */}
       {currentView === 'discover' && (
         <div className="max-w-md mx-auto pt-8 px-4">
-          {currentCardIndex < discoveryCards.length ? (
+          {/* Discovery Mode Toggle */}
+          <div className="flex bg-gray-100 rounded-xl p-1 mb-6">
+            <button
+              onClick={() => setDiscoveryMode('browse')}
+              className={`flex-1 py-2 px-4 rounded-lg font-medium transition-all ${
+                discoveryMode === 'browse' 
+                  ? 'bg-white text-black shadow-sm' 
+                  : 'text-gray-600 hover:text-black'
+              }`}
+            >
+              Browse All
+            </button>
+            <button
+              onClick={() => setDiscoveryMode('ai')}
+              className={`flex-1 py-2 px-4 rounded-lg font-medium transition-all ${
+                discoveryMode === 'ai' 
+                  ? 'bg-white text-black shadow-sm' 
+                  : 'text-gray-600 hover:text-black'
+              }`}
+            >
+              🤖 AI Recommended
+            </button>
+          </div>
+
+          {getCurrentIndex() < getCurrentCards().length ? (
             <div className="bg-white rounded-2xl overflow-hidden shadow-lg border border-gray-200">
+              {/* AI Compatibility Banner */}
+              {discoveryMode === 'ai' && getCurrentCard()?.ai_compatibility && (
+                <div className="bg-gradient-to-r from-purple-500 to-blue-600 text-white p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-medium">AI Compatibility</span>
+                    <span className="text-2xl font-bold">
+                      {getCurrentCard().ai_compatibility.compatibility_percentage}%
+                    </span>
+                  </div>
+                  <div className="space-y-1">
+                    {getCurrentCard().ai_compatibility.recommendations.map((rec, idx) => (
+                      <p key={idx} className="text-xs text-purple-100">{rec}</p>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <div className="relative">
                 <img
-                  src={discoveryCards[currentCardIndex]?.avatar_url}
+                  src={getCurrentCard()?.avatar_url}
                   alt="Profile"
                   className="w-full h-96 object-cover"
                 />
                 <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6">
                   <h3 className="text-2xl font-bold text-white">
-                    {discoveryCards[currentCardIndex]?.display_name}
+                    {getCurrentCard()?.display_name}
                   </h3>
                   <div className="flex items-center space-x-2 mt-1">
-                    {discoveryCards[currentCardIndex]?.show_twitter && discoveryCards[currentCardIndex]?.twitter_username && (
+                    {getCurrentCard()?.show_twitter && getCurrentCard()?.twitter_username && (
                       <p className="text-blue-300 text-sm">
-                        🐦 @{discoveryCards[currentCardIndex]?.twitter_username}
+                        🐦 @{getCurrentCard()?.twitter_username}
                       </p>
                     )}
-                    {discoveryCards[currentCardIndex]?.location && (
-                      <p className="text-white/90 text-sm">📍 {discoveryCards[currentCardIndex]?.location}</p>
+                    {getCurrentCard()?.location && (
+                      <p className="text-white/90 text-sm">📍 {getCurrentCard()?.location}</p>
                     )}
                   </div>
                 </div>
               </div>
               
               <div className="p-6 space-y-4">
-                <p className="text-gray-700">{discoveryCards[currentCardIndex]?.bio}</p>
+                <p className="text-gray-700">{getCurrentCard()?.bio}</p>
                 
                 <div className="space-y-3">
                   <div className="grid grid-cols-2 gap-3">
                     <div className="flex items-center space-x-2">
                       <span className="text-sm font-medium text-gray-500">Experience:</span>
                       <span className="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs">
-                        {discoveryCards[currentCardIndex]?.trading_experience}
+                        {getCurrentCard()?.trading_experience}
                       </span>
                     </div>
                     
                     <div className="flex items-center space-x-2">
                       <span className="text-sm font-medium text-gray-500">Years:</span>
                       <span className="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs">
-                        {discoveryCards[currentCardIndex]?.years_trading}
+                        {getCurrentCard()?.years_trading}
                       </span>
                     </div>
                   </div>
@@ -884,35 +972,35 @@ function App() {
                     <div className="flex items-center space-x-2">
                       <span className="text-sm font-medium text-gray-500">Style:</span>
                       <span className="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs">
-                        {discoveryCards[currentCardIndex]?.trading_style}
+                        {getCurrentCard()?.trading_style}
                       </span>
                     </div>
                     
                     <div className="flex items-center space-x-2">
                       <span className="text-sm font-medium text-gray-500">Risk:</span>
                       <span className="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs">
-                        {discoveryCards[currentCardIndex]?.risk_tolerance}
+                        {getCurrentCard()?.risk_tolerance}
                       </span>
                     </div>
                   </div>
 
                   {/* Communication Preferences */}
-                  {(discoveryCards[currentCardIndex]?.preferred_communication_platform || discoveryCards[currentCardIndex]?.preferred_trading_platform) && (
+                  {(getCurrentCard()?.preferred_communication_platform || getCurrentCard()?.preferred_trading_platform) && (
                     <div className="space-y-2">
-                      {discoveryCards[currentCardIndex]?.preferred_communication_platform && (
+                      {getCurrentCard()?.preferred_communication_platform && (
                         <div className="flex items-center space-x-2">
                           <span className="text-sm font-medium text-gray-500">Prefers:</span>
                           <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">
-                            📱 {discoveryCards[currentCardIndex]?.preferred_communication_platform}
+                            📱 {getCurrentCard()?.preferred_communication_platform}
                           </span>
                         </div>
                       )}
                       
-                      {discoveryCards[currentCardIndex]?.preferred_trading_platform && (
+                      {getCurrentCard()?.preferred_trading_platform && (
                         <div className="flex items-center space-x-2">
                           <span className="text-sm font-medium text-gray-500">Trades on:</span>
                           <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">
-                            ⚡ {discoveryCards[currentCardIndex]?.preferred_trading_platform}
+                            ⚡ {getCurrentCard()?.preferred_trading_platform}
                           </span>
                         </div>
                       )}
@@ -922,7 +1010,7 @@ function App() {
                   <div>
                     <span className="text-sm font-medium text-gray-500 block mb-2">Preferred Tokens:</span>
                     <div className="flex flex-wrap gap-1">
-                      {discoveryCards[currentCardIndex]?.preferred_tokens.map(token => (
+                      {getCurrentCard()?.preferred_tokens.map(token => (
                         <span key={token} className="bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-xs">
                           {token}
                         </span>
@@ -930,23 +1018,39 @@ function App() {
                     </div>
                   </div>
 
-                  {discoveryCards[currentCardIndex]?.best_trade && (
+                  {getCurrentCard()?.best_trade && (
                     <div>
                       <span className="text-sm font-medium text-gray-500 block mb-1">Best Trade:</span>
                       <p className="text-sm text-gray-700 bg-green-50 p-2 rounded-lg">
-                        {discoveryCards[currentCardIndex]?.best_trade}
+                        {getCurrentCard()?.best_trade}
                       </p>
                     </div>
                   )}
 
-                  {discoveryCards[currentCardIndex]?.looking_for?.length > 0 && (
+                  {getCurrentCard()?.looking_for?.length > 0 && (
                     <div>
                       <span className="text-sm font-medium text-gray-500 block mb-2">Looking For:</span>
                       <div className="flex flex-wrap gap-1">
-                        {discoveryCards[currentCardIndex]?.looking_for.map(item => (
+                        {getCurrentCard()?.looking_for.map(item => (
                           <span key={item} className="bg-black text-white px-2 py-1 rounded-full text-xs">
                             {item}
                           </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* AI Compatibility Details */}
+                  {discoveryMode === 'ai' && getCurrentCard()?.ai_compatibility && (
+                    <div className="mt-4 p-3 bg-purple-50 rounded-lg">
+                      <span className="text-sm font-medium text-purple-800 block mb-2">
+                        Why AI Recommends This Match:
+                      </span>
+                      <div className="space-y-1">
+                        {Object.entries(getCurrentCard().ai_compatibility.breakdown).map(([key, value]) => (
+                          <div key={key} className="text-xs text-purple-700">
+                            <span className="capitalize font-medium">{key}:</span> {value.reason}
+                          </div>
                         ))}
                       </div>
                     </div>
@@ -956,13 +1060,13 @@ function App() {
               
               <div className="flex space-x-4 p-6 pt-0">
                 <button
-                  onClick={() => handleSwipe('pass')}
+                  onClick={() => handleSwipe('pass', discoveryMode === 'ai')}
                   className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-3 px-6 rounded-xl transition-all duration-200"
                 >
                   ❌ Pass
                 </button>
                 <button
-                  onClick={() => handleSwipe('like')}
+                  onClick={() => handleSwipe('like', discoveryMode === 'ai')}
                   className="flex-1 bg-black hover:bg-gray-800 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200"
                 >
                   ❤️ Like
@@ -971,19 +1075,37 @@ function App() {
             </div>
           ) : (
             <div className="text-center text-gray-600 py-12">
-              <h3 className="text-2xl font-bold mb-4">No more traders to discover!</h3>
-              <p className="text-gray-500 mb-6">Check back later for new potential matches.</p>
-              <button
-                onClick={() => setCurrentView('matches')}
-                className="bg-black hover:bg-gray-800 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200"
-              >
-                View Your Matches
-              </button>
+              <h3 className="text-2xl font-bold mb-4">
+                No more {discoveryMode === 'ai' ? 'AI recommendations' : 'traders to discover'}!
+              </h3>
+              <p className="text-gray-500 mb-6">
+                {discoveryMode === 'ai' 
+                  ? 'Try browsing all traders or check back later for new AI recommendations.'
+                  : 'Check back later for new potential matches.'
+                }
+              </p>
+              <div className="space-x-4">
+                {discoveryMode === 'ai' && (
+                  <button
+                    onClick={() => setDiscoveryMode('browse')}
+                    className="bg-black hover:bg-gray-800 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200"
+                  >
+                    Browse All Traders
+                  </button>
+                )}
+                <button
+                  onClick={() => setCurrentView('matches')}
+                  className="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200"
+                >
+                  View Your Matches
+                </button>
+              </div>
             </div>
           )}
         </div>
       )}
 
+      {/* Matches View and Chat View remain the same */}
       {/* Matches View */}
       {currentView === 'matches' && !selectedMatch && (
         <div className="max-w-4xl mx-auto pt-8 px-4">

@@ -100,6 +100,359 @@ class ChatMessage(BaseModel):
     content: str
     timestamp: datetime
 
+# AI Matching Algorithm
+class AIMatchingService:
+    @staticmethod
+    def calculate_compatibility_score(user1: dict, user2: dict) -> dict:
+        """Calculate AI compatibility score between two users"""
+        score_breakdown = {}
+        total_score = 0
+        max_possible_score = 0
+        
+        # 1. Experience Level Compatibility (Weight: 20)
+        experience_score = AIMatchingService._calculate_experience_compatibility(
+            user1.get('trading_experience', ''), 
+            user2.get('trading_experience', ''),
+            user1.get('years_trading', 0),
+            user2.get('years_trading', 0)
+        )
+        score_breakdown['experience'] = experience_score
+        total_score += experience_score['score']
+        max_possible_score += experience_score['max_score']
+        
+        # 2. Platform Compatibility (Weight: 25)
+        platform_score = AIMatchingService._calculate_platform_compatibility(
+            user1.get('preferred_trading_platform', ''),
+            user2.get('preferred_trading_platform', ''),
+            user1.get('preferred_communication_platform', ''),
+            user2.get('preferred_communication_platform', '')
+        )
+        score_breakdown['platform'] = platform_score
+        total_score += platform_score['score']
+        max_possible_score += platform_score['max_score']
+        
+        # 3. Token Interest Overlap (Weight: 20)
+        token_score = AIMatchingService._calculate_token_compatibility(
+            user1.get('preferred_tokens', []),
+            user2.get('preferred_tokens', [])
+        )
+        score_breakdown['tokens'] = token_score
+        total_score += token_score['score']
+        max_possible_score += token_score['max_score']
+        
+        # 4. Goal Alignment (Weight: 15)
+        goal_score = AIMatchingService._calculate_goal_compatibility(
+            user1.get('looking_for', []),
+            user2.get('looking_for', [])
+        )
+        score_breakdown['goals'] = goal_score
+        total_score += goal_score['score']
+        max_possible_score += goal_score['max_score']
+        
+        # 5. Trading Style & Risk Compatibility (Weight: 10)
+        style_score = AIMatchingService._calculate_style_compatibility(
+            user1.get('trading_style', ''),
+            user2.get('trading_style', ''),
+            user1.get('risk_tolerance', ''),
+            user2.get('risk_tolerance', '')
+        )
+        score_breakdown['style'] = style_score
+        total_score += style_score['score']
+        max_possible_score += style_score['max_score']
+        
+        # 6. Communication & Schedule Compatibility (Weight: 10)
+        communication_score = AIMatchingService._calculate_communication_compatibility(
+            user1.get('communication_style', ''),
+            user2.get('communication_style', ''),
+            user1.get('trading_hours', ''),
+            user2.get('trading_hours', '')
+        )
+        score_breakdown['communication'] = communication_score
+        total_score += communication_score['score']
+        max_possible_score += communication_score['max_score']
+        
+        # Calculate final percentage
+        compatibility_percentage = int((total_score / max_possible_score) * 100) if max_possible_score > 0 else 0
+        
+        return {
+            'compatibility_percentage': compatibility_percentage,
+            'total_score': total_score,
+            'max_possible_score': max_possible_score,
+            'breakdown': score_breakdown,
+            'recommendations': AIMatchingService._generate_recommendations(score_breakdown, user1, user2)
+        }
+    
+    @staticmethod
+    def _calculate_experience_compatibility(exp1: str, exp2: str, years1: int, years2: int) -> dict:
+        """Calculate experience level compatibility"""
+        experience_levels = {'Beginner': 1, 'Intermediate': 2, 'Advanced': 3, 'Expert': 4}
+        
+        level1 = experience_levels.get(exp1, 0)
+        level2 = experience_levels.get(exp2, 0)
+        
+        if level1 == 0 or level2 == 0:
+            return {'score': 0, 'max_score': 20, 'reason': 'Missing experience information'}
+        
+        diff = abs(level1 - level2)
+        
+        # Perfect for mentoring: beginner with intermediate+
+        if (level1 == 1 and level2 >= 2) or (level2 == 1 and level1 >= 2):
+            score = 18
+            reason = "Perfect for mentoring relationship"
+        # Same level - great for peer learning
+        elif diff == 0:
+            score = 20
+            reason = "Same experience level - ideal for peer collaboration"
+        # One level apart - good compatibility
+        elif diff == 1:
+            score = 15
+            reason = "Similar experience levels - good match"
+        # Two levels apart - some compatibility
+        elif diff == 2:
+            score = 10
+            reason = "Different experience levels - moderate match"
+        else:
+            score = 5
+            reason = "Very different experience levels"
+        
+        # Bonus for similar years of experience
+        year_diff = abs(years1 - years2)
+        if year_diff <= 1:
+            score = min(score + 2, 20)
+        
+        return {'score': score, 'max_score': 20, 'reason': reason}
+    
+    @staticmethod
+    def _calculate_platform_compatibility(trading_platform1: str, trading_platform2: str, 
+                                        comm_platform1: str, comm_platform2: str) -> dict:
+        """Calculate platform compatibility"""
+        score = 0
+        reasons = []
+        
+        # Trading platform compatibility (15 points)
+        if trading_platform1 and trading_platform2:
+            if trading_platform1 == trading_platform2:
+                score += 15
+                reasons.append(f"Both use {trading_platform1} for trading")
+            else:
+                score += 5
+                reasons.append("Different trading platforms")
+        else:
+            score += 3
+            reasons.append("Missing trading platform info")
+        
+        # Communication platform compatibility (10 points)
+        if comm_platform1 and comm_platform2:
+            if comm_platform1 == comm_platform2:
+                score += 10
+                reasons.append(f"Both prefer {comm_platform1} for communication")
+            else:
+                score += 3
+                reasons.append("Different communication preferences")
+        else:
+            score += 2
+            reasons.append("Missing communication platform info")
+        
+        return {'score': score, 'max_score': 25, 'reason': '; '.join(reasons)}
+    
+    @staticmethod
+    def _calculate_token_compatibility(tokens1: List[str], tokens2: List[str]) -> dict:
+        """Calculate token interest overlap"""
+        if not tokens1 or not tokens2:
+            return {'score': 5, 'max_score': 20, 'reason': 'Missing token preferences'}
+        
+        overlap = set(tokens1) & set(tokens2)
+        total_unique = set(tokens1) | set(tokens2)
+        
+        if not total_unique:
+            return {'score': 0, 'max_score': 20, 'reason': 'No token preferences specified'}
+        
+        overlap_ratio = len(overlap) / len(total_unique)
+        score = int(20 * overlap_ratio)
+        
+        if len(overlap) >= 3:
+            reason = f"Strong overlap in {len(overlap)} token categories"
+        elif len(overlap) >= 2:
+            reason = f"Good overlap in {len(overlap)} token categories"
+        elif len(overlap) == 1:
+            reason = f"Some overlap in token interests"
+        else:
+            reason = "Different token interests - good for diversification"
+            score = max(score, 5)  # Minimum score for diversity
+        
+        return {'score': score, 'max_score': 20, 'reason': reason}
+    
+    @staticmethod
+    def _calculate_goal_compatibility(goals1: List[str], goals2: List[str]) -> dict:
+        """Calculate goal alignment - complementary goals score higher"""
+        if not goals1 or not goals2:
+            return {'score': 3, 'max_score': 15, 'reason': 'Missing goal information'}
+        
+        # Complementary pairs that work well together
+        complementary_pairs = [
+            ('Learning', 'Teaching'),
+            ('Teaching', 'Learning'),
+            ('Alpha Sharing', 'Alpha Sharing'),
+            ('Research Partner', 'Research Partner'),
+            ('Risk Management', 'Teaching'),
+            ('Networking', 'Networking')
+        ]
+        
+        score = 0
+        reasons = []
+        
+        # Check for perfect complementary matches
+        for goal1 in goals1:
+            for goal2 in goals2:
+                if (goal1, goal2) in complementary_pairs:
+                    score += 8
+                    if goal1 == goal2:
+                        reasons.append(f"Both interested in {goal1}")
+                    else:
+                        reasons.append(f"Perfect match: {goal1} ↔ {goal2}")
+        
+        # Check for any overlap
+        overlap = set(goals1) & set(goals2)
+        if overlap and not reasons:
+            score += len(overlap) * 3
+            reasons.append(f"Shared interests: {', '.join(overlap)}")
+        
+        # Minimum score for having goals
+        if not reasons:
+            score = 2
+            reasons.append("Different goals - potential for diverse perspectives")
+        
+        score = min(score, 15)  # Cap at max score
+        return {'score': score, 'max_score': 15, 'reason': '; '.join(reasons)}
+    
+    @staticmethod
+    def _calculate_style_compatibility(style1: str, style2: str, risk1: str, risk2: str) -> dict:
+        """Calculate trading style and risk compatibility"""
+        score = 0
+        reasons = []
+        
+        # Trading style compatibility (6 points)
+        compatible_styles = {
+            'Day Trader': ['Day Trader', 'Scalper'],
+            'Swing Trader': ['Swing Trader', 'Long-term Investor'],
+            'HODLer': ['HODLer', 'Long-term Investor'],
+            'Scalper': ['Scalper', 'Day Trader'],
+            'Long-term Investor': ['Long-term Investor', 'HODLer', 'Swing Trader'],
+            'Arbitrage': ['Arbitrage', 'Day Trader', 'Scalper']
+        }
+        
+        if style1 and style2:
+            if style1 == style2:
+                score += 6
+                reasons.append(f"Same trading style: {style1}")
+            elif style2 in compatible_styles.get(style1, []):
+                score += 4
+                reasons.append(f"Compatible trading styles")
+            else:
+                score += 2
+                reasons.append("Different trading styles")
+        
+        # Risk tolerance compatibility (4 points)
+        risk_levels = {'Conservative': 1, 'Moderate': 2, 'Aggressive': 3, 'YOLO': 4}
+        
+        if risk1 and risk2:
+            level1 = risk_levels.get(risk1, 0)
+            level2 = risk_levels.get(risk2, 0)
+            
+            if level1 and level2:
+                diff = abs(level1 - level2)
+                if diff == 0:
+                    score += 4
+                    reasons.append(f"Same risk tolerance: {risk1}")
+                elif diff == 1:
+                    score += 3
+                    reasons.append("Similar risk tolerance")
+                else:
+                    score += 1
+                    reasons.append("Different risk tolerance")
+        
+        return {'score': score, 'max_score': 10, 'reason': '; '.join(reasons)}
+    
+    @staticmethod
+    def _calculate_communication_compatibility(comm_style1: str, comm_style2: str, 
+                                             hours1: str, hours2: str) -> dict:
+        """Calculate communication and schedule compatibility"""
+        score = 0
+        reasons = []
+        
+        # Communication style (6 points)
+        if comm_style1 and comm_style2:
+            if comm_style1 == comm_style2:
+                score += 6
+                reasons.append(f"Same communication style: {comm_style1}")
+            else:
+                compatible_pairs = [
+                    ('Professional', 'Technical'),
+                    ('Technical', 'Professional'),
+                    ('Casual', 'Friendly'),
+                    ('Friendly', 'Casual')
+                ]
+                if (comm_style1, comm_style2) in compatible_pairs:
+                    score += 4
+                    reasons.append("Compatible communication styles")
+                else:
+                    score += 2
+                    reasons.append("Different communication styles")
+        
+        # Trading hours compatibility (4 points)
+        if hours1 and hours2:
+            if hours1 == hours2:
+                score += 4
+                reasons.append(f"Same trading hours: {hours1}")
+            elif hours1 == '24/7' or hours2 == '24/7':
+                score += 3
+                reasons.append("Flexible trading hours")
+            else:
+                # Check for overlapping time periods
+                overlap_score = 2
+                score += overlap_score
+                reasons.append("Different trading hours")
+        
+        return {'score': score, 'max_score': 10, 'reason': '; '.join(reasons)}
+    
+    @staticmethod
+    def _generate_recommendations(breakdown: dict, user1: dict, user2: dict) -> List[str]:
+        """Generate AI recommendations based on compatibility analysis"""
+        recommendations = []
+        
+        # Experience-based recommendations
+        exp_score = breakdown.get('experience', {}).get('score', 0)
+        if exp_score >= 18:
+            recommendations.append("🎯 Perfect for mentoring or peer collaboration")
+        elif exp_score >= 15:
+            recommendations.append("📈 Great match for skill development")
+        
+        # Platform-based recommendations
+        platform_score = breakdown.get('platform', {}).get('score', 0)
+        if platform_score >= 20:
+            recommendations.append("🔗 Same platforms - easy to share strategies")
+        elif platform_score >= 15:
+            recommendations.append("⚡ Compatible trading setup")
+        
+        # Token-based recommendations
+        token_score = breakdown.get('tokens', {}).get('score', 0)
+        if token_score >= 15:
+            recommendations.append("💎 Strong shared interest in token categories")
+        elif token_score <= 5:
+            recommendations.append("🌐 Different interests - great for diversification")
+        
+        # Goal-based recommendations
+        goal_score = breakdown.get('goals', {}).get('score', 0)
+        if goal_score >= 12:
+            recommendations.append("🤝 Perfectly aligned trading goals")
+        elif goal_score >= 8:
+            recommendations.append("📚 Complementary learning objectives")
+        
+        if not recommendations:
+            recommendations.append("🔍 Potential for unique trading perspectives")
+        
+        return recommendations[:3]  # Limit to top 3 recommendations
+
 # WebSocket connection manager
 class ConnectionManager:
     def __init__(self):
@@ -472,6 +825,43 @@ async def update_user_profile(user_id: str, profile_data: dict):
     )
     
     return {"message": "Profile updated successfully"}
+
+@app.get("/api/ai-recommendations/{user_id}")
+async def get_ai_recommendations(user_id: str, limit: int = 10):
+    """Get AI-recommended matches for a user"""
+    current_user = users_collection.find_one({"user_id": user_id})
+    if not current_user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    if not current_user.get('profile_complete'):
+        raise HTTPException(status_code=400, detail="Profile must be complete to get AI recommendations")
+    
+    # Get users already swiped on
+    swiped_user_ids = [doc["target_id"] for doc in swipes_collection.find({"swiper_id": user_id})]
+    swiped_user_ids.append(user_id)  # Exclude self
+    
+    # Find all potential matches with complete profiles
+    potential_matches = list(users_collection.find({
+        "user_id": {"$nin": swiped_user_ids},
+        "profile_complete": True
+    }))
+    
+    # Calculate AI compatibility scores for each potential match
+    scored_matches = []
+    for match in potential_matches:
+        match.pop('_id', None)
+        compatibility = AIMatchingService.calculate_compatibility_score(current_user, match)
+        
+        scored_matches.append({
+            **match,
+            'ai_compatibility': compatibility
+        })
+    
+    # Sort by compatibility score (highest first)
+    scored_matches.sort(key=lambda x: x['ai_compatibility']['compatibility_percentage'], reverse=True)
+    
+    # Return top matches
+    return scored_matches[:limit]
 
 @app.get("/api/discover/{user_id}")
 async def discover_users(user_id: str, limit: int = 10):
