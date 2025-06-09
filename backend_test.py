@@ -438,6 +438,7 @@ def main():
     if tester.test_user_id:
         tester.test_get_user()
         tester.test_update_user()
+        tester.test_profile_completion_validation()
         tester.test_discover_users()
         tester.test_swipe_action()
         
