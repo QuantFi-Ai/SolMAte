@@ -276,6 +276,8 @@ class SolMatchAPITester:
                 "favorite_project": "Tensor - best NFT trading platform",
                 "trading_hours": "24/7",
                 "communication_style": "Casual",
+                "preferred_communication_platform": "Twitter DM",
+                "preferred_trading_platform": "Birdeye",
                 "looking_for": ["Learning", "Networking"],
                 "profile_complete": True,
                 "created_at": datetime.utcnow().isoformat(),
