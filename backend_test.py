@@ -91,18 +91,28 @@ class SolMatchAPITester:
         user_id = str(uuid.uuid4())
         twitter_id = f"test_twitter_{int(datetime.now().timestamp())}"
         
-        # Create user data
+        # Create user data with enhanced profile fields
         user_data = {
             "user_id": user_id,
             "twitter_id": twitter_id,
             "username": f"test_user_{int(datetime.now().timestamp())}",
             "display_name": "Test User",
-            "avatar_url": "https://via.placeholder.com/400",
+            "avatar_url": "https://images.pexels.com/photos/31610834/pexels-photo-31610834.jpeg",
             "bio": "This is a test user for API testing",
+            "location": "San Francisco, CA",
             "trading_experience": "Intermediate",
+            "years_trading": 3,
             "preferred_tokens": ["Meme Coins", "DeFi"],
             "trading_style": "Day Trader",
             "portfolio_size": "$1K-$10K",
+            "risk_tolerance": "Moderate",
+            "best_trade": "Bought SOL at $20, sold at $200",
+            "worst_trade": "Lost 50% on a meme coin rugpull",
+            "favorite_project": "Jupiter - best DEX aggregator",
+            "trading_hours": "Evening",
+            "communication_style": "Technical",
+            "looking_for": ["Alpha Sharing", "Research Partner"],
+            "profile_complete": True,
             "created_at": datetime.utcnow().isoformat(),
             "last_active": datetime.utcnow().isoformat()
         }
