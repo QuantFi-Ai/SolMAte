@@ -818,16 +818,16 @@ function App() {
           <div className="flex items-center space-x-3">
             <button
               onClick={handleEditProfile}
-              className="text-gray-600 hover:text-black text-sm"
+              className="group flex items-center space-x-2 hover:bg-gray-50 px-2 py-1 rounded-lg transition-all"
+              title="Click to edit profile"
             >
-              Edit Profile
+              <img
+                src={currentUser?.avatar_url}
+                alt="Profile"
+                className="w-8 h-8 rounded-full border-2 border-gray-300 group-hover:border-gray-400 transition-all"
+              />
+              <span className="text-black font-medium group-hover:text-gray-700">{currentUser?.display_name}</span>
             </button>
-            <img
-              src={currentUser?.avatar_url}
-              alt="Profile"
-              className="w-8 h-8 rounded-full border-2 border-gray-300"
-            />
-            <span className="text-black font-medium">{currentUser?.display_name}</span>
           </div>
         </div>
       </nav>
