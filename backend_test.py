@@ -383,6 +383,8 @@ class SolMatchAPITester:
                 "favorite_project": "Phantom wallet - so easy to use",
                 "trading_hours": "Morning",
                 "communication_style": "Friendly",
+                "preferred_communication_platform": "WhatsApp",
+                "preferred_trading_platform": "Photon",
                 "looking_for": ["Learning", "Teaching"],
                 "profile_complete": True,
                 "created_at": datetime.utcnow().isoformat(),
