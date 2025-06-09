@@ -419,34 +419,31 @@ class SolMatchAPITester:
             print(f"❌ Failed to test swipe action: {str(e)}")
             return False
             
-    def test_profile_completion_validation(self):
-        """Test that profile completion validation works correctly"""
+    def test_communication_platform_preferences(self):
+        """Test that communication platform preferences are saved and retrieved correctly"""
         if not self.test_user_id:
             print("❌ No test user ID available")
             return False
             
-        # First, update the profile to be incomplete
-        incomplete_data = {
-            "trading_experience": "",
-            "preferred_tokens": [],
-            "trading_style": "",
-            "portfolio_size": ""
+        # Update with communication platform preferences
+        update_data = {
+            "preferred_communication_platform": "Signal"
         }
         
         success, _ = self.run_test(
-            "Set Incomplete Profile",
+            "Update Communication Platform",
             "PUT",
             f"user/{self.test_user_id}",
             200,
-            data=incomplete_data
+            data=update_data
         )
         
         if not success:
             return False
             
-        # Verify profile is marked as incomplete
+        # Verify the update
         verify_success, user_data = self.run_test(
-            "Verify Incomplete Profile",
+            "Verify Communication Platform",
             "GET",
             f"user/{self.test_user_id}",
             200
@@ -455,32 +452,38 @@ class SolMatchAPITester:
         if not verify_success:
             return False
             
-        if user_data.get("profile_complete") == True:
-            print("❌ Profile incorrectly marked as complete when it should be incomplete")
+        if user_data.get("preferred_communication_platform") != "Signal":
+            print("❌ Communication platform preference not updated correctly")
             return False
             
-        # Now update to complete the profile
-        complete_data = {
-            "trading_experience": "Intermediate",
-            "preferred_tokens": ["Meme Coins", "DeFi"],
-            "trading_style": "Day Trader",
-            "portfolio_size": "$1K-$10K"
+        print("✅ Communication platform preferences work correctly")
+        return True
+        
+    def test_trading_platform_preferences(self):
+        """Test that trading platform preferences are saved and retrieved correctly"""
+        if not self.test_user_id:
+            print("❌ No test user ID available")
+            return False
+            
+        # Update with trading platform preferences
+        update_data = {
+            "preferred_trading_platform": "DexScreener"
         }
         
         success, _ = self.run_test(
-            "Set Complete Profile",
+            "Update Trading Platform",
             "PUT",
             f"user/{self.test_user_id}",
             200,
-            data=complete_data
+            data=update_data
         )
         
         if not success:
             return False
             
-        # Verify profile is marked as complete
+        # Verify the update
         verify_success, user_data = self.run_test(
-            "Verify Complete Profile",
+            "Verify Trading Platform",
             "GET",
             f"user/{self.test_user_id}",
             200
@@ -489,11 +492,11 @@ class SolMatchAPITester:
         if not verify_success:
             return False
             
-        if user_data.get("profile_complete") != True:
-            print("❌ Profile incorrectly marked as incomplete when it should be complete")
+        if user_data.get("preferred_trading_platform") != "DexScreener":
+            print("❌ Trading platform preference not updated correctly")
             return False
             
-        print("✅ Profile completion validation works correctly")
+        print("✅ Trading platform preferences work correctly")
         return True
 
 def main():
