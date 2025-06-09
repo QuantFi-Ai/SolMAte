@@ -102,6 +102,24 @@ class ChatMessage(BaseModel):
     content: str
     timestamp: datetime
 
+class TradingHighlight(BaseModel):
+    user_id: str
+    title: str
+    description: str
+    image_data: str  # base64 encoded image
+    highlight_type: str  # "pnl_screenshot", "achievement", "trade_analysis", "portfolio"
+    date_achieved: str
+    profit_loss: Optional[str] = ""
+    percentage_gain: Optional[str] = ""
+
+class SocialLinks(BaseModel):
+    user_id: str
+    twitter: Optional[str] = ""
+    discord: Optional[str] = ""
+    telegram: Optional[str] = ""
+    website: Optional[str] = ""
+    linkedin: Optional[str] = ""
+
 # AI Matching Algorithm
 class AIMatchingService:
     @staticmethod
