@@ -155,6 +155,26 @@ function App() {
     window.location.href = `${API_BASE_URL}/api/login/twitter`;
   };
 
+  const handleDemoLogin = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/create-demo-user`, {
+        method: 'POST'
+      });
+      const demoUser = await response.json();
+      setCurrentUser(demoUser);
+      setProfileForm({
+        bio: demoUser.bio || '',
+        trading_experience: demoUser.trading_experience || '',
+        preferred_tokens: demoUser.preferred_tokens || [],
+        trading_style: demoUser.trading_style || '',
+        portfolio_size: demoUser.portfolio_size || ''
+      });
+      setCurrentView('profile-setup');
+    } catch (error) {
+      console.error('Error creating demo user:', error);
+    }
+  };
+
   const handleSwipe = async (action) => {
     if (currentCardIndex >= discoveryCards.length) return;
     
