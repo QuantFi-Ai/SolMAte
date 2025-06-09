@@ -167,7 +167,79 @@ async def twitter_callback(request: Request):
     except Exception as e:
         return RedirectResponse(url=f"{request.base_url.replace(request.base_url.path, '')}?auth_error=true")
 
-@app.get("/api/user/{user_id}")
+@app.post("/api/create-demo-user")
+async def create_demo_user():
+    """Create a demo user for testing purposes"""
+    demo_user_data = {
+        "user_id": str(uuid.uuid4()),
+        "twitter_id": f"demo_{int(datetime.utcnow().timestamp())}",
+        "username": f"demo_trader_{int(datetime.utcnow().timestamp())}",
+        "display_name": "Demo Solana Trader",
+        "avatar_url": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face",
+        "bio": "Demo trader looking for trenching buddies! 🚀",
+        "trading_experience": "",
+        "preferred_tokens": [],
+        "trading_style": "",
+        "portfolio_size": "",
+        "created_at": datetime.utcnow(),
+        "last_active": datetime.utcnow()
+    }
+    
+    # Insert demo user
+    users_collection.insert_one(demo_user_data)
+    
+    # Create some demo potential matches
+    demo_matches = [
+        {
+            "user_id": str(uuid.uuid4()),
+            "twitter_id": f"demo_match_1_{int(datetime.utcnow().timestamp())}",
+            "username": "crypto_whale_2024",
+            "display_name": "Alex Chen",
+            "avatar_url": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face",
+            "bio": "DeFi enthusiast and meme coin hunter. Let's find the next 100x together! 💎",
+            "trading_experience": "Advanced",
+            "preferred_tokens": ["Meme Coins", "DeFi", "Layer 1s"],
+            "trading_style": "Day Trader",
+            "portfolio_size": "$10K-$100K",
+            "created_at": datetime.utcnow(),
+            "last_active": datetime.utcnow()
+        },
+        {
+            "user_id": str(uuid.uuid4()),
+            "twitter_id": f"demo_match_2_{int(datetime.utcnow().timestamp())}",
+            "username": "sol_degen_pro",
+            "display_name": "Sarah Johnson",
+            "avatar_url": "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop&crop=face",
+            "bio": "Solana maximalist and NFT collector. Looking for diamond hands only! 💪",
+            "trading_experience": "Expert",
+            "preferred_tokens": ["NFTs", "GameFi", "Blue Chips"],
+            "trading_style": "Swing Trader",
+            "portfolio_size": "$100K+",
+            "created_at": datetime.utcnow(),
+            "last_active": datetime.utcnow()
+        },
+        {
+            "user_id": str(uuid.uuid4()),
+            "twitter_id": f"demo_match_3_{int(datetime.utcnow().timestamp())}",
+            "username": "moon_hunter_99",
+            "display_name": "Mike Rodriguez",
+            "avatar_url": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face",
+            "bio": "Beginner trader learning the ropes. Let's grow together and share insights! 📈",
+            "trading_experience": "Beginner",
+            "preferred_tokens": ["Meme Coins", "AI Tokens"],
+            "trading_style": "HODLer",
+            "portfolio_size": "Under $1K",
+            "created_at": datetime.utcnow(),
+            "last_active": datetime.utcnow()
+        }
+    ]
+    
+    # Insert demo matches
+    for match in demo_matches:
+        users_collection.insert_one(match)
+    
+    demo_user_data.pop('_id', None)
+    return demo_user_data
 async def get_user(user_id: str):
     """Get user profile"""
     user = users_collection.find_one({"user_id": user_id})
