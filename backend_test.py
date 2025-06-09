@@ -162,10 +162,19 @@ class SolMatchAPITester:
             
         update_data = {
             "bio": "Updated bio for testing",
+            "location": "New York, NY",
             "trading_experience": "Expert",
-            "preferred_tokens": ["Blue Chips", "NFTs"],
+            "years_trading": 5,
+            "preferred_tokens": ["Blue Chips", "NFTs", "AI Tokens"],
             "trading_style": "HODLer",
-            "portfolio_size": "$100K+"
+            "portfolio_size": "$100K+",
+            "risk_tolerance": "Aggressive",
+            "best_trade": "Updated best trade story",
+            "worst_trade": "Updated worst trade story",
+            "favorite_project": "Magic Eden - best NFT marketplace",
+            "trading_hours": "Night Owl",
+            "communication_style": "Professional",
+            "looking_for": ["Teaching", "Risk Management"]
         }
         
         success, response = self.run_test(
