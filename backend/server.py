@@ -1,8 +1,9 @@
 import os
 import uuid
+import base64
 from datetime import datetime
 from typing import List, Optional
-from fastapi import FastAPI, HTTPException, Request, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, HTTPException, Request, WebSocket, WebSocketDisconnect, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 from pydantic import BaseModel
@@ -22,6 +23,7 @@ users_collection = db.users
 matches_collection = db.matches
 messages_collection = db.messages
 swipes_collection = db.swipes
+profile_images_collection = db.profile_images
 
 # FastAPI app
 app = FastAPI(title="SolMatch API", version="1.0.0")
@@ -62,6 +64,9 @@ class UserProfile(BaseModel):
     avatar_url: str
     bio: str = ""
     location: str = ""
+    # Twitter settings
+    show_twitter: bool = True
+    twitter_username: str = ""
     # Trading experience
     trading_experience: str  # "Beginner", "Intermediate", "Advanced", "Expert"
     years_trading: int = 0
@@ -168,6 +173,8 @@ async def twitter_callback(request: Request):
                 "avatar_url": twitter_user['profile_image_url_https'].replace('_normal', '_400x400'),
                 "bio": twitter_user.get('description', ''),
                 "location": "",
+                "show_twitter": True,
+                "twitter_username": twitter_user['screen_name'],
                 "trading_experience": "",
                 "years_trading": 0,
                 "preferred_tokens": [],
@@ -195,6 +202,64 @@ async def twitter_callback(request: Request):
     except Exception as e:
         return RedirectResponse(url=f"{request.base_url.replace(request.base_url.path, '')}?auth_error=true")
 
+@app.post("/api/upload-profile-image/{user_id}")
+async def upload_profile_image(user_id: str, file: UploadFile = File(...)):
+    """Upload a profile image for a user"""
+    try:
+        # Validate user exists
+        user = users_collection.find_one({"user_id": user_id})
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        # Validate file type
+        if not file.content_type.startswith('image/'):
+            raise HTTPException(status_code=400, detail="File must be an image")
+        
+        # Read and encode the image
+        contents = await file.read()
+        
+        # Store image in database (for simplicity - in production, use cloud storage)
+        image_data = {
+            "image_id": str(uuid.uuid4()),
+            "user_id": user_id,
+            "filename": file.filename,
+            "content_type": file.content_type,
+            "data": base64.b64encode(contents).decode('utf-8'),
+            "uploaded_at": datetime.utcnow()
+        }
+        profile_images_collection.insert_one(image_data)
+        
+        # Update user's avatar URL to point to our image endpoint
+        new_avatar_url = f"{os.environ.get('REACT_APP_BACKEND_URL', 'https://b455855f-f3ef-4faa-b146-fcff2737404b.preview.emergentagent.com')}/api/profile-image/{image_data['image_id']}"
+        
+        users_collection.update_one(
+            {"user_id": user_id},
+            {"$set": {"avatar_url": new_avatar_url, "last_active": datetime.utcnow()}}
+        )
+        
+        return {"message": "Profile image uploaded successfully", "image_id": image_data['image_id']}
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to upload image: {str(e)}")
+
+@app.get("/api/profile-image/{image_id}")
+async def get_profile_image(image_id: str):
+    """Get a profile image by ID"""
+    from fastapi.responses import Response
+    
+    image_data = profile_images_collection.find_one({"image_id": image_id})
+    if not image_data:
+        raise HTTPException(status_code=404, detail="Image not found")
+    
+    # Decode the base64 image data
+    image_bytes = base64.b64decode(image_data['data'])
+    
+    return Response(
+        content=image_bytes,
+        media_type=image_data['content_type'],
+        headers={"Cache-Control": "public, max-age=3600"}
+    )
+
 @app.post("/api/create-demo-user")
 async def create_demo_user():
     """Create a demo user for testing purposes"""
@@ -215,6 +280,8 @@ async def create_demo_user():
         "avatar_url": demo_avatars[0],
         "bio": "Demo trader looking for trenching buddies! 🚀",
         "location": "",
+        "show_twitter": False,
+        "twitter_username": "",
         "trading_experience": "",
         "years_trading": 0,
         "preferred_tokens": [],
@@ -247,6 +314,8 @@ async def create_demo_user():
             "avatar_url": demo_avatars[1],
             "bio": "DeFi enthusiast and meme coin hunter. Let's find the next 100x together! 💎",
             "location": "San Francisco, CA",
+            "show_twitter": True,
+            "twitter_username": "crypto_whale_2024",
             "trading_experience": "Advanced",
             "years_trading": 4,
             "preferred_tokens": ["Meme Coins", "DeFi", "Layer 1s"],
@@ -273,6 +342,8 @@ async def create_demo_user():
             "avatar_url": demo_avatars[2],
             "bio": "Solana maximalist and NFT collector. Looking for diamond hands only! 💪",
             "location": "New York, NY",
+            "show_twitter": True,
+            "twitter_username": "sol_degen_pro",
             "trading_experience": "Expert",
             "years_trading": 6,
             "preferred_tokens": ["NFTs", "GameFi", "Blue Chips"],
@@ -299,6 +370,8 @@ async def create_demo_user():
             "avatar_url": demo_avatars[3],
             "bio": "Beginner trader learning the ropes. Let's grow together and share insights! 📈",
             "location": "Austin, TX",
+            "show_twitter": False,
+            "twitter_username": "moon_hunter_99",
             "trading_experience": "Beginner",
             "years_trading": 1,
             "preferred_tokens": ["Meme Coins", "AI Tokens"],
@@ -325,6 +398,8 @@ async def create_demo_user():
             "avatar_url": demo_avatars[4],
             "bio": "MEV bot developer and yield farmer. Always hunting for alpha opportunities! ⚡",
             "location": "Seoul, South Korea",
+            "show_twitter": True,
+            "twitter_username": "defi_alpha_king",
             "trading_experience": "Expert",
             "years_trading": 5,
             "preferred_tokens": ["DeFi", "Infrastructure", "Layer 1s"],
@@ -372,7 +447,7 @@ async def update_user_profile(user_id: str, profile_data: dict):
     
     # Update allowed fields
     allowed_fields = [
-        "bio", "location", "trading_experience", "years_trading", "preferred_tokens", 
+        "bio", "location", "show_twitter", "twitter_username", "trading_experience", "years_trading", "preferred_tokens", 
         "trading_style", "portfolio_size", "risk_tolerance", "best_trade", "worst_trade",
         "favorite_project", "trading_hours", "communication_style", "preferred_communication_platform",
         "preferred_trading_platform", "looking_for"

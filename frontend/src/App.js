@@ -14,9 +14,12 @@ function App() {
   const [newMessage, setNewMessage] = useState('');
   const [ws, setWs] = useState(null);
   const [showMatchModal, setShowMatchModal] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [profileForm, setProfileForm] = useState({
     bio: '',
     location: '',
+    show_twitter: true,
+    twitter_username: '',
     trading_experience: '',
     years_trading: 0,
     preferred_tokens: [],
@@ -34,6 +37,7 @@ function App() {
   });
 
   const messagesEndRef = useRef(null);
+  const fileInputRef = useRef(null);
 
   // Enhanced trading options
   const EXPERIENCE_OPTIONS = ['Beginner', 'Intermediate', 'Advanced', 'Expert'];
@@ -135,6 +139,8 @@ function App() {
         setProfileForm({
           bio: user.bio || '',
           location: user.location || '',
+          show_twitter: user.show_twitter !== undefined ? user.show_twitter : true,
+          twitter_username: user.twitter_username || '',
           trading_experience: user.trading_experience || '',
           years_trading: user.years_trading || 0,
           preferred_tokens: user.preferred_tokens || [],
@@ -206,6 +212,8 @@ function App() {
       setProfileForm({
         bio: demoUser.bio || '',
         location: demoUser.location || '',
+        show_twitter: demoUser.show_twitter !== undefined ? demoUser.show_twitter : false,
+        twitter_username: demoUser.twitter_username || '',
         trading_experience: demoUser.trading_experience || '',
         years_trading: demoUser.years_trading || 0,
         preferred_tokens: demoUser.preferred_tokens || [],
@@ -224,6 +232,54 @@ function App() {
       setCurrentView('profile-setup');
     } catch (error) {
       console.error('Error creating demo user:', error);
+    }
+  };
+
+  const handleFileUpload = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      alert('Please select an image file');
+      return;
+    }
+
+    // Validate file size (5MB limit)
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Image must be smaller than 5MB');
+      return;
+    }
+
+    setUploading(true);
+    
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await fetch(`${API_BASE_URL}/api/upload-profile-image/${currentUser.user_id}`, {
+        method: 'POST',
+        body: formData
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to upload image');
+      }
+
+      const result = await response.json();
+      
+      // Update current user with new avatar URL
+      const updatedUser = await fetch(`${API_BASE_URL}/api/user/${currentUser.user_id}`);
+      const userData = await updatedUser.json();
+      setCurrentUser(userData);
+      
+      alert('Profile picture updated successfully!');
+      
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      alert('Failed to upload image. Please try again.');
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -291,6 +347,8 @@ function App() {
     setProfileForm({
       bio: currentUser.bio || '',
       location: currentUser.location || '',
+      show_twitter: currentUser.show_twitter !== undefined ? currentUser.show_twitter : true,
+      twitter_username: currentUser.twitter_username || '',
       trading_experience: currentUser.trading_experience || '',
       years_trading: currentUser.years_trading || 0,
       preferred_tokens: currentUser.preferred_tokens || [],
@@ -396,6 +454,45 @@ function App() {
                 </button>
               )}
             </div>
+
+            {/* Profile Picture Upload Section */}
+            <div className="mb-8 p-6 bg-gray-50 rounded-2xl">
+              <h3 className="text-lg font-semibold text-black mb-4">Profile Picture</h3>
+              <div className="flex items-center space-x-6">
+                <div className="relative">
+                  <img
+                    src={currentUser?.avatar_url}
+                    alt="Profile"
+                    className="w-24 h-24 rounded-full object-cover border-4 border-white shadow-lg"
+                  />
+                  {uploading && (
+                    <div className="absolute inset-0 bg-black bg-opacity-50 rounded-full flex items-center justify-center">
+                      <div className="loading-spinner"></div>
+                    </div>
+                  )}
+                </div>
+                <div className="flex-1">
+                  <p className="text-gray-600 mb-3">Upload a professional photo that represents you as a trader</p>
+                  <div className="flex space-x-3">
+                    <button
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={uploading}
+                      className="bg-black hover:bg-gray-800 disabled:opacity-50 text-white font-medium py-2 px-4 rounded-lg transition-all"
+                    >
+                      {uploading ? 'Uploading...' : 'Upload New Photo'}
+                    </button>
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      onChange={handleFileUpload}
+                      accept="image/*"
+                      className="hidden"
+                    />
+                  </div>
+                  <p className="text-xs text-gray-500 mt-2">JPG, PNG or GIF. Max size 5MB.</p>
+                </div>
+              </div>
+            </div>
             
             <form onSubmit={handleProfileUpdate} className="space-y-8">
               {/* Basic Info */}
@@ -421,6 +518,42 @@ function App() {
                     placeholder="e.g., San Francisco, CA"
                   />
                 </div>
+              </div>
+
+              {/* Twitter Settings */}
+              <div className="p-6 bg-blue-50 rounded-2xl">
+                <h3 className="text-lg font-semibold text-black mb-4">Twitter Settings</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-black font-medium mb-2">Twitter Username</label>
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">@</span>
+                      <input
+                        type="text"
+                        value={profileForm.twitter_username}
+                        onChange={(e) => setProfileForm(prev => ({ ...prev, twitter_username: e.target.value }))}
+                        className="w-full border border-gray-300 rounded-xl pl-8 pr-4 py-3 text-black placeholder-gray-500 focus:ring-2 focus:ring-black focus:border-transparent"
+                        placeholder="your_twitter_handle"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center space-x-3">
+                    <input
+                      type="checkbox"
+                      id="show_twitter"
+                      checked={profileForm.show_twitter}
+                      onChange={(e) => setProfileForm(prev => ({ ...prev, show_twitter: e.target.checked }))}
+                      className="w-4 h-4 text-black bg-gray-100 border-gray-300 rounded focus:ring-black focus:ring-2"
+                    />
+                    <label htmlFor="show_twitter" className="text-black font-medium">
+                      Show Twitter account to other traders
+                    </label>
+                  </div>
+                </div>
+                <p className="text-sm text-gray-600 mt-3">
+                  Displaying your Twitter helps other traders verify your identity and connect with you outside the platform.
+                </p>
               </div>
 
               {/* Trading Experience */}
@@ -714,8 +847,16 @@ function App() {
                   <h3 className="text-2xl font-bold text-white">
                     {discoveryCards[currentCardIndex]?.display_name}
                   </h3>
-                  <p className="text-white/80">@{discoveryCards[currentCardIndex]?.username}</p>
-                  <p className="text-white/90 text-sm mt-1">{discoveryCards[currentCardIndex]?.location}</p>
+                  <div className="flex items-center space-x-2 mt-1">
+                    {discoveryCards[currentCardIndex]?.show_twitter && discoveryCards[currentCardIndex]?.twitter_username && (
+                      <p className="text-blue-300 text-sm">
+                        🐦 @{discoveryCards[currentCardIndex]?.twitter_username}
+                      </p>
+                    )}
+                    {discoveryCards[currentCardIndex]?.location && (
+                      <p className="text-white/90 text-sm">📍 {discoveryCards[currentCardIndex]?.location}</p>
+                    )}
+                  </div>
                 </div>
               </div>
               
@@ -762,7 +903,7 @@ function App() {
                         <div className="flex items-center space-x-2">
                           <span className="text-sm font-medium text-gray-500">Prefers:</span>
                           <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">
-                            {discoveryCards[currentCardIndex]?.preferred_communication_platform}
+                            📱 {discoveryCards[currentCardIndex]?.preferred_communication_platform}
                           </span>
                         </div>
                       )}
@@ -771,7 +912,7 @@ function App() {
                         <div className="flex items-center space-x-2">
                           <span className="text-sm font-medium text-gray-500">Trades on:</span>
                           <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">
-                            {discoveryCards[currentCardIndex]?.preferred_trading_platform}
+                            ⚡ {discoveryCards[currentCardIndex]?.preferred_trading_platform}
                           </span>
                         </div>
                       )}
@@ -880,12 +1021,18 @@ function App() {
                       <h3 className="text-black font-semibold text-lg">
                         {match.other_user.display_name}
                       </h3>
-                      <p className="text-gray-600">@{match.other_user.username}</p>
-                      {match.other_user.preferred_communication_platform && (
-                        <p className="text-xs text-blue-600">
-                          📱 {match.other_user.preferred_communication_platform}
-                        </p>
-                      )}
+                      <div className="space-y-1">
+                        {match.other_user.show_twitter && match.other_user.twitter_username && (
+                          <p className="text-xs text-blue-600">
+                            🐦 @{match.other_user.twitter_username}
+                          </p>
+                        )}
+                        {match.other_user.preferred_communication_platform && (
+                          <p className="text-xs text-blue-600">
+                            📱 {match.other_user.preferred_communication_platform}
+                          </p>
+                        )}
+                      </div>
                     </div>
                   </div>
                   
@@ -937,6 +1084,9 @@ function App() {
                   </h3>
                   <p className="text-gray-600 text-sm">
                     {selectedMatch.other_user.trading_style} • {selectedMatch.other_user.trading_experience}
+                    {selectedMatch.other_user.show_twitter && selectedMatch.other_user.twitter_username && 
+                      ` • 🐦 @${selectedMatch.other_user.twitter_username}`
+                    }
                     {selectedMatch.other_user.preferred_communication_platform && 
                       ` • 📱 ${selectedMatch.other_user.preferred_communication_platform}`
                     }
