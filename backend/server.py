@@ -240,6 +240,7 @@ async def create_demo_user():
     
     demo_user_data.pop('_id', None)
     return demo_user_data
+@app.get("/api/user/{user_id}")
 async def get_user(user_id: str):
     """Get user profile"""
     user = users_collection.find_one({"user_id": user_id})
