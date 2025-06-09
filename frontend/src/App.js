@@ -55,8 +55,13 @@ function App() {
   // Setup WebSocket when user is logged in
   useEffect(() => {
     if (currentUser && !ws) {
-      const wsUrl = API_BASE_URL.replace('http', 'ws') + `/api/ws/${currentUser.user_id}`;
+      // Convert HTTPS URL to WSS for WebSocket
+      const wsUrl = API_BASE_URL.replace('https://', 'wss://') + `/api/ws/${currentUser.user_id}`;
       const websocket = new WebSocket(wsUrl);
+      
+      websocket.onopen = () => {
+        console.log('WebSocket connected');
+      };
       
       websocket.onmessage = (event) => {
         const data = JSON.parse(event.data);
@@ -66,6 +71,14 @@ function App() {
         } else if (data.type === 'chat_message') {
           setMessages(prev => [...prev, data.message]);
         }
+      };
+      
+      websocket.onerror = (error) => {
+        console.error('WebSocket error:', error);
+      };
+      
+      websocket.onclose = () => {
+        console.log('WebSocket disconnected');
       };
       
       setWs(websocket);
