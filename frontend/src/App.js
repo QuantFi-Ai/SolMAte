@@ -28,6 +28,8 @@ function App() {
     favorite_project: '',
     trading_hours: '',
     communication_style: '',
+    preferred_communication_platform: '',
+    preferred_trading_platform: '',
     looking_for: []
   });
 
@@ -41,6 +43,8 @@ function App() {
   const RISK_OPTIONS = ['Conservative', 'Moderate', 'Aggressive', 'YOLO'];
   const HOURS_OPTIONS = ['Early Morning', 'Morning', 'Afternoon', 'Evening', 'Night Owl', '24/7'];
   const COMMUNICATION_OPTIONS = ['Casual', 'Professional', 'Technical', 'Friendly'];
+  const COMMUNICATION_PLATFORM_OPTIONS = ['Discord', 'Telegram', 'Twitter DM', 'Signal', 'WhatsApp', 'In-App Only'];
+  const TRADING_PLATFORM_OPTIONS = ['Axiom', 'BullX', 'Photon', 'Padre', 'Jupiter', 'Raydium', 'Birdeye', 'DexScreener', 'Other'];
   const LOOKING_FOR_OPTIONS = ['Learning', 'Teaching', 'Alpha Sharing', 'Research Partner', 'Risk Management', 'Networking'];
 
   // Handle auth callback on page load
@@ -142,6 +146,8 @@ function App() {
           favorite_project: user.favorite_project || '',
           trading_hours: user.trading_hours || '',
           communication_style: user.communication_style || '',
+          preferred_communication_platform: user.preferred_communication_platform || '',
+          preferred_trading_platform: user.preferred_trading_platform || '',
           looking_for: user.looking_for || []
         });
         setCurrentView('profile-setup');
@@ -211,6 +217,8 @@ function App() {
         favorite_project: demoUser.favorite_project || '',
         trading_hours: demoUser.trading_hours || '',
         communication_style: demoUser.communication_style || '',
+        preferred_communication_platform: demoUser.preferred_communication_platform || '',
+        preferred_trading_platform: demoUser.preferred_trading_platform || '',
         looking_for: demoUser.looking_for || []
       });
       setCurrentView('profile-setup');
@@ -264,12 +272,41 @@ function App() {
       
       // Update current user state
       setCurrentUser(prev => ({ ...prev, ...profileForm, profile_complete: true }));
-      setCurrentView('discover');
-      fetchDiscoveryCards();
-      fetchMatches();
+      
+      // Determine where to go next
+      if (currentView === 'profile-edit') {
+        setCurrentView('discover'); // Go back to discover after editing
+      } else {
+        setCurrentView('discover'); // First time setup
+        fetchDiscoveryCards();
+        fetchMatches();
+      }
     } catch (error) {
       console.error('Error updating profile:', error);
     }
+  };
+
+  const handleEditProfile = () => {
+    // Load current user data into form
+    setProfileForm({
+      bio: currentUser.bio || '',
+      location: currentUser.location || '',
+      trading_experience: currentUser.trading_experience || '',
+      years_trading: currentUser.years_trading || 0,
+      preferred_tokens: currentUser.preferred_tokens || [],
+      trading_style: currentUser.trading_style || '',
+      portfolio_size: currentUser.portfolio_size || '',
+      risk_tolerance: currentUser.risk_tolerance || '',
+      best_trade: currentUser.best_trade || '',
+      worst_trade: currentUser.worst_trade || '',
+      favorite_project: currentUser.favorite_project || '',
+      trading_hours: currentUser.trading_hours || '',
+      communication_style: currentUser.communication_style || '',
+      preferred_communication_platform: currentUser.preferred_communication_platform || '',
+      preferred_trading_platform: currentUser.preferred_trading_platform || '',
+      looking_for: currentUser.looking_for || []
+    });
+    setCurrentView('profile-edit');
   };
 
   const handleSendMessage = (e) => {
@@ -338,13 +375,27 @@ function App() {
     );
   }
 
-  // Profile Setup View
-  if (currentView === 'profile-setup') {
+  // Profile Setup/Edit View
+  if (currentView === 'profile-setup' || currentView === 'profile-edit') {
+    const isEditing = currentView === 'profile-edit';
+    
     return (
       <div className="min-h-screen bg-gray-50 p-4">
         <div className="max-w-4xl mx-auto">
           <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-lg">
-            <h2 className="text-3xl font-bold text-black mb-6 text-center">Complete Your Trading Profile</h2>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-3xl font-bold text-black">
+                {isEditing ? 'Edit Your Profile' : 'Complete Your Trading Profile'}
+              </h2>
+              {isEditing && (
+                <button
+                  onClick={() => setCurrentView('discover')}
+                  className="text-gray-600 hover:text-black px-4 py-2 rounded-lg transition-all"
+                >
+                  ← Back to Discover
+                </button>
+              )}
+            </div>
             
             <form onSubmit={handleProfileUpdate} className="space-y-8">
               {/* Basic Info */}
@@ -379,9 +430,8 @@ function App() {
                   <select
                     value={profileForm.trading_experience}
                     onChange={(e) => setProfileForm(prev => ({ ...prev, trading_experience: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-xl px-4 py-3 text-black bg-white focus:ring-2 focus:ring-black focus:border-transparent appearance-none"
+                    className="w-full border border-gray-300 rounded-xl px-4 py-3 text-black bg-white focus:ring-2 focus:ring-black focus:border-transparent"
                     required
-                    style={{ backgroundImage: 'none' }}
                   >
                     <option value="">Select experience level</option>
                     {EXPERIENCE_OPTIONS.map(exp => (
@@ -411,9 +461,8 @@ function App() {
                   <select
                     value={profileForm.trading_style}
                     onChange={(e) => setProfileForm(prev => ({ ...prev, trading_style: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-xl px-4 py-3 text-black bg-white focus:ring-2 focus:ring-black focus:border-transparent appearance-none"
+                    className="w-full border border-gray-300 rounded-xl px-4 py-3 text-black bg-white focus:ring-2 focus:ring-black focus:border-transparent"
                     required
-                    style={{ backgroundImage: 'none' }}
                   >
                     <option value="">Select trading style</option>
                     {STYLE_OPTIONS.map(style => (
@@ -427,9 +476,8 @@ function App() {
                   <select
                     value={profileForm.portfolio_size}
                     onChange={(e) => setProfileForm(prev => ({ ...prev, portfolio_size: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-xl px-4 py-3 text-black bg-white focus:ring-2 focus:ring-black focus:border-transparent appearance-none"
+                    className="w-full border border-gray-300 rounded-xl px-4 py-3 text-black bg-white focus:ring-2 focus:ring-black focus:border-transparent"
                     required
-                    style={{ backgroundImage: 'none' }}
                   >
                     <option value="">Select portfolio size</option>
                     {PORTFOLIO_OPTIONS.map(size => (
@@ -446,7 +494,7 @@ function App() {
                   <select
                     value={profileForm.risk_tolerance}
                     onChange={(e) => setProfileForm(prev => ({ ...prev, risk_tolerance: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-xl px-4 py-3 text-black focus:ring-2 focus:ring-black focus:border-transparent"
+                    className="w-full border border-gray-300 rounded-xl px-4 py-3 text-black bg-white focus:ring-2 focus:ring-black focus:border-transparent"
                   >
                     <option value="">Select risk tolerance</option>
                     {RISK_OPTIONS.map(risk => (
@@ -460,7 +508,7 @@ function App() {
                   <select
                     value={profileForm.trading_hours}
                     onChange={(e) => setProfileForm(prev => ({ ...prev, trading_hours: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-xl px-4 py-3 text-black focus:ring-2 focus:ring-black focus:border-transparent"
+                    className="w-full border border-gray-300 rounded-xl px-4 py-3 text-black bg-white focus:ring-2 focus:ring-black focus:border-transparent"
                   >
                     <option value="">Select trading hours</option>
                     {HOURS_OPTIONS.map(hour => (
@@ -468,6 +516,52 @@ function App() {
                     ))}
                   </select>
                 </div>
+              </div>
+
+              {/* Communication Preferences */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-black font-medium mb-2">Communication Style</label>
+                  <select
+                    value={profileForm.communication_style}
+                    onChange={(e) => setProfileForm(prev => ({ ...prev, communication_style: e.target.value }))}
+                    className="w-full border border-gray-300 rounded-xl px-4 py-3 text-black bg-white focus:ring-2 focus:ring-black focus:border-transparent"
+                  >
+                    <option value="">Select style</option>
+                    {COMMUNICATION_OPTIONS.map(style => (
+                      <option key={style} value={style}>{style}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-black font-medium mb-2">Preferred Communication Platform</label>
+                  <select
+                    value={profileForm.preferred_communication_platform}
+                    onChange={(e) => setProfileForm(prev => ({ ...prev, preferred_communication_platform: e.target.value }))}
+                    className="w-full border border-gray-300 rounded-xl px-4 py-3 text-black bg-white focus:ring-2 focus:ring-black focus:border-transparent"
+                  >
+                    <option value="">Select platform</option>
+                    {COMMUNICATION_PLATFORM_OPTIONS.map(platform => (
+                      <option key={platform} value={platform}>{platform}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Trading Platform */}
+              <div>
+                <label className="block text-black font-medium mb-2">Preferred Trading Platform</label>
+                <select
+                  value={profileForm.preferred_trading_platform}
+                  onChange={(e) => setProfileForm(prev => ({ ...prev, preferred_trading_platform: e.target.value }))}
+                  className="w-full border border-gray-300 rounded-xl px-4 py-3 text-black bg-white focus:ring-2 focus:ring-black focus:border-transparent"
+                >
+                  <option value="">Select trading platform</option>
+                  {TRADING_PLATFORM_OPTIONS.map(platform => (
+                    <option key={platform} value={platform}>{platform}</option>
+                  ))}
+                </select>
               </div>
 
               {/* Token Preferences */}
@@ -537,32 +631,16 @@ function App() {
                 </div>
               </div>
 
-              {/* Favorite Project & Communication */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-black font-medium mb-2">Favorite Project/Protocol</label>
-                  <input
-                    type="text"
-                    value={profileForm.favorite_project}
-                    onChange={(e) => setProfileForm(prev => ({ ...prev, favorite_project: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-xl px-4 py-3 text-black placeholder-gray-500 focus:ring-2 focus:ring-black focus:border-transparent"
-                    placeholder="e.g., Jupiter, Magic Eden, Phantom..."
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-black font-medium mb-2">Communication Style</label>
-                  <select
-                    value={profileForm.communication_style}
-                    onChange={(e) => setProfileForm(prev => ({ ...prev, communication_style: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-xl px-4 py-3 text-black focus:ring-2 focus:ring-black focus:border-transparent"
-                  >
-                    <option value="">Select style</option>
-                    {COMMUNICATION_OPTIONS.map(style => (
-                      <option key={style} value={style}>{style}</option>
-                    ))}
-                  </select>
-                </div>
+              {/* Favorite Project */}
+              <div>
+                <label className="block text-black font-medium mb-2">Favorite Project/Protocol</label>
+                <input
+                  type="text"
+                  value={profileForm.favorite_project}
+                  onChange={(e) => setProfileForm(prev => ({ ...prev, favorite_project: e.target.value }))}
+                  className="w-full border border-gray-300 rounded-xl px-4 py-3 text-black placeholder-gray-500 focus:ring-2 focus:ring-black focus:border-transparent"
+                  placeholder="e.g., Jupiter, Magic Eden, Phantom..."
+                />
               </div>
 
               <button
@@ -570,7 +648,7 @@ function App() {
                 disabled={!profileForm.trading_experience || profileForm.preferred_tokens.length === 0 || !profileForm.trading_style || !profileForm.portfolio_size}
                 className="w-full bg-black hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200"
               >
-                Start Trading & Matching
+                {isEditing ? 'Update Profile' : 'Start Trading & Matching'}
               </button>
             </form>
           </div>
@@ -605,6 +683,12 @@ function App() {
             </button>
           </div>
           <div className="flex items-center space-x-3">
+            <button
+              onClick={handleEditProfile}
+              className="text-gray-600 hover:text-black text-sm"
+            >
+              Edit Profile
+            </button>
             <img
               src={currentUser?.avatar_url}
               alt="Profile"
@@ -670,6 +754,29 @@ function App() {
                       </span>
                     </div>
                   </div>
+
+                  {/* Communication Preferences */}
+                  {(discoveryCards[currentCardIndex]?.preferred_communication_platform || discoveryCards[currentCardIndex]?.preferred_trading_platform) && (
+                    <div className="space-y-2">
+                      {discoveryCards[currentCardIndex]?.preferred_communication_platform && (
+                        <div className="flex items-center space-x-2">
+                          <span className="text-sm font-medium text-gray-500">Prefers:</span>
+                          <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">
+                            {discoveryCards[currentCardIndex]?.preferred_communication_platform}
+                          </span>
+                        </div>
+                      )}
+                      
+                      {discoveryCards[currentCardIndex]?.preferred_trading_platform && (
+                        <div className="flex items-center space-x-2">
+                          <span className="text-sm font-medium text-gray-500">Trades on:</span>
+                          <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">
+                            {discoveryCards[currentCardIndex]?.preferred_trading_platform}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  )}
                   
                   <div>
                     <span className="text-sm font-medium text-gray-500 block mb-2">Preferred Tokens:</span>
@@ -774,6 +881,11 @@ function App() {
                         {match.other_user.display_name}
                       </h3>
                       <p className="text-gray-600">@{match.other_user.username}</p>
+                      {match.other_user.preferred_communication_platform && (
+                        <p className="text-xs text-blue-600">
+                          📱 {match.other_user.preferred_communication_platform}
+                        </p>
+                      )}
                     </div>
                   </div>
                   
@@ -786,6 +898,13 @@ function App() {
                         {match.other_user.trading_style}
                       </span>
                     </div>
+                    {match.other_user.preferred_trading_platform && (
+                      <div className="flex items-center space-x-2">
+                        <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">
+                          ⚡ {match.other_user.preferred_trading_platform}
+                        </span>
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}
@@ -818,6 +937,9 @@ function App() {
                   </h3>
                   <p className="text-gray-600 text-sm">
                     {selectedMatch.other_user.trading_style} • {selectedMatch.other_user.trading_experience}
+                    {selectedMatch.other_user.preferred_communication_platform && 
+                      ` • 📱 ${selectedMatch.other_user.preferred_communication_platform}`
+                    }
                   </p>
                 </div>
               </div>

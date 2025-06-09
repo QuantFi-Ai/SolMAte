@@ -73,9 +73,11 @@ class UserProfile(BaseModel):
     best_trade: str = ""
     worst_trade: str = ""
     favorite_project: str = ""
-    # Social & preferences
+    # Communication & Platform preferences
     trading_hours: str = ""  # "Early Morning", "Morning", "Afternoon", "Evening", "Night Owl", "24/7"
     communication_style: str = ""  # "Casual", "Professional", "Technical", "Friendly"
+    preferred_communication_platform: str = ""  # "Discord", "Telegram", "Twitter DM", "Signal", "WhatsApp", "In-App Only"
+    preferred_trading_platform: str = ""  # "Axiom", "BullX", "Photon", "Padre", "Jupiter", "Raydium", "Other"
     looking_for: List[str] = []  # ["Learning", "Teaching", "Alpha Sharing", "Research Partner", "Risk Management"]
     # Profile completion
     profile_complete: bool = False
@@ -177,6 +179,8 @@ async def twitter_callback(request: Request):
                 "favorite_project": "",
                 "trading_hours": "",
                 "communication_style": "",
+                "preferred_communication_platform": "",
+                "preferred_trading_platform": "",
                 "looking_for": [],
                 "profile_complete": False,
                 "created_at": datetime.utcnow(),
@@ -222,6 +226,8 @@ async def create_demo_user():
         "favorite_project": "",
         "trading_hours": "",
         "communication_style": "",
+        "preferred_communication_platform": "",
+        "preferred_trading_platform": "",
         "looking_for": [],
         "profile_complete": False,
         "created_at": datetime.utcnow(),
@@ -252,6 +258,8 @@ async def create_demo_user():
             "favorite_project": "Solana ecosystem - the speed and low fees are unmatched",
             "trading_hours": "Morning",
             "communication_style": "Technical",
+            "preferred_communication_platform": "Discord",
+            "preferred_trading_platform": "Jupiter",
             "looking_for": ["Alpha Sharing", "Research Partner"],
             "profile_complete": True,
             "created_at": datetime.utcnow(),
@@ -276,6 +284,8 @@ async def create_demo_user():
             "favorite_project": "Magic Eden - revolutionizing NFT trading on Solana",
             "trading_hours": "Evening",
             "communication_style": "Professional",
+            "preferred_communication_platform": "Telegram",
+            "preferred_trading_platform": "BullX",
             "looking_for": ["Teaching", "Risk Management"],
             "profile_complete": True,
             "created_at": datetime.utcnow(),
@@ -300,7 +310,35 @@ async def create_demo_user():
             "favorite_project": "Jupiter - makes swapping so easy for beginners",
             "trading_hours": "Night Owl",
             "communication_style": "Casual",
+            "preferred_communication_platform": "Discord",
+            "preferred_trading_platform": "Photon",
             "looking_for": ["Learning", "Research Partner"],
+            "profile_complete": True,
+            "created_at": datetime.utcnow(),
+            "last_active": datetime.utcnow()
+        },
+        {
+            "user_id": str(uuid.uuid4()),
+            "twitter_id": f"demo_match_4_{int(datetime.utcnow().timestamp())}",
+            "username": "defi_alpha_king",
+            "display_name": "Jordan Kim",
+            "avatar_url": demo_avatars[4],
+            "bio": "MEV bot developer and yield farmer. Always hunting for alpha opportunities! ⚡",
+            "location": "Seoul, South Korea",
+            "trading_experience": "Expert",
+            "years_trading": 5,
+            "preferred_tokens": ["DeFi", "Infrastructure", "Layer 1s"],
+            "trading_style": "Scalper",
+            "portfolio_size": "$100K+",
+            "risk_tolerance": "YOLO",
+            "best_trade": "Arbitrage opportunity between DEXs, 15% in 2 minutes",
+            "worst_trade": "Smart contract exploit lost 30% of portfolio",
+            "favorite_project": "Raydium - best liquidity and MEV opportunities",
+            "trading_hours": "24/7",
+            "communication_style": "Technical",
+            "preferred_communication_platform": "Signal",
+            "preferred_trading_platform": "Axiom",
+            "looking_for": ["Alpha Sharing", "Teaching"],
             "profile_complete": True,
             "created_at": datetime.utcnow(),
             "last_active": datetime.utcnow()
@@ -336,13 +374,13 @@ async def update_user_profile(user_id: str, profile_data: dict):
     allowed_fields = [
         "bio", "location", "trading_experience", "years_trading", "preferred_tokens", 
         "trading_style", "portfolio_size", "risk_tolerance", "best_trade", "worst_trade",
-        "favorite_project", "trading_hours", "communication_style", "looking_for"
+        "favorite_project", "trading_hours", "communication_style", "preferred_communication_platform",
+        "preferred_trading_platform", "looking_for"
     ]
     update_data = {k: v for k, v in profile_data.items() if k in allowed_fields}
     update_data["last_active"] = datetime.utcnow()
     
     # Check if profile is complete
-    required_fields = ["trading_experience", "preferred_tokens", "trading_style", "portfolio_size"]
     current_profile = {**user, **update_data}
     profile_complete = (
         bool(current_profile.get("trading_experience")) and 
