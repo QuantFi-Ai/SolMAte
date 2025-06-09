@@ -48,6 +48,9 @@ oauth.register(
     access_token_url='https://api.twitter.com/oauth/access_token',
     authorize_url='https://api.twitter.com/oauth/authenticate',
     api_base_url='https://api.twitter.com/1.1/',
+    client_kwargs={
+        'force_include_body': True,
+    }
 )
 
 # Pydantic models
