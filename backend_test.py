@@ -111,6 +111,8 @@ class SolMatchAPITester:
             "favorite_project": "Jupiter - best DEX aggregator",
             "trading_hours": "Evening",
             "communication_style": "Technical",
+            "preferred_communication_platform": "Discord",
+            "preferred_trading_platform": "Jupiter",
             "looking_for": ["Alpha Sharing", "Research Partner"],
             "profile_complete": True,
             "created_at": datetime.utcnow().isoformat(),
