@@ -494,6 +494,168 @@ manager = ConnectionManager()
 
 # Routes
 
+@app.get("/api/public-profile/{username}")
+async def get_public_profile(username: str):
+    """Get public profile by username for sharing"""
+    user = users_collection.find_one({"username": username})
+    if not user:
+        raise HTTPException(status_code=404, detail="Profile not found")
+    
+    # Get user's trading highlights
+    highlights = list(trading_highlights_collection.find({"user_id": user["user_id"]}))
+    for highlight in highlights:
+        highlight.pop('_id', None)
+    
+    # Get user's social links
+    social_links = social_links_collection.find_one({"user_id": user["user_id"]})
+    if social_links:
+        social_links.pop('_id', None)
+    
+    # Remove sensitive information for public view
+    public_profile = {
+        "user_id": user["user_id"],
+        "username": user["username"], 
+        "display_name": user["display_name"],
+        "avatar_url": user["avatar_url"],
+        "bio": user["bio"],
+        "location": user["location"],
+        "show_twitter": user.get("show_twitter", False),
+        "twitter_username": user.get("twitter_username", "") if user.get("show_twitter", False) else "",
+        "trading_experience": user["trading_experience"],
+        "years_trading": user["years_trading"],
+        "preferred_tokens": user["preferred_tokens"],
+        "trading_style": user["trading_style"],
+        "portfolio_size": user["portfolio_size"],
+        "risk_tolerance": user["risk_tolerance"],
+        "best_trade": user.get("best_trade", ""),
+        "favorite_project": user.get("favorite_project", ""),
+        "trading_hours": user.get("trading_hours", ""),
+        "preferred_trading_platform": user.get("preferred_trading_platform", ""),
+        "looking_for": user.get("looking_for", []),
+        "profile_complete": user.get("profile_complete", False),
+        "created_at": user["created_at"],
+        "trading_highlights": highlights,
+        "social_links": social_links or {}
+    }
+    
+    return public_profile
+
+@app.post("/api/upload-trading-highlight/{user_id}")
+async def upload_trading_highlight(user_id: str, file: UploadFile = File(...)):
+    """Upload a trading highlight image (PnL screenshot, achievement, etc.)"""
+    try:
+        # Validate user exists
+        user = users_collection.find_one({"user_id": user_id})
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        # Validate file type
+        if not file.content_type.startswith('image/'):
+            raise HTTPException(status_code=400, detail="File must be an image")
+        
+        # Read and encode the image
+        contents = await file.read()
+        
+        highlight_data = {
+            "highlight_id": str(uuid.uuid4()),
+            "user_id": user_id,
+            "filename": file.filename,
+            "content_type": file.content_type,
+            "image_data": base64.b64encode(contents).decode('utf-8'),
+            "uploaded_at": datetime.utcnow()
+        }
+        
+        return {"message": "Trading highlight uploaded successfully", "highlight_id": highlight_data['highlight_id'], "image_data": highlight_data['image_data']}
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to upload highlight: {str(e)}")
+
+@app.post("/api/save-trading-highlight/{user_id}")
+async def save_trading_highlight(user_id: str, highlight_data: dict):
+    """Save trading highlight with details"""
+    try:
+        # Validate user exists
+        user = users_collection.find_one({"user_id": user_id})
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        highlight = {
+            "highlight_id": str(uuid.uuid4()),
+            "user_id": user_id,
+            "title": highlight_data.get("title", ""),
+            "description": highlight_data.get("description", ""),
+            "image_data": highlight_data.get("image_data", ""),
+            "highlight_type": highlight_data.get("highlight_type", "achievement"),
+            "date_achieved": highlight_data.get("date_achieved", ""),
+            "profit_loss": highlight_data.get("profit_loss", ""),
+            "percentage_gain": highlight_data.get("percentage_gain", ""),
+            "created_at": datetime.utcnow()
+        }
+        
+        trading_highlights_collection.insert_one(highlight)
+        highlight.pop('_id', None)
+        
+        return {"message": "Trading highlight saved successfully", "highlight": highlight}
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to save highlight: {str(e)}")
+
+@app.get("/api/trading-highlights/{user_id}")
+async def get_trading_highlights(user_id: str):
+    """Get all trading highlights for a user"""
+    highlights = list(trading_highlights_collection.find({"user_id": user_id}))
+    for highlight in highlights:
+        highlight.pop('_id', None)
+    return highlights
+
+@app.delete("/api/trading-highlights/{highlight_id}")
+async def delete_trading_highlight(highlight_id: str):
+    """Delete a trading highlight"""
+    result = trading_highlights_collection.delete_one({"highlight_id": highlight_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Highlight not found")
+    return {"message": "Highlight deleted successfully"}
+
+@app.post("/api/update-social-links/{user_id}")
+async def update_social_links(user_id: str, social_data: dict):
+    """Update user's social media links"""
+    try:
+        # Validate user exists
+        user = users_collection.find_one({"user_id": user_id})
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        social_links = {
+            "user_id": user_id,
+            "twitter": social_data.get("twitter", ""),
+            "discord": social_data.get("discord", ""),
+            "telegram": social_data.get("telegram", ""),
+            "website": social_data.get("website", ""),
+            "linkedin": social_data.get("linkedin", ""),
+            "updated_at": datetime.utcnow()
+        }
+        
+        # Upsert social links
+        social_links_collection.replace_one(
+            {"user_id": user_id},
+            social_links,
+            upsert=True
+        )
+        
+        return {"message": "Social links updated successfully"}
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to update social links: {str(e)}")
+
+@app.get("/api/social-links/{user_id}")
+async def get_social_links(user_id: str):
+    """Get user's social media links"""
+    social_links = social_links_collection.find_one({"user_id": user_id})
+    if social_links:
+        social_links.pop('_id', None)
+        return social_links
+    return {}
+
 @app.get("/api/health")
 async def health_check():
     return {"status": "healthy", "service": "SolMatch API"}
