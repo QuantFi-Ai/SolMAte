@@ -381,6 +381,27 @@ def main():
     # Test Twitter login redirect
     twitter_login_success = tester.test_twitter_login_redirect()
     
+    # Test demo user creation
+    def test_create_demo_user(self):
+        """Test creating a demo user"""
+        success, response = self.run_test(
+            "Create Demo User",
+            "POST",
+            "create-demo-user",
+            200
+        )
+        
+        if success and "user_id" in response:
+            print(f"Created demo user with ID: {response['user_id']}")
+            return True
+        return False
+    
+    # Add the method to the tester class
+    SolMatchAPITester.test_create_demo_user = test_create_demo_user
+    
+    # Run the demo user test
+    tester.test_create_demo_user(tester)
+    
     # Create a test user for further testing
     tester.create_test_user()
     
