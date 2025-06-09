@@ -249,7 +249,7 @@ class SolMatchAPITester:
             users_collection = db.users
             matches_collection = db.matches
             
-            # Create another test user
+            # Create another test user with enhanced profile
             other_user_id = str(uuid.uuid4())
             twitter_id = f"test_twitter_{int(datetime.now().timestamp())}"
             
@@ -258,12 +258,22 @@ class SolMatchAPITester:
                 "twitter_id": twitter_id,
                 "username": f"test_match_{int(datetime.now().timestamp())}",
                 "display_name": "Test Match",
-                "avatar_url": "https://via.placeholder.com/400",
+                "avatar_url": "https://images.pexels.com/photos/31630004/pexels-photo-31630004.jpeg",
                 "bio": "This is a test match for API testing",
+                "location": "Austin, TX",
                 "trading_experience": "Advanced",
+                "years_trading": 4,
                 "preferred_tokens": ["GameFi", "AI Tokens"],
                 "trading_style": "Swing Trader",
                 "portfolio_size": "$10K-$100K",
+                "risk_tolerance": "YOLO",
+                "best_trade": "Made 20x on a GameFi token",
+                "worst_trade": "Bought the top of a bull market",
+                "favorite_project": "Tensor - best NFT trading platform",
+                "trading_hours": "24/7",
+                "communication_style": "Casual",
+                "looking_for": ["Learning", "Networking"],
+                "profile_complete": True,
                 "created_at": datetime.utcnow().isoformat(),
                 "last_active": datetime.utcnow().isoformat()
             }
