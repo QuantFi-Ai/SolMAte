@@ -345,11 +345,11 @@ async def update_user_profile(user_id: str, profile_data: dict):
     required_fields = ["trading_experience", "preferred_tokens", "trading_style", "portfolio_size"]
     current_profile = {**user, **update_data}
     profile_complete = (
-        current_profile.get("trading_experience") and 
-        current_profile.get("preferred_tokens") and 
+        bool(current_profile.get("trading_experience")) and 
+        bool(current_profile.get("preferred_tokens")) and 
         len(current_profile.get("preferred_tokens", [])) > 0 and
-        current_profile.get("trading_style") and 
-        current_profile.get("portfolio_size")
+        bool(current_profile.get("trading_style")) and 
+        bool(current_profile.get("portfolio_size"))
     )
     update_data["profile_complete"] = profile_complete
     
