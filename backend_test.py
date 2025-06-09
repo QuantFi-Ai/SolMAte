@@ -527,6 +527,8 @@ def main():
         tester.test_get_user()
         tester.test_update_user()
         tester.test_profile_completion_validation()
+        tester.test_communication_platform_preferences()
+        tester.test_trading_platform_preferences()
         tester.test_discover_users()
         tester.test_swipe_action()
         
