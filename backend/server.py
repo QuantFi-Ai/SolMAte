@@ -483,13 +483,13 @@ async def login_twitter(request: Request):
     """Initiate Twitter OAuth login"""
     try:
         # Use the exact external URL for callback
-        callback_url = f"https://b455855f-f3ef-4faa-b146-fcff2737404b.preview.emergentagent.com/api/auth/twitter/callback"
+        callback_url = f"https://6d4fa949-a991-4f95-aa5c-530bff69c87b.preview.emergentagent.com/api/auth/twitter/callback"
         return await oauth.twitter.authorize_redirect(request, callback_url)
     except Exception as e:
         print(f"Twitter OAuth error: {str(e)}")
         # For demo purposes, return a mock success for now
         mock_user_id = str(uuid.uuid4())
-        frontend_url = f"https://b455855f-f3ef-4faa-b146-fcff2737404b.preview.emergentagent.com?auth_success=true&user_id={mock_user_id}&demo=true"
+        frontend_url = f"https://6d4fa949-a991-4f95-aa5c-530bff69c87b.preview.emergentagent.com?auth_success=true&user_id={mock_user_id}&demo=true"
         return RedirectResponse(url=frontend_url)
 
 @app.get("/api/auth/twitter/callback")
@@ -583,7 +583,7 @@ async def upload_profile_image(user_id: str, file: UploadFile = File(...)):
         profile_images_collection.insert_one(image_data)
         
         # Update user's avatar URL to point to our image endpoint
-        new_avatar_url = f"{os.environ.get('REACT_APP_BACKEND_URL', 'https://b455855f-f3ef-4faa-b146-fcff2737404b.preview.emergentagent.com')}/api/profile-image/{image_data['image_id']}"
+        new_avatar_url = f"{os.environ.get('REACT_APP_BACKEND_URL', 'https://6d4fa949-a991-4f95-aa5c-530bff69c87b.preview.emergentagent.com')}/api/profile-image/{image_data['image_id']}"
         
         users_collection.update_one(
             {"user_id": user_id},
