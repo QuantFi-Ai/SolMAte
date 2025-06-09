@@ -410,6 +410,83 @@ class SolMatchAPITester:
         except Exception as e:
             print(f"❌ Failed to test swipe action: {str(e)}")
             return False
+            
+    def test_profile_completion_validation(self):
+        """Test that profile completion validation works correctly"""
+        if not self.test_user_id:
+            print("❌ No test user ID available")
+            return False
+            
+        # First, update the profile to be incomplete
+        incomplete_data = {
+            "trading_experience": "",
+            "preferred_tokens": [],
+            "trading_style": "",
+            "portfolio_size": ""
+        }
+        
+        success, _ = self.run_test(
+            "Set Incomplete Profile",
+            "PUT",
+            f"user/{self.test_user_id}",
+            200,
+            data=incomplete_data
+        )
+        
+        if not success:
+            return False
+            
+        # Verify profile is marked as incomplete
+        verify_success, user_data = self.run_test(
+            "Verify Incomplete Profile",
+            "GET",
+            f"user/{self.test_user_id}",
+            200
+        )
+        
+        if not verify_success:
+            return False
+            
+        if user_data.get("profile_complete") == True:
+            print("❌ Profile incorrectly marked as complete when it should be incomplete")
+            return False
+            
+        # Now update to complete the profile
+        complete_data = {
+            "trading_experience": "Intermediate",
+            "preferred_tokens": ["Meme Coins", "DeFi"],
+            "trading_style": "Day Trader",
+            "portfolio_size": "$1K-$10K"
+        }
+        
+        success, _ = self.run_test(
+            "Set Complete Profile",
+            "PUT",
+            f"user/{self.test_user_id}",
+            200,
+            data=complete_data
+        )
+        
+        if not success:
+            return False
+            
+        # Verify profile is marked as complete
+        verify_success, user_data = self.run_test(
+            "Verify Complete Profile",
+            "GET",
+            f"user/{self.test_user_id}",
+            200
+        )
+        
+        if not verify_success:
+            return False
+            
+        if user_data.get("profile_complete") != True:
+            print("❌ Profile incorrectly marked as incomplete when it should be complete")
+            return False
+            
+        print("✅ Profile completion validation works correctly")
+        return True
 
 def main():
     tester = SolMatchAPITester()
