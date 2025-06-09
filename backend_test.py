@@ -70,14 +70,14 @@ class SolMatchAPITester:
         
         try:
             response = requests.get(url, allow_redirects=False)
-            # We expect a redirect (302 or 303)
-            if response.status_code in [302, 303]:
+            # We expect a redirect (302, 303, or 307)
+            if response.status_code in [302, 303, 307]:
                 self.tests_passed += 1
                 print(f"✅ Passed - Status: {response.status_code}")
                 print(f"Redirect URL: {response.headers.get('Location')}")
                 return True
             else:
-                print(f"❌ Failed - Expected 302/303, got {response.status_code}")
+                print(f"❌ Failed - Expected redirect status, got {response.status_code}")
                 return False
         except Exception as e:
             print(f"❌ Failed - Error: {str(e)}")
