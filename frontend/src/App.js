@@ -265,10 +265,18 @@ function App() {
               <p className="text-white/80 mb-6">Connect with Solana traders for collaborative trenching sessions</p>
               <button
                 onClick={handleTwitterLogin}
-                className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 flex items-center justify-center space-x-2"
+                className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 flex items-center justify-center space-x-2 mb-4"
               >
                 <span>🐦</span>
                 <span>Continue with Twitter</span>
+              </button>
+              <div className="text-white/60 text-sm mb-4">or</div>
+              <button
+                onClick={handleDemoLogin}
+                className="w-full bg-purple-500 hover:bg-purple-600 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 flex items-center justify-center space-x-2"
+              >
+                <span>🎮</span>
+                <span>Try Demo Mode</span>
               </button>
             </div>
           </div>
