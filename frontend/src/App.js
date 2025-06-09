@@ -35,8 +35,17 @@ function App() {
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('auth_success') === 'true') {
       const userId = urlParams.get('user_id');
+      const isDemo = urlParams.get('demo') === 'true';
+      
       if (userId) {
-        fetchUserProfile(userId);
+        if (isDemo) {
+          // Create a demo user first
+          createDemoUser().then(() => {
+            fetchUserProfile(userId);
+          });
+        } else {
+          fetchUserProfile(userId);
+        }
       }
     } else if (urlParams.get('auth_error') === 'true') {
       alert('Authentication failed. Please try again.');
