@@ -427,8 +427,9 @@ function App() {
                   <select
                     value={profileForm.portfolio_size}
                     onChange={(e) => setProfileForm(prev => ({ ...prev, portfolio_size: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-xl px-4 py-3 text-black focus:ring-2 focus:ring-black focus:border-transparent"
+                    className="w-full border border-gray-300 rounded-xl px-4 py-3 text-black bg-white focus:ring-2 focus:ring-black focus:border-transparent appearance-none"
                     required
+                    style={{ backgroundImage: 'none' }}
                   >
                     <option value="">Select portfolio size</option>
                     {PORTFOLIO_OPTIONS.map(size => (
