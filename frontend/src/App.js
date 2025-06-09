@@ -83,7 +83,7 @@ function App() {
 
   const createDemoUser = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/demo/create`, {
+      const response = await fetch(`${API_BASE_URL}/api/create-demo-user`, {
         method: 'POST'
       });
       if (!response.ok) {
