@@ -343,9 +343,15 @@ async def update_user_profile(user_id: str, profile_data: dict):
     
     # Check if profile is complete
     required_fields = ["trading_experience", "preferred_tokens", "trading_style", "portfolio_size"]
-    profile_complete = all(update_data.get(field) or user.get(field) for field in required_fields)
-    if profile_complete and update_data.get("preferred_tokens"):
-        update_data["profile_complete"] = True
+    current_profile = {**user, **update_data}
+    profile_complete = (
+        current_profile.get("trading_experience") and 
+        current_profile.get("preferred_tokens") and 
+        len(current_profile.get("preferred_tokens", [])) > 0 and
+        current_profile.get("trading_style") and 
+        current_profile.get("portfolio_size")
+    )
+    update_data["profile_complete"] = profile_complete
     
     users_collection.update_one(
         {"user_id": user_id},
