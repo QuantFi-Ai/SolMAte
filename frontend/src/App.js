@@ -411,8 +411,9 @@ function App() {
                   <select
                     value={profileForm.trading_style}
                     onChange={(e) => setProfileForm(prev => ({ ...prev, trading_style: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-xl px-4 py-3 text-black focus:ring-2 focus:ring-black focus:border-transparent"
+                    className="w-full border border-gray-300 rounded-xl px-4 py-3 text-black bg-white focus:ring-2 focus:ring-black focus:border-transparent appearance-none"
                     required
+                    style={{ backgroundImage: 'none' }}
                   >
                     <option value="">Select trading style</option>
                     {STYLE_OPTIONS.map(style => (
