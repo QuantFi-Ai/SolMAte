@@ -885,6 +885,187 @@ class Solm8APITester:
         print(f"\n📊 Tests passed: {self.tests_passed}/{self.tests_run}")
         return self.tests_passed == self.tests_run
 
+    def test_send_message(self, match_id, sender_id, content):
+        """Test sending a message via API"""
+        return self.run_test(
+            "Send Message",
+            "POST",
+            "messages",
+            200,
+            data={
+                "match_id": match_id,
+                "sender_id": sender_id,
+                "content": content
+            }
+        )
+
+    def test_user_matching_flow(self):
+        """Test the complete user matching flow from swipe to chat"""
+        print("\n🔍 Testing User Matching Flow...")
+        
+        # Step 1: Create two test users
+        print("\n1️⃣ Creating two test users...")
+        success1, user_a = self.test_create_demo_user()
+        if not success1 or not user_a:
+            print("❌ Failed to create User A")
+            return False
+        
+        success2, user_b = self.test_create_demo_user()
+        if not success2 or not user_b:
+            print("❌ Failed to create User B")
+            return False
+        
+        user_a_id = user_a['user_id']
+        user_b_id = user_b['user_id']
+        
+        print(f"✅ Created User A (ID: {user_a_id}) and User B (ID: {user_b_id})")
+        
+        # Make sure both users have complete profiles
+        profile_data = {
+            "bio": "Test bio for matching",
+            "location": "Test Location",
+            "trading_experience": "Intermediate",
+            "years_trading": 3,
+            "preferred_tokens": ["Meme Coins", "DeFi", "NFTs"],
+            "trading_style": "Day Trader",
+            "portfolio_size": "$10K-$100K",
+            "risk_tolerance": "Moderate",
+            "looking_for": ["Alpha Sharing", "Research Partner"]
+        }
+        
+        self.test_update_user_profile(user_a_id, profile_data)
+        self.test_update_user_profile(user_b_id, profile_data)
+        
+        # Step 2: Test swipe/like system
+        print("\n2️⃣ Testing swipe/like system...")
+        
+        # User A likes User B
+        success3, swipe_a_response = self.test_swipe_action(user_a_id, user_b_id, "like")
+        if not success3:
+            print("❌ Failed when User A swiped right on User B")
+            return False
+        
+        # Verify no match yet
+        if swipe_a_response.get('matched', False):
+            print("❌ Match created prematurely after only User A liked User B")
+            self.tests_run += 1
+            return False
+        else:
+            print("✅ No match created yet (as expected)")
+            self.tests_passed += 1
+            self.tests_run += 1
+        
+        # User B likes User A back
+        success4, swipe_b_response = self.test_swipe_action(user_b_id, user_a_id, "like")
+        if not success4:
+            print("❌ Failed when User B swiped right on User A")
+            return False
+        
+        # Verify match was created
+        if not swipe_b_response.get('matched', False):
+            print("❌ No match created after mutual likes")
+            self.tests_run += 1
+            return False
+        else:
+            print(f"✅ Match created successfully! Match ID: {swipe_b_response.get('match_id')}")
+            self.tests_passed += 1
+            self.tests_run += 1
+            match_id = swipe_b_response.get('match_id')
+        
+        # Step 3: Verify match creation
+        print("\n3️⃣ Verifying match creation...")
+        
+        # Check User A's matches
+        success5, matches_a = self.test_get_matches(user_a_id)
+        if not success5:
+            print("❌ Failed to get User A's matches")
+            return False
+        
+        # Check User B's matches
+        success6, matches_b = self.test_get_matches(user_b_id)
+        if not success6:
+            print("❌ Failed to get User B's matches")
+            return False
+        
+        # Verify match appears in both users' match lists
+        match_in_a = any(match.get('match_id') == match_id for match in matches_a)
+        match_in_b = any(match.get('match_id') == match_id for match in matches_b)
+        
+        if not match_in_a or not match_in_b:
+            print(f"❌ Match verification failed - Match not found in {'User A' if not match_in_a else 'User B'}'s matches")
+            self.tests_run += 1
+            return False
+        else:
+            print("✅ Match appears in both users' match lists")
+            self.tests_passed += 1
+            self.tests_run += 1
+        
+        # Verify match data structure and content
+        match_a = next((match for match in matches_a if match.get('match_id') == match_id), None)
+        match_b = next((match for match in matches_b if match.get('match_id') == match_id), None)
+        
+        if not match_a or not match_b:
+            print("❌ Could not find match details in users' match lists")
+            self.tests_run += 1
+            return False
+        
+        # Check that other_user field is populated correctly
+        if match_a.get('other_user', {}).get('user_id') != user_b_id:
+            print("❌ Match data structure incorrect - User A's match doesn't show User B as other_user")
+            self.tests_run += 1
+            return False
+        
+        if match_b.get('other_user', {}).get('user_id') != user_a_id:
+            print("❌ Match data structure incorrect - User B's match doesn't show User A as other_user")
+            self.tests_run += 1
+            return False
+        
+        print("✅ Match data structure and content verified")
+        self.tests_passed += 1
+        self.tests_run += 1
+        
+        # Step 4: Test chat functionality
+        print("\n4️⃣ Testing chat functionality...")
+        
+        # Test sending a message from User A to User B
+        message_content_a = "Hello from User A! This is a test message."
+        success7, send_message_response = self.test_send_message(match_id, user_a_id, message_content_a)
+        if not success7:
+            print("❌ Failed to send message from User A to User B")
+            return False
+        
+        # Test sending a message from User B to User A
+        message_content_b = "Hi User A! This is User B responding to your test message."
+        success8, send_message_response = self.test_send_message(match_id, user_b_id, message_content_b)
+        if not success8:
+            print("❌ Failed to send message from User B to User A")
+            return False
+        
+        # Verify message delivery and storage
+        success9, messages = self.test_get_messages(match_id)
+        if not success9:
+            print("❌ Failed to get messages for the match")
+            return False
+        
+        # Check if both messages are in the conversation
+        message_a_found = any(msg.get('content') == message_content_a and msg.get('sender_id') == user_a_id for msg in messages)
+        message_b_found = any(msg.get('content') == message_content_b and msg.get('sender_id') == user_b_id for msg in messages)
+        
+        if not message_a_found or not message_b_found:
+            print(f"❌ Message verification failed - {'User A' if not message_a_found else 'User B'}'s message not found")
+            self.tests_run += 1
+            return False
+        else:
+            print("✅ Both messages found in conversation history")
+            self.tests_passed += 1
+            self.tests_run += 1
+        
+        print("\n✅ User matching flow test completed successfully!")
+        return True
+
 if __name__ == "__main__":
     tester = Solm8APITester()
-    tester.run_all_tests()
+    # Test the user matching flow
+    tester.test_user_matching_flow()
+    # Alternatively, run all tests
+    # tester.run_all_tests()
