@@ -305,7 +305,7 @@ const LandingPage = () => {
             {[
               { step: "01", title: "NEURAL SCAN", desc: "Connect your trading identity and let our AI analyze your profile" },
               { step: "02", title: "QUANTUM MATCH", desc: "Advanced algorithms find your perfect trading counterparts" },
-              { step: "03", title: "SYNC & TRADE", desc: "Enter the matrix and start building your trading empire" }
+              { step: "03", title: "SYNC & TRADE", desc: "Find your SolM8 and start building your trading empire" }
             ].map((step, index) => (
               <div key={index} className="text-center group">
                 <div className="relative mx-auto mb-8">
