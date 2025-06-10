@@ -23,6 +23,15 @@ const wallets = useMemo(() => [
   new SolflareWalletAdapter(),
 ], []);
 
+// Solana wallet configuration
+const endpoint = clusterApiUrl('mainnet-beta');
+
+// Wallet adapters
+const wallets = useMemo(() => [
+  new PhantomWalletAdapter(),
+  new SolflareWalletAdapter(),
+], []);
+
 function App() {
   const [currentUser, setCurrentUser] = useState(null);
   const [currentView, setCurrentView] = useState('login');
