@@ -1306,4 +1306,16 @@ function App() {
   );
 }
 
-export default App;
+// Main App Component with Router
+const AppWithRouter = () => {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/profile/:username" element={<PublicProfile />} />
+        <Route path="/" element={<App />} />
+      </Routes>
+    </Router>
+  );
+};
+
+export default AppWithRouter;
