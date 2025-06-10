@@ -58,7 +58,7 @@ const PublicProfile = () => {
           <h1 className="text-2xl font-bold text-gray-800 mb-4">Profile Not Found</h1>
           <p className="text-gray-600 mb-6">{error}</p>
           <a href="/" className="bg-black text-white px-6 py-3 rounded-xl font-semibold hover:bg-gray-800 transition-all">
-            Go to SolMatch
+            Go to Solm8
           </a>
         </div>
       </div>
