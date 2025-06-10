@@ -373,10 +373,10 @@ function App() {
     // Debug: Check current user state
     console.log('Current user during upload:', currentUser);
 
-    // Check if user is logged in
-    if (!currentUser || !currentUser.user_id) {
+    // Check if user is logged in (less strict check)
+    if (!currentUser?.user_id) {
       console.error('Upload failed - user not authenticated:', { currentUser, user_id: currentUser?.user_id });
-      alert('Please log in to upload a profile picture');
+      alert('Please complete login/registration first before uploading a profile picture');
       return;
     }
 
