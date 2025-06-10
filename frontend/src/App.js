@@ -1397,13 +1397,13 @@ function App() {
           
           {matches.length === 0 ? (
             <div className="text-center text-gray-600 py-12">
-              <h3 className="text-xl font-semibold mb-4">No matches yet</h3>
-              <p className="text-gray-500 mb-6">Start swiping on Solm8 to find your trading buddies!</p>
+              <h3 className="text-xl font-semibold mb-4">No trading connections yet</h3>
+              <p className="text-gray-500 mb-6">Start connecting with fellow traders to build your network!</p>
               <button
                 onClick={() => setCurrentView('discover')}
                 className="bg-black hover:bg-gray-800 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200"
               >
-                Start Discovering
+                Start Connecting
               </button>
             </div>
           ) : (
