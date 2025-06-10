@@ -731,7 +731,7 @@ async def twitter_callback(request: Request):
             users_collection.insert_one(user_data)
         
         # Redirect to frontend with user data
-        frontend_url = f"{request.base_url.replace(request.base_url.path, '')}?auth_success=true&user_id={user_data['user_id']}"
+        frontend_url = f"https://6d4fa949-a991-4f95-aa5c-530bff69c87b.preview.emergentagent.com/app?auth_success=true&user_id={user_data['user_id']}"
         return RedirectResponse(url=frontend_url)
         
     except Exception as e:
