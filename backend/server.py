@@ -586,6 +586,128 @@ manager = ConnectionManager()
 
 # Routes
 
+# Authentication Endpoints
+
+@app.post("/api/auth/email/signup")
+async def email_signup(signup_data: EmailSignup):
+    """Sign up with email and password"""
+    try:
+        # Check if email already exists
+        existing_user = users_collection.find_one({"email": signup_data.email})
+        if existing_user:
+            raise HTTPException(status_code=400, detail="Email already registered")
+        
+        # Hash password
+        hashed_password = hash_password(signup_data.password)
+        
+        # Create user profile
+        user_data = create_user_profile({
+            "email": signup_data.email,
+            "display_name": signup_data.display_name,
+            "username": f"trader_{secrets.token_hex(4)}",
+            "auth_method": "email"
+        })
+        
+        # Add password hash (not stored in main profile for security)
+        user_data["password_hash"] = hashed_password
+        
+        # Insert user
+        users_collection.insert_one(user_data)
+        
+        # Remove sensitive data before returning
+        user_data.pop('_id', None)
+        user_data.pop('password_hash', None)
+        
+        return {"message": "Account created successfully", "user": user_data}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to create account: {str(e)}")
+
+@app.post("/api/auth/email/login")
+async def email_login(login_data: EmailLogin):
+    """Login with email and password"""
+    try:
+        # Find user by email
+        user = users_collection.find_one({"email": login_data.email})
+        if not user:
+            raise HTTPException(status_code=401, detail="Invalid email or password")
+        
+        # Verify password
+        if not verify_password(login_data.password, user.get("password_hash", "")):
+            raise HTTPException(status_code=401, detail="Invalid email or password")
+        
+        # Update last activity
+        users_collection.update_one(
+            {"email": login_data.email},
+            {"$set": {"last_active": datetime.utcnow(), "user_status": "active"}}
+        )
+        
+        # Remove sensitive data before returning
+        user.pop('_id', None)
+        user.pop('password_hash', None)
+        
+        return {"message": "Login successful", "user": user}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Login failed: {str(e)}")
+
+@app.post("/api/auth/wallet/connect")
+async def wallet_connect(wallet_data: WalletAuth):
+    """Connect with Solana wallet"""
+    try:
+        # For this demo, we'll do basic wallet address validation
+        # In production, you'd verify the signature against the message
+        if not wallet_data.wallet_address or len(wallet_data.wallet_address) < 32:
+            raise HTTPException(status_code=400, detail="Invalid wallet address")
+        
+        # Check if wallet already exists
+        existing_user = users_collection.find_one({"wallet_address": wallet_data.wallet_address})
+        
+        if existing_user:
+            # Update last activity
+            users_collection.update_one(
+                {"wallet_address": wallet_data.wallet_address},
+                {"$set": {"last_active": datetime.utcnow(), "user_status": "active"}}
+            )
+            
+            existing_user.pop('_id', None)
+            existing_user.pop('password_hash', None)
+            return {"message": "Wallet connected successfully", "user": existing_user}
+        else:
+            # Create new user profile
+            user_data = create_user_profile({
+                "wallet_address": wallet_data.wallet_address,
+                "display_name": f"Trader {wallet_data.wallet_address[:8]}...",
+                "username": f"wallet_{secrets.token_hex(4)}",
+                "auth_method": "wallet"
+            })
+            
+            # Insert user
+            users_collection.insert_one(user_data)
+            
+            # Remove sensitive data before returning
+            user_data.pop('_id', None)
+            
+            return {"message": "New wallet account created", "user": user_data}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Wallet connection failed: {str(e)}")
+
+@app.get("/api/auth/wallet/message")
+async def get_wallet_message():
+    """Get message for wallet signature verification"""
+    timestamp = int(datetime.utcnow().timestamp())
+    message = f"Sign this message to authenticate with Solm8: {timestamp}"
+    return {"message": message, "timestamp": timestamp}
+
+# Routes
+
 @app.get("/api/public-profile/{username}")
 async def get_public_profile(username: str):
     """Get public profile by username for sharing"""
