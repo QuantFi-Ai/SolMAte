@@ -84,6 +84,21 @@ function App() {
   ];
 
   const [showProfileManager, setShowProfileManager] = useState(false);
+  
+  // User status management
+  const [userStatus, setUserStatus] = useState('offline'); // 'active' or 'offline'
+  const [showOnlyActive, setShowOnlyActive] = useState(false);
+  
+  // Token launch features
+  const [showTokenLaunchForm, setShowTokenLaunchForm] = useState(false);
+  const [tokenLaunchProfile, setTokenLaunchProfile] = useState({
+    interested_in_token_launch: false,
+    token_launch_experience: '',
+    launch_timeline: '',
+    launch_budget: '',
+    project_type: '',
+    looking_for_help_with: []
+  });
 
   // Handle auth callback on page load
   useEffect(() => {
