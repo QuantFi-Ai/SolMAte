@@ -46,17 +46,42 @@ function App() {
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
 
-  // Enhanced trading options
-  const EXPERIENCE_OPTIONS = ['Beginner', 'Intermediate', 'Advanced', 'Expert'];
-  const TOKEN_OPTIONS = ['Meme Coins', 'DeFi', 'GameFi', 'NFTs', 'Blue Chips', 'Layer 1s', 'AI Tokens', 'RWA', 'Infrastructure'];
-  const STYLE_OPTIONS = ['Day Trader', 'Swing Trader', 'HODLer', 'Scalper', 'Long-term Investor', 'Arbitrage'];
-  const PORTFOLIO_OPTIONS = ['Under $1K', '$1K-$10K', '$10K-$100K', '$100K+', 'Prefer not to say'];
-  const RISK_OPTIONS = ['Conservative', 'Moderate', 'Aggressive', 'YOLO'];
-  const HOURS_OPTIONS = ['Early Morning', 'Morning', 'Afternoon', 'Evening', 'Night Owl', '24/7'];
-  const COMMUNICATION_OPTIONS = ['Casual', 'Professional', 'Technical', 'Friendly'];
-  const COMMUNICATION_PLATFORM_OPTIONS = ['Discord', 'Telegram', 'Twitter DM', 'Signal', 'WhatsApp', 'In-App Only'];
-  const TRADING_PLATFORM_OPTIONS = ['Axiom', 'BullX', 'Photon', 'Padre', 'Jupiter', 'Raydium', 'Birdeye', 'DexScreener', 'Other'];
-  const LOOKING_FOR_OPTIONS = ['Learning', 'Teaching', 'Alpha Sharing', 'Research Partner', 'Risk Management', 'Networking'];
+  // Options for profile form
+  const EXPERIENCE_OPTIONS = ["Beginner", "Intermediate", "Advanced", "Expert"];
+  const STYLE_OPTIONS = ["Day Trader", "Swing Trader", "HODLer", "Scalper", "Long-term Investor"];
+  const PORTFOLIO_OPTIONS = ["Under $1K", "$1K-$10K", "$10K-$100K", "$100K+", "Prefer not to say"];
+  const RISK_OPTIONS = ["Conservative", "Moderate", "Aggressive", "YOLO"];
+  const HOURS_OPTIONS = ["Early Morning", "Morning", "Afternoon", "Evening", "Night Owl", "24/7"];
+  const COMMUNICATION_OPTIONS = ["Casual", "Professional", "Technical", "Friendly"];
+  const COMMUNICATION_PLATFORM_OPTIONS = ["Discord", "Telegram", "Twitter DM", "Signal", "WhatsApp", "In-App Only"];
+  const TRADING_PLATFORM_OPTIONS = ["Axiom", "BullX", "Photon", "Padre", "Jupiter", "Raydium", "Magic Eden", "Other"];
+  const TOKEN_OPTIONS = ["Meme Coins", "DeFi", "GameFi", "NFTs", "Blue Chips", "Layer 1s"];
+  const LOOKING_FOR_OPTIONS = ["Learning", "Teaching", "Alpha Sharing", "Research Partner", "Risk Management", "Networking"];
+
+  // Token Launch Options
+  const TOKEN_LAUNCH_EXPERIENCE_OPTIONS = ["None", "Beginner", "Experienced", "Expert"];
+  const LAUNCH_TIMELINE_OPTIONS = ["Immediate", "1-3 months", "3-6 months", "6+ months", "Just researching"];
+  const LAUNCH_BUDGET_OPTIONS = ["Under $10K", "$10K-$50K", "$50K-$100K", "$100K+", "Prefer not to say"];
+  const PROJECT_TYPE_OPTIONS = ["Meme Coin", "Utility Token", "DeFi Protocol", "GameFi", "NFT Project", "Other"];
+  const HELP_WITH_OPTIONS = ["Technical Development", "Marketing", "Community Building", "Funding", "Legal/Compliance"];
+
+  // Timezone options (popular ones)
+  const TIMEZONE_OPTIONS = [
+    "UTC",
+    "America/New_York",
+    "America/Chicago", 
+    "America/Denver",
+    "America/Los_Angeles",
+    "Europe/London",
+    "Europe/Paris",
+    "Europe/Berlin",
+    "Asia/Tokyo",
+    "Asia/Shanghai",
+    "Asia/Singapore",
+    "Asia/Dubai",
+    "Australia/Sydney",
+    "Australia/Melbourne"
+  ];
 
   const [showProfileManager, setShowProfileManager] = useState(false);
 
