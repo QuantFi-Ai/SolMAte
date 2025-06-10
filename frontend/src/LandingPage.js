@@ -1,39 +1,117 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const LandingPage = () => {
   const [email, setEmail] = useState('');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+
+  // Track mouse position for parallax effects
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      setMousePosition({
+        x: (e.clientX / window.innerWidth) * 100,
+        y: (e.clientY / window.innerHeight) * 100,
+      });
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
 
   const handleGetStarted = () => {
-    // Redirect to the main app
     window.location.href = '/app';
   };
 
   const handleEmailSignup = (e) => {
     e.preventDefault();
-    // For now, just redirect to app
     window.location.href = '/app';
   };
 
+  // Floating particles component
+  const FloatingParticles = () => (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      {[...Array(20)].map((_, i) => (
+        <div
+          key={i}
+          className="absolute w-1 h-1 bg-cyan-400 rounded-full animate-pulse"
+          style={{
+            left: `${Math.random() * 100}%`,
+            top: `${Math.random() * 100}%`,
+            animationDelay: `${Math.random() * 3}s`,
+            animationDuration: `${2 + Math.random() * 3}s`,
+          }}
+        />
+      ))}
+    </div>
+  );
+
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-black relative overflow-hidden">
+      {/* Animated Background */}
+      <div className="fixed inset-0 z-0">
+        {/* Grid Pattern */}
+        <div 
+          className="absolute inset-0 opacity-20"
+          style={{
+            backgroundImage: `
+              linear-gradient(rgba(0, 255, 255, 0.1) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(0, 255, 255, 0.1) 1px, transparent 1px)
+            `,
+            backgroundSize: '50px 50px',
+            transform: `translate(${mousePosition.x * 0.02}px, ${mousePosition.y * 0.02}px)`,
+          }}
+        />
+        
+        {/* Animated Gradient Orbs */}
+        <div 
+          className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-r from-cyan-500/20 to-purple-500/20 rounded-full blur-3xl animate-pulse"
+          style={{
+            transform: `translate(${mousePosition.x * 0.05}px, ${mousePosition.y * 0.05}px)`,
+          }}
+        />
+        <div 
+          className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-full blur-3xl animate-pulse"
+          style={{
+            transform: `translate(${-mousePosition.x * 0.03}px, ${-mousePosition.y * 0.03}px)`,
+            animationDelay: '1s',
+          }}
+        />
+        
+        <FloatingParticles />
+      </div>
+
       {/* Navigation */}
-      <nav className="bg-white border-b border-gray-100 sticky top-0 z-50">
+      <nav className="relative z-50 backdrop-blur-md bg-black/20 border-b border-cyan-500/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center">
-              <h1 className="text-2xl font-bold text-black">Solm8</h1>
-              <span className="ml-2 text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded-full">Beta</span>
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
+                Solm8
+              </h1>
+              <div className="ml-3 px-2 py-1 text-xs bg-cyan-500/20 text-cyan-300 rounded-full border border-cyan-500/30">
+                BETA
+              </div>
             </div>
+            
             <div className="hidden md:flex items-center space-x-8">
-              <a href="#features" className="text-gray-600 hover:text-black transition-all">Features</a>
-              <a href="#how-it-works" className="text-gray-600 hover:text-black transition-all">How it Works</a>
-              <a href="#community" className="text-gray-600 hover:text-black transition-all">Community</a>
+              <a href="#features" className="text-gray-300 hover:text-cyan-400 transition-all duration-300 relative group">
+                Features
+                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-cyan-400 group-hover:w-full transition-all duration-300"></span>
+              </a>
+              <a href="#how-it-works" className="text-gray-300 hover:text-cyan-400 transition-all duration-300 relative group">
+                How it Works
+                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-cyan-400 group-hover:w-full transition-all duration-300"></span>
+              </a>
+              <a href="#community" className="text-gray-300 hover:text-cyan-400 transition-all duration-300 relative group">
+                Community
+                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-cyan-400 group-hover:w-full transition-all duration-300"></span>
+              </a>
               <button 
                 onClick={handleGetStarted}
-                className="bg-black text-white px-6 py-2 rounded-lg hover:bg-gray-800 transition-all font-medium"
+                className="relative px-6 py-2 bg-gradient-to-r from-cyan-500 to-purple-500 text-white rounded-lg font-medium overflow-hidden group transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/25"
               >
-                Get Started
+                <span className="relative z-10">Launch App</span>
+                <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-cyan-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </button>
             </div>
             
@@ -41,7 +119,7 @@ const LandingPage = () => {
             <div className="md:hidden">
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="text-gray-600 hover:text-black transition-all"
+                className="text-gray-300 hover:text-cyan-400 transition-all"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
@@ -52,16 +130,16 @@ const LandingPage = () => {
           
           {/* Mobile menu */}
           {mobileMenuOpen && (
-            <div className="md:hidden bg-white border-t border-gray-100 py-4">
+            <div className="md:hidden backdrop-blur-md bg-black/40 border-t border-cyan-500/20 py-4">
               <div className="space-y-4">
-                <a href="#features" className="block text-gray-600 hover:text-black transition-all px-4">Features</a>
-                <a href="#how-it-works" className="block text-gray-600 hover:text-black transition-all px-4">How it Works</a>
-                <a href="#community" className="block text-gray-600 hover:text-black transition-all px-4">Community</a>
+                <a href="#features" className="block text-gray-300 hover:text-cyan-400 transition-all px-4">Features</a>
+                <a href="#how-it-works" className="block text-gray-300 hover:text-cyan-400 transition-all px-4">How it Works</a>
+                <a href="#community" className="block text-gray-300 hover:text-cyan-400 transition-all px-4">Community</a>
                 <button 
                   onClick={handleGetStarted}
-                  className="mx-4 w-[calc(100%-2rem)] bg-black text-white px-6 py-2 rounded-lg hover:bg-gray-800 transition-all font-medium"
+                  className="mx-4 w-[calc(100%-2rem)] bg-gradient-to-r from-cyan-500 to-purple-500 text-white px-6 py-2 rounded-lg font-medium"
                 >
-                  Get Started
+                  Launch App
                 </button>
               </div>
             </div>
@@ -70,236 +148,276 @@ const LandingPage = () => {
       </nav>
 
       {/* Hero Section */}
-      <section className="pt-20 pb-32 bg-gradient-to-br from-gray-50 to-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center animate-fade-in-up">
-            <h1 className="text-5xl md:text-7xl font-bold text-black mb-8 leading-tight">
-              Find Your Perfect
-              <span className="block bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent animate-gradient">
-                Trading Partner
-              </span>
-            </h1>
-            <p className="text-xl text-gray-600 mb-12 max-w-3xl mx-auto leading-relaxed">
-              Connect with like-minded crypto traders. Share strategies, learn together, and grow your portfolio with AI-powered matching.
+      <section className="relative z-10 pt-20 pb-32 min-h-screen flex items-center">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+          <div className="text-center">
+            {/* Glitch effect heading */}
+            <div className="relative mb-8">
+              <h1 className="text-6xl md:text-8xl font-black text-white mb-4 leading-tight tracking-tight">
+                FIND YOUR
+              </h1>
+              <div className="relative inline-block">
+                <h1 className="text-6xl md:text-8xl font-black bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent animate-gradient leading-tight tracking-tight">
+                  TRADING M8
+                </h1>
+                {/* Glitch layers */}
+                <h1 className="absolute inset-0 text-6xl md:text-8xl font-black text-cyan-400 opacity-30 animate-pulse leading-tight tracking-tight" style={{ transform: 'translate(2px, 0)' }}>
+                  TRADING M8
+                </h1>
+                <h1 className="absolute inset-0 text-6xl md:text-8xl font-black text-purple-400 opacity-20 animate-pulse leading-tight tracking-tight" style={{ transform: 'translate(-2px, 0)', animationDelay: '0.1s' }}>
+                  TRADING M8
+                </h1>
+              </div>
+            </div>
+            
+            <p className="text-xl md:text-2xl text-gray-300 mb-12 max-w-4xl mx-auto leading-relaxed">
+              AI-powered matching system connecting crypto traders worldwide. 
+              <span className="text-cyan-400"> Share strategies</span>, 
+              <span className="text-purple-400"> build networks</span>, 
+              <span className="text-pink-400"> dominate markets</span>.
             </p>
             
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-16">
               <button 
                 onClick={handleGetStarted}
-                className="bg-black text-white px-8 py-4 rounded-xl text-lg font-semibold hover:bg-gray-800 transition-all shadow-lg"
+                className="group relative px-8 py-4 bg-gradient-to-r from-cyan-500 to-purple-500 text-white text-lg font-bold rounded-xl overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-cyan-500/25"
               >
-                Start Trading Together
+                <span className="relative z-10 flex items-center">
+                  <span>ENTER THE MATRIX</span>
+                  <svg className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                  </svg>
+                </span>
+                <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-cyan-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </button>
-              <button className="text-gray-600 px-8 py-4 rounded-xl text-lg font-medium hover:text-black transition-all">
-                Watch Demo →
+              
+              <button className="group text-gray-300 px-8 py-4 rounded-xl border border-cyan-500/30 hover:border-cyan-500 transition-all duration-300 hover:bg-cyan-500/10 backdrop-blur-sm">
+                <span className="flex items-center text-lg font-medium">
+                  <span>WATCH DEMO</span>
+                  <div className="ml-2 w-0 h-0 border-l-4 border-l-cyan-400 border-t-2 border-t-transparent border-b-2 border-b-transparent group-hover:translate-x-1 transition-transform"></div>
+                </span>
               </button>
             </div>
 
-            {/* Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-2xl mx-auto">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-black">1000+</div>
-                <div className="text-sm text-gray-500">Active Traders</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-black">95%</div>
-                <div className="text-sm text-gray-500">Match Success</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-black">24/7</div>
-                <div className="text-sm text-gray-500">Global Network</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-black">AI</div>
-                <div className="text-sm text-gray-500">Powered</div>
-              </div>
+            {/* Futuristic Stats Grid */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
+              {[
+                { value: "1K+", label: "ACTIVE TRADERS", accent: "cyan" },
+                { value: "95%", label: "MATCH SUCCESS", accent: "purple" },
+                { value: "24/7", label: "GLOBAL NETWORK", accent: "pink" },
+                { value: "AI", label: "POWERED", accent: "cyan" }
+              ].map((stat, index) => (
+                <div key={index} className="group">
+                  <div className="relative p-6 rounded-xl backdrop-blur-md bg-black/20 border border-cyan-500/20 hover:border-cyan-500/50 transition-all duration-300 hover:bg-black/40">
+                    <div className={`text-3xl font-black text-${stat.accent}-400 mb-2 group-hover:scale-110 transition-transform`}>
+                      {stat.value}
+                    </div>
+                    <div className="text-xs text-gray-400 font-mono tracking-wider">
+                      {stat.label}
+                    </div>
+                    {/* Animated corner accents */}
+                    <div className={`absolute top-0 left-0 w-2 h-2 bg-${stat.accent}-400 opacity-0 group-hover:opacity-100 transition-opacity`}></div>
+                    <div className={`absolute bottom-0 right-0 w-2 h-2 bg-${stat.accent}-400 opacity-0 group-hover:opacity-100 transition-opacity`}></div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
       </section>
 
       {/* Features Section */}
-      <section id="features" className="py-24 bg-white">
+      <section id="features" className="relative z-10 py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-20">
-            <h2 className="text-4xl font-bold text-black mb-6">Why Traders Choose Solm8</h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Built for crypto traders, by crypto traders. Every feature designed to help you succeed.
+            <h2 className="text-5xl font-black text-white mb-6">
+              NEXT-GEN
+              <span className="block bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
+                TRADING TECH
+              </span>
+            </h2>
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+              Cutting-edge features designed for the future of crypto trading collaboration
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-            {/* AI Matching */}
-            <div className="text-center group">
-              <div className="bg-gradient-to-br from-purple-50 to-blue-50 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-all">
-                <span className="text-3xl">🤖</span>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              {
+                icon: "🤖",
+                title: "AI NEURAL MATCHING",
+                desc: "Advanced machine learning algorithms analyze trading patterns, risk profiles, and compatibility factors to create perfect partnerships.",
+                accent: "cyan",
+                delay: "0s"
+              },
+              {
+                icon: "📱",
+                title: "HOLOGRAPHIC PROFILES",
+                desc: "3D interactive trading profiles with real-time P&L visualization, achievement showcases, and social proof integration.",
+                accent: "purple", 
+                delay: "0.2s"
+              },
+              {
+                icon: "⚡",
+                title: "QUANTUM CHAT",
+                desc: "Encrypted, real-time communication with built-in strategy sharing, market analysis tools, and collaborative trading features.",
+                accent: "pink",
+                delay: "0.4s"
+              }
+            ].map((feature, index) => (
+              <div 
+                key={index} 
+                className="group relative"
+                style={{ animationDelay: feature.delay }}
+              >
+                <div className="relative p-8 rounded-2xl backdrop-blur-md bg-black/20 border border-cyan-500/20 hover:border-cyan-500/50 transition-all duration-500 hover:bg-black/40 hover:scale-105 overflow-hidden">
+                  {/* Animated background gradient */}
+                  <div className={`absolute inset-0 bg-gradient-to-br from-${feature.accent}-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500`}></div>
+                  
+                  <div className="relative z-10">
+                    <div className="text-6xl mb-6 group-hover:scale-110 transition-transform duration-300">
+                      {feature.icon}
+                    </div>
+                    <h3 className={`text-xl font-black text-${feature.accent}-400 mb-4 tracking-wider`}>
+                      {feature.title}
+                    </h3>
+                    <p className="text-gray-300 leading-relaxed">
+                      {feature.desc}
+                    </p>
+                  </div>
+                  
+                  {/* Corner accents */}
+                  <div className={`absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-${feature.accent}-400/20 to-transparent`}></div>
+                  <div className={`absolute bottom-0 left-0 w-16 h-16 bg-gradient-to-tr from-${feature.accent}-400/20 to-transparent`}></div>
+                </div>
               </div>
-              <h3 className="text-xl font-semibold text-black mb-4">AI-Powered Matching</h3>
-              <p className="text-gray-600 leading-relaxed">
-                Our advanced algorithm analyzes trading style, experience, and preferences to find your perfect trading partner.
-              </p>
-            </div>
-
-            {/* Shareable Profiles */}
-            <div className="text-center group">
-              <div className="bg-gradient-to-br from-green-50 to-emerald-50 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-all">
-                <span className="text-3xl">📱</span>
-              </div>
-              <h3 className="text-xl font-semibold text-black mb-4">Shareable Profiles</h3>
-              <p className="text-gray-600 leading-relaxed">
-                Showcase your trading achievements with PnL screenshots, build your reputation, and attract the right connections.
-              </p>
-            </div>
-
-            {/* Secure Chat */}
-            <div className="text-center group">
-              <div className="bg-gradient-to-br from-orange-50 to-red-50 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-all">
-                <span className="text-3xl">💬</span>
-              </div>
-              <h3 className="text-xl font-semibold text-black mb-4">Secure Conversations</h3>
-              <p className="text-gray-600 leading-relaxed">
-                Connect instantly with matched traders. Share strategies, discuss markets, and learn from each other safely.
-              </p>
-            </div>
-          </div>
-
-          {/* Additional Features Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-20">
-            <div className="bg-gray-50 p-8 rounded-2xl">
-              <h4 className="text-lg font-semibold text-black mb-4">🎯 Smart Recommendations</h4>
-              <p className="text-gray-600">Get personalized match suggestions based on your trading goals, experience level, and preferred tokens.</p>
-            </div>
-            <div className="bg-gray-50 p-8 rounded-2xl">
-              <h4 className="text-lg font-semibold text-black mb-4">📊 Portfolio Insights</h4>
-              <p className="text-gray-600">Share and compare trading strategies, analyze performance, and learn from successful traders.</p>
-            </div>
-            <div className="bg-gray-50 p-8 rounded-2xl">
-              <h4 className="text-lg font-semibold text-black mb-4">🌐 Global Community</h4>
-              <p className="text-gray-600">Connect with traders worldwide across different time zones and trading styles.</p>
-            </div>
-            <div className="bg-gray-50 p-8 rounded-2xl">
-              <h4 className="text-lg font-semibold text-black mb-4">🔒 Privacy First</h4>
-              <p className="text-gray-600">Your data is secure. Share only what you want, control your visibility, and trade with confidence.</p>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* How It Works */}
-      <section id="how-it-works" className="py-24 bg-gradient-to-br from-gray-50 to-white">
+      {/* How It Works - Futuristic Process */}
+      <section id="how-it-works" className="relative z-10 py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-20">
-            <h2 className="text-4xl font-bold text-black mb-6">How Solm8 Works</h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Get started in minutes and find your trading community today.
-            </p>
+            <h2 className="text-5xl font-black text-white mb-6">
+              ACTIVATION
+              <span className="block bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                PROTOCOL
+              </span>
+            </h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-            <div className="text-center">
-              <div className="bg-black text-white w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-6 text-lg font-bold">
-                1
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              { step: "01", title: "NEURAL SCAN", desc: "Connect your trading identity and let our AI analyze your profile" },
+              { step: "02", title: "QUANTUM MATCH", desc: "Advanced algorithms find your perfect trading counterparts" },
+              { step: "03", title: "SYNC & TRADE", desc: "Enter the matrix and start building your trading empire" }
+            ].map((step, index) => (
+              <div key={index} className="text-center group">
+                <div className="relative mx-auto mb-8">
+                  {/* Hexagonal frame */}
+                  <div className="relative w-24 h-24 mx-auto">
+                    <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/20 to-purple-500/20 rotate-45 rounded-lg backdrop-blur-sm border border-cyan-500/30 group-hover:rotate-90 transition-transform duration-500"></div>
+                    <div className="absolute inset-2 bg-black/60 rotate-45 rounded-lg flex items-center justify-center group-hover:rotate-90 transition-transform duration-500">
+                      <span className="text-2xl font-black text-cyan-400 -rotate-45 group-hover:-rotate-90 transition-transform duration-500">
+                        {step.step}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <h3 className="text-xl font-black text-white mb-4 tracking-wider">{step.title}</h3>
+                <p className="text-gray-300 leading-relaxed max-w-xs mx-auto">{step.desc}</p>
               </div>
-              <h3 className="text-xl font-semibold text-black mb-4">Create Your Profile</h3>
-              <p className="text-gray-600">
-                Connect with Twitter, add your trading experience, preferred tokens, and showcase your best trades.
-              </p>
-            </div>
-
-            <div className="text-center">
-              <div className="bg-black text-white w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-6 text-lg font-bold">
-                2
-              </div>
-              <h3 className="text-xl font-semibold text-black mb-4">Get AI Matches</h3>
-              <p className="text-gray-600">
-                Our AI analyzes your profile and suggests traders with complementary skills and compatible goals.
-              </p>
-            </div>
-
-            <div className="text-center">
-              <div className="bg-black text-white w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-6 text-lg font-bold">
-                3
-              </div>
-              <h3 className="text-xl font-semibold text-black mb-4">Start Trading Together</h3>
-              <p className="text-gray-600">
-                Connect, chat, share strategies, and grow your portfolio together with like-minded traders.
-              </p>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Community Section */}
-      <section id="community" className="py-24 bg-white">
+      {/* Community Section - Futuristic CTA */}
+      <section id="community" className="relative z-10 py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-gradient-to-r from-purple-600 to-blue-600 rounded-3xl p-12 text-center text-white">
-            <h2 className="text-4xl font-bold mb-6">Join the Solm8 Community</h2>
-            <p className="text-xl mb-8 opacity-90 max-w-2xl mx-auto">
-              Connect with thousands of traders, share your success stories, and build your trading network.
-            </p>
+          <div className="relative p-12 rounded-3xl backdrop-blur-md bg-gradient-to-br from-black/40 to-black/20 border border-cyan-500/30 overflow-hidden">
+            {/* Animated background elements */}
+            <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 via-purple-500/10 to-pink-500/10 animate-gradient"></div>
             
-            <form onSubmit={handleEmailSignup} className="max-w-md mx-auto">
-              <div className="flex flex-col sm:flex-row gap-4">
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Enter your email"
-                  className="flex-1 px-6 py-4 rounded-xl text-black placeholder-gray-500 border-none focus:ring-2 focus:ring-white/50"
-                  required
-                />
-                <button
-                  type="submit"
-                  className="bg-white text-purple-600 px-8 py-4 rounded-xl font-semibold hover:bg-gray-100 transition-all"
-                >
-                  Get Early Access
-                </button>
-              </div>
-            </form>
-            
-            <p className="text-sm opacity-75 mt-4">Join 1000+ traders already using Solm8</p>
+            <div className="relative z-10 text-center text-white">
+              <h2 className="text-5xl font-black mb-6">
+                <span className="bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
+                  JOIN THE REVOLUTION
+                </span>
+              </h2>
+              <p className="text-xl mb-8 text-gray-300 max-w-3xl mx-auto">
+                Enter the future of crypto trading collaboration. Limited beta access available.
+              </p>
+              
+              <form onSubmit={handleEmailSignup} className="max-w-md mx-auto">
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="Enter your neural link..."
+                    className="flex-1 px-6 py-4 rounded-xl bg-black/60 text-white placeholder-gray-400 border border-cyan-500/30 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 backdrop-blur-sm transition-all"
+                    required
+                  />
+                  <button
+                    type="submit"
+                    className="bg-gradient-to-r from-cyan-500 to-purple-500 text-white px-8 py-4 rounded-xl font-bold hover:scale-105 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/25"
+                  >
+                    ACTIVATE
+                  </button>
+                </div>
+              </form>
+              
+              <p className="text-sm text-gray-400 mt-6 font-mono">
+                &gt; 1000+ TRADERS CONNECTED TO THE MATRIX
+              </p>
+            </div>
           </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-black text-white py-16">
+      <footer className="relative z-10 bg-black/60 backdrop-blur-md border-t border-cyan-500/20 py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div className="col-span-1 md:col-span-2">
-              <h3 className="text-2xl font-bold mb-4">Solm8</h3>
-              <p className="text-gray-400 max-w-md">
-                The premier platform for crypto traders to connect, learn, and grow together. Find your trading partner today.
+              <h3 className="text-3xl font-black bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent mb-4">
+                Solm8
+              </h3>
+              <p className="text-gray-400 max-w-md leading-relaxed">
+                The neural network for crypto traders. Connect, collaborate, and conquer the markets together.
               </p>
             </div>
             
             <div>
-              <h4 className="font-semibold mb-4">Platform</h4>
-              <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-white transition-all">Features</a></li>
-                <li><a href="#" className="hover:text-white transition-all">How it Works</a></li>
-                <li><a href="#" className="hover:text-white transition-all">Pricing</a></li>
-                <li><a href="#" className="hover:text-white transition-all">Security</a></li>
+              <h4 className="font-bold text-cyan-400 mb-4 tracking-wider">MATRIX</h4>
+              <ul className="space-y-3 text-gray-400 font-mono text-sm">
+                <li><a href="#" className="hover:text-cyan-400 transition-all">&gt; FEATURES</a></li>
+                <li><a href="#" className="hover:text-cyan-400 transition-all">&gt; PROTOCOLS</a></li>
+                <li><a href="#" className="hover:text-cyan-400 transition-all">&gt; SECURITY</a></li>
+                <li><a href="#" className="hover:text-cyan-400 transition-all">&gt; NEURAL_NET</a></li>
               </ul>
             </div>
             
             <div>
-              <h4 className="font-semibold mb-4">Community</h4>
-              <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-white transition-all">Discord</a></li>
-                <li><a href="#" className="hover:text-white transition-all">Twitter</a></li>
-                <li><a href="#" className="hover:text-white transition-all">Telegram</a></li>
-                <li><a href="#" className="hover:text-white transition-all">Blog</a></li>
+              <h4 className="font-bold text-purple-400 mb-4 tracking-wider">NETWORK</h4>
+              <ul className="space-y-3 text-gray-400 font-mono text-sm">
+                <li><a href="#" className="hover:text-purple-400 transition-all">&gt; DISCORD_NODE</a></li>
+                <li><a href="#" className="hover:text-purple-400 transition-all">&gt; TWITTER_FEED</a></li>
+                <li><a href="#" className="hover:text-purple-400 transition-all">&gt; TELEGRAM_NET</a></li>
+                <li><a href="#" className="hover:text-purple-400 transition-all">&gt; DATA_STREAM</a></li>
               </ul>
             </div>
           </div>
           
-          <div className="border-t border-gray-800 mt-12 pt-8 flex flex-col md:flex-row items-center justify-between">
-            <p className="text-gray-400 text-sm">© 2024 Solm8. All rights reserved.</p>
-            <div className="flex space-x-6 mt-4 md:mt-0">
-              <a href="#" className="text-gray-400 hover:text-white transition-all text-sm">Privacy Policy</a>
-              <a href="#" className="text-gray-400 hover:text-white transition-all text-sm">Terms of Service</a>
-              <a href="#" className="text-gray-400 hover:text-white transition-all text-sm">Support</a>
+          <div className="border-t border-cyan-500/20 mt-12 pt-8 flex flex-col md:flex-row items-center justify-between">
+            <p className="text-gray-400 text-sm font-mono">© 2024 SOLM8.NETWORK // ALL_RIGHTS_RESERVED</p>
+            <div className="flex space-x-6 mt-4 md:mt-0 font-mono text-sm">
+              <a href="#" className="text-gray-400 hover:text-cyan-400 transition-all">&gt; PRIVACY_PROTOCOL</a>
+              <a href="#" className="text-gray-400 hover:text-cyan-400 transition-all">&gt; TERMS_MATRIX</a>
+              <a href="#" className="text-gray-400 hover:text-cyan-400 transition-all">&gt; SUPPORT_NET</a>
             </div>
           </div>
         </div>
