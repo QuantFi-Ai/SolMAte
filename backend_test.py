@@ -190,7 +190,7 @@ class SolMatchAPITester:
 
     def run_all_tests(self):
         """Run all API tests in sequence"""
-        print("🚀 Starting SolMatch API Tests")
+        print("🚀 Starting Solm8 API Tests")
         
         # Test health check
         self.test_health_check()
