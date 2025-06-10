@@ -920,6 +920,9 @@ async def create_demo_user():
             "avatar_url": demo_avatars[2],
             "bio": "Solana maximalist and NFT collector. Looking for diamond hands only! 💪",
             "location": "New York, NY",
+            "timezone": "America/New_York",
+            "user_status": "offline",
+            "last_activity": datetime.utcnow() - timedelta(minutes=45),  # 45 minutes ago
             "show_twitter": True,
             "twitter_username": "sol_degen_pro",
             "trading_experience": "Expert",
@@ -934,11 +937,15 @@ async def create_demo_user():
             "trading_hours": "Evening",
             "communication_style": "Professional",
             "preferred_communication_platform": "Telegram",
-            "preferred_trading_platform": "BullX",
-            "looking_for": ["Teaching", "Risk Management"],
+            "preferred_trading_platform": "Magic Eden",
+            "looking_for": ["Teaching", "Networking"],
+            "interested_in_token_launch": True,
+            "token_launch_experience": "Experienced",
+            "launch_timeline": "3-6 months",
+            "launch_budget": "$50K-$100K",
             "profile_complete": True,
             "created_at": datetime.utcnow(),
-            "last_active": datetime.utcnow()
+            "last_active": datetime.utcnow() - timedelta(minutes=45)
         },
         {
             "user_id": str(uuid.uuid4()),
