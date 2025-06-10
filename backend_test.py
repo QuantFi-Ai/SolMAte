@@ -261,6 +261,211 @@ class Solm8APITester:
             f"public-profile/{username}",
             200
         )
+        
+    # Authentication Tests
+    
+    def test_email_signup(self, email=None, password=None, display_name=None):
+        """Test email signup"""
+        if not email:
+            # Generate random email to avoid conflicts
+            random_suffix = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
+            email = f"test_{random_suffix}@example.com"
+        
+        if not password:
+            password = "TestPassword123!"
+            
+        if not display_name:
+            display_name = f"Test User {random_suffix}"
+            
+        data = {
+            "email": email,
+            "password": password,
+            "display_name": display_name
+        }
+        
+        success, response = self.run_test(
+            "Email Signup",
+            "POST",
+            "auth/email/signup",
+            200,
+            data=data
+        )
+        
+        if success:
+            self.email_user = response.get("user")
+            print(f"Created email user: {self.email_user['username']}")
+            
+        return success, response
+    
+    def test_email_signup_duplicate(self, email, password="TestPassword123!", display_name="Duplicate Test User"):
+        """Test email signup with duplicate email (should fail)"""
+        data = {
+            "email": email,
+            "password": password,
+            "display_name": display_name
+        }
+        
+        # This should fail with 400 status code
+        return self.run_test(
+            "Email Signup (Duplicate)",
+            "POST",
+            "auth/email/signup",
+            400,
+            data=data
+        )
+    
+    def test_email_signup_missing_fields(self):
+        """Test email signup with missing fields (should fail)"""
+        # Missing password
+        data = {
+            "email": "missing_fields@example.com",
+            "display_name": "Missing Fields User"
+        }
+        
+        # This should fail with 422 status code (validation error)
+        return self.run_test(
+            "Email Signup (Missing Fields)",
+            "POST",
+            "auth/email/signup",
+            422,
+            data=data
+        )
+    
+    def test_email_login(self, email, password="TestPassword123!"):
+        """Test email login"""
+        data = {
+            "email": email,
+            "password": password
+        }
+        
+        return self.run_test(
+            "Email Login",
+            "POST",
+            "auth/email/login",
+            200,
+            data=data
+        )
+    
+    def test_email_login_invalid(self, email, wrong_password="WrongPassword123!"):
+        """Test email login with invalid credentials (should fail)"""
+        data = {
+            "email": email,
+            "password": wrong_password
+        }
+        
+        # This should fail with 401 status code
+        return self.run_test(
+            "Email Login (Invalid Credentials)",
+            "POST",
+            "auth/email/login",
+            401,
+            data=data
+        )
+    
+    def test_email_login_nonexistent(self):
+        """Test email login with non-existent email (should fail)"""
+        data = {
+            "email": "nonexistent_user@example.com",
+            "password": "SomePassword123!"
+        }
+        
+        # This should fail with 401 status code
+        return self.run_test(
+            "Email Login (Non-existent User)",
+            "POST",
+            "auth/email/login",
+            401,
+            data=data
+        )
+    
+    def test_get_wallet_message(self):
+        """Test getting message for wallet signature"""
+        success, response = self.run_test(
+            "Get Wallet Message",
+            "GET",
+            "auth/wallet/message",
+            200
+        )
+        
+        if success:
+            self.wallet_message = response.get("message")
+            print(f"Got wallet message: {self.wallet_message}")
+            
+        return success, response
+    
+    def test_wallet_connect(self, wallet_address=None, signature=None, message=None):
+        """Test connecting with Solana wallet"""
+        if not wallet_address:
+            # Generate random wallet address
+            wallet_address = ''.join(random.choices(string.ascii_lowercase + string.digits, k=44))
+            
+        if not signature:
+            # Generate random signature
+            signature = ''.join(random.choices(string.ascii_lowercase + string.digits, k=88))
+            
+        if not message:
+            message = self.wallet_message or f"Sign this message to authenticate with Solm8: {int(time.time())}"
+            
+        data = {
+            "wallet_address": wallet_address,
+            "signature": signature,
+            "message": message
+        }
+        
+        success, response = self.run_test(
+            "Wallet Connect",
+            "POST",
+            "auth/wallet/connect",
+            200,
+            data=data
+        )
+        
+        if success:
+            self.wallet_user = response.get("user")
+            print(f"Connected wallet user: {self.wallet_user['username']}")
+            
+        return success, response
+    
+    def test_wallet_connect_duplicate(self, wallet_address, signature=None, message=None):
+        """Test connecting with the same wallet address again"""
+        if not signature:
+            # Generate random signature
+            signature = ''.join(random.choices(string.ascii_lowercase + string.digits, k=88))
+            
+        if not message:
+            message = self.wallet_message or f"Sign this message to authenticate with Solm8: {int(time.time())}"
+            
+        data = {
+            "wallet_address": wallet_address,
+            "signature": signature,
+            "message": message
+        }
+        
+        # This should succeed with 200 status code (existing user login)
+        return self.run_test(
+            "Wallet Connect (Duplicate)",
+            "POST",
+            "auth/wallet/connect",
+            200,
+            data=data
+        )
+    
+    def test_wallet_connect_invalid(self):
+        """Test connecting with invalid wallet address (should fail)"""
+        data = {
+            "wallet_address": "invalid",  # Too short
+            "signature": "some_signature",
+            "message": "some_message"
+        }
+        
+        # This should fail with 400 status code
+        return self.run_test(
+            "Wallet Connect (Invalid)",
+            "POST",
+            "auth/wallet/connect",
+            400,
+            data=data
+        )
 
     def create_test_image(self):
         """Create a temporary test image for upload testing"""
