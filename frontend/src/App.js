@@ -1130,6 +1130,32 @@ function App() {
             </button>
           </div>
 
+          {/* Active Users Filter */}
+          <div className="flex items-center justify-between mb-6 p-3 bg-white rounded-lg border border-gray-200">
+            <div className="flex items-center space-x-2">
+              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+              <span className="text-sm font-medium text-gray-700">Show only active traders</span>
+            </div>
+            <button
+              onClick={() => {
+                setShowOnlyActive(!showOnlyActive);
+                // Refresh cards with new filter
+                if (discoveryMode === 'browse') {
+                  fetchDiscoveryCards();
+                } else {
+                  fetchAiRecommendations();
+                }
+              }}
+              className={`w-12 h-6 rounded-full transition-all duration-200 focus:outline-none ${
+                showOnlyActive ? 'bg-green-500' : 'bg-gray-300'
+              }`}
+            >
+              <div className={`w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-200 ${
+                showOnlyActive ? 'translate-x-6' : 'translate-x-0.5'
+              }`}></div>
+            </button>
+          </div>
+
           {getCurrentIndex() < getCurrentCards().length ? (
             <div className="bg-white rounded-2xl overflow-hidden shadow-lg border border-gray-200">
               {/* AI Compatibility Banner */}
