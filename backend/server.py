@@ -129,6 +129,18 @@ class SocialLinks(BaseModel):
     website: Optional[str] = ""
     linkedin: Optional[str] = ""
 
+class UserStatusUpdate(BaseModel):
+    user_status: str  # "active" or "offline"
+
+class TokenLaunchProfile(BaseModel):
+    user_id: str
+    interested_in_token_launch: bool
+    token_launch_experience: str = ""  # "None", "Beginner", "Experienced", "Expert"
+    launch_timeline: str = ""  # "Immediate", "1-3 months", "3-6 months", "6+ months", "Just researching"
+    launch_budget: str = ""  # "Under $10K", "$10K-$50K", "$50K-$100K", "$100K+", "Prefer not to say"
+    project_type: str = ""  # "Meme Coin", "Utility Token", "DeFi Protocol", "GameFi", "NFT Project", "Other"
+    looking_for_help_with: List[str] = []  # ["Technical Development", "Marketing", "Community Building", "Funding", "Legal/Compliance"]
+
 # AI Matching Algorithm
 class AIMatchingService:
     @staticmethod
