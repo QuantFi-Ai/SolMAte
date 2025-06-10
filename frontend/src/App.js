@@ -279,9 +279,10 @@ function App() {
   const fetchDiscoveryCards = async () => {
     try {
       const response = await fetch(`${API_BASE_URL}/api/discover/${currentUser.user_id}`);
-      const cards = await response.json();
-      setDiscoveryCards(cards);
-      setCurrentCardIndex(0);
+      if (response.ok) {
+        const data = await response.json();
+        setDiscoveryCards(filterCardsByStatus(data.potential_matches || []));
+      }
     } catch (error) {
       console.error('Error fetching discovery cards:', error);
     }
@@ -289,11 +290,10 @@ function App() {
 
   const fetchAiRecommendations = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/ai-recommendations/${currentUser.user_id}`);
+      const response = await fetch(`${API_BASE_URL}/api/ai-matches/${currentUser.user_id}`);
       if (response.ok) {
-        const recommendations = await response.json();
-        setAiRecommendations(recommendations);
-        setCurrentAiIndex(0);
+        const data = await response.json();
+        setAiRecommendations(filterCardsByStatus(data.ai_matches || []));
       }
     } catch (error) {
       console.error('Error fetching AI recommendations:', error);
