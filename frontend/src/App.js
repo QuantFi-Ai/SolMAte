@@ -1181,6 +1181,18 @@ function App() {
                   alt="Profile"
                   className="w-full h-96 object-cover"
                 />
+                {/* Status Indicator */}
+                {getCurrentCard()?.user_status === 'active' && (
+                  <div className="absolute top-4 right-4 flex items-center space-x-1 bg-green-500 text-white px-2 py-1 rounded-full text-xs font-medium">
+                    <div className="w-2 h-2 bg-white rounded-full"></div>
+                    <span>Active</span>
+                  </div>
+                )}
+                {getCurrentCard()?.timezone && (
+                  <div className="absolute top-4 left-4 bg-black/70 text-white px-2 py-1 rounded text-xs">
+                    🌍 {getCurrentCard().timezone.replace('_', ' ')}
+                  </div>
+                )}
                 <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6">
                   <h3 className="text-2xl font-bold text-white">
                     {getCurrentCard()?.display_name}
