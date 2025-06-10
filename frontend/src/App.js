@@ -120,15 +120,6 @@ function App() {
     display_name: ''
   });
   const [authLoading, setAuthLoading] = useState(false);
-  
-  // Email/Password Authentication
-  const [authMode, setAuthMode] = useState('signin'); // 'signin', 'signup', 'wallet'
-  const [emailForm, setEmailForm] = useState({
-    email: '',
-    password: '',
-    display_name: ''
-  });
-  const [authLoading, setAuthLoading] = useState(false);
 
   // Handle auth callback on page load
   useEffect(() => {
