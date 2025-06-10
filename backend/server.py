@@ -28,7 +28,7 @@ trading_highlights_collection = db.trading_highlights
 social_links_collection = db.social_links
 
 # FastAPI app
-app = FastAPI(title="SolMatch API", version="1.0.0")
+app = FastAPI(title="Solm8 API", version="1.0.0")
 
 # CORS middleware
 app.add_middleware(
