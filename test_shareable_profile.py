@@ -120,7 +120,7 @@ def test_new_endpoints():
     else:
         print(f"❌ Failed to get public profile: {response.status_code}")
     
-    print("\n🎉 Shareable Profile Endpoint Testing Complete!")
+    print("\n🎉 Solm8 Shareable Profile Endpoint Testing Complete!")
 
 if __name__ == "__main__":
     test_new_endpoints()
