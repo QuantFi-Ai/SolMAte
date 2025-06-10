@@ -298,7 +298,7 @@ const LandingPage = () => {
           <div className="text-center mb-20">
             <h2 className="text-5xl font-black text-white mb-6">
               ACTIVATION
-              <span className="block bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+              <span className="block text-gray-300">
                 PROTOCOL
               </span>
             </h2>
