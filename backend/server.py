@@ -31,6 +31,58 @@ trading_highlights_collection = db.trading_highlights
 social_links_collection = db.social_links
 token_launch_profiles_collection = db.token_launch_profiles
 
+# Authentication utilities
+def hash_password(password: str) -> str:
+    """Hash a password using bcrypt"""
+    salt = bcrypt.gensalt()
+    hashed = bcrypt.hashpw(password.encode('utf-8'), salt)
+    return hashed.decode('utf-8')
+
+def verify_password(password: str, hashed: str) -> bool:
+    """Verify a password against its hash"""
+    return bcrypt.checkpw(password.encode('utf-8'), hashed.encode('utf-8'))
+
+def create_user_profile(user_data: dict) -> dict:
+    """Create a standardized user profile"""
+    return {
+        "user_id": str(uuid.uuid4()),
+        "email": user_data.get("email", ""),
+        "wallet_address": user_data.get("wallet_address", ""),
+        "twitter_id": user_data.get("twitter_id", ""),
+        "username": user_data.get("username", ""),
+        "display_name": user_data.get("display_name", ""),
+        "avatar_url": user_data.get("avatar_url", "https://images.pexels.com/photos/31610834/pexels-photo-31610834.jpeg"),
+        "bio": user_data.get("bio", ""),
+        "location": user_data.get("location", ""),
+        "timezone": user_data.get("timezone", ""),
+        "user_status": "active",
+        "last_activity": datetime.utcnow(),
+        "show_twitter": user_data.get("show_twitter", False),
+        "twitter_username": user_data.get("twitter_username", ""),
+        "trading_experience": "",
+        "years_trading": 0,
+        "preferred_tokens": [],
+        "trading_style": "",
+        "portfolio_size": "",
+        "risk_tolerance": "",
+        "best_trade": "",
+        "worst_trade": "",
+        "favorite_project": "",
+        "trading_hours": "",
+        "communication_style": "",
+        "preferred_communication_platform": "",
+        "preferred_trading_platform": "",
+        "looking_for": [],
+        "interested_in_token_launch": False,
+        "token_launch_experience": "",
+        "launch_timeline": "",
+        "launch_budget": "",
+        "profile_complete": False,
+        "created_at": datetime.utcnow(),
+        "last_active": datetime.utcnow(),
+        "auth_method": user_data.get("auth_method", "email")  # "email", "wallet", "twitter", "demo"
+    }
+
 # FastAPI app
 app = FastAPI(title="Solm8 API", version="1.0.0")
 
