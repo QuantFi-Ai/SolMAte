@@ -1305,18 +1305,18 @@ function App() {
                   {/* Token Launch Interest */}
                   {getCurrentCard()?.interested_in_token_launch && (
                     <div>
-                      <span className="text-sm font-medium text-gray-500 block mb-2">Token Launch Interest:</span>
+                      <span className="text-sm font-medium text-gray-500 block mb-2">Project Interest:</span>
                       <div className="flex flex-wrap gap-1">
-                        <span className="bg-purple-100 text-purple-800 px-2 py-1 rounded-full text-xs font-medium">
-                          🚀 Token Launcher
+                        <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
+                          💰 Project Builder
                         </span>
                         {getCurrentCard()?.token_launch_experience && (
-                          <span className="bg-purple-50 text-purple-700 px-2 py-1 rounded-full text-xs">
+                          <span className="bg-blue-50 text-blue-700 px-2 py-1 rounded-full text-xs">
                             {getCurrentCard().token_launch_experience} Experience
                           </span>
                         )}
                         {getCurrentCard()?.launch_timeline && (
-                          <span className="bg-purple-50 text-purple-700 px-2 py-1 rounded-full text-xs">
+                          <span className="bg-blue-50 text-blue-700 px-2 py-1 rounded-full text-xs">
                             Timeline: {getCurrentCard().launch_timeline}
                           </span>
                         )}
