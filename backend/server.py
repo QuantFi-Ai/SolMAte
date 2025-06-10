@@ -730,6 +730,9 @@ async def twitter_callback(request: Request):
                 "avatar_url": twitter_user['profile_image_url_https'].replace('_normal', '_400x400'),
                 "bio": twitter_user.get('description', ''),
                 "location": "",
+                "timezone": "",
+                "user_status": "active",  # New users start as active
+                "last_activity": datetime.utcnow(),
                 "show_twitter": True,
                 "twitter_username": twitter_user['screen_name'],
                 "trading_experience": "",
@@ -746,6 +749,10 @@ async def twitter_callback(request: Request):
                 "preferred_communication_platform": "",
                 "preferred_trading_platform": "",
                 "looking_for": [],
+                "interested_in_token_launch": False,
+                "token_launch_experience": "",
+                "launch_timeline": "",
+                "launch_budget": "",
                 "profile_complete": False,
                 "created_at": datetime.utcnow(),
                 "last_active": datetime.utcnow()
