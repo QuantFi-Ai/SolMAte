@@ -219,6 +219,8 @@ class Solm8APITester:
     
     def test_update_token_launch_profile(self, user_id, token_profile_data):
         """Test updating token launch profile"""
+        # Add user_id to the token profile data
+        token_profile_data["user_id"] = user_id
         return self.run_test(
             "Update Token Launch Profile",
             "POST",
