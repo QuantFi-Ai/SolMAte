@@ -363,55 +363,9 @@ function AppContent() {
     }
   };
 
-  // Solana Wallet Authentication
+  // Temporary wallet connect placeholder
   const handleWalletConnect = async () => {
-    if (!connected || !publicKey || !signMessage) {
-      alert('Please connect your wallet first');
-      return;
-    }
-    
-    setAuthLoading(true);
-    try {
-      // Get message to sign
-      const messageResponse = await fetch(`${API_BASE_URL}/api/auth/wallet/message`);
-      const { message } = await messageResponse.json();
-      
-      // Sign the message
-      const encodedMessage = new TextEncoder().encode(message);
-      const signature = await signMessage(encodedMessage);
-      
-      // Authenticate with backend
-      const response = await fetch(`${API_BASE_URL}/api/auth/wallet/connect`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          wallet_address: publicKey.toString(),
-          signature: Array.from(signature),
-          message: message
-        })
-      });
-      
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.detail || 'Wallet authentication failed');
-      }
-      
-      const data = await response.json();
-      setCurrentUser(data.user);
-      
-      // Check if profile is complete
-      if (!data.user.profile_complete) {
-        setCurrentView('profile-setup');
-      } else {
-        setCurrentView('discover');
-      }
-      
-    } catch (error) {
-      console.error('Wallet auth error:', error);
-      alert(error.message || 'Wallet authentication failed. Please try again.');
-    } finally {
-      setAuthLoading(false);
-    }
+    alert('Wallet authentication coming soon! Please use email/password for now.');
   };
 
   // Email/Password Authentication Functions
