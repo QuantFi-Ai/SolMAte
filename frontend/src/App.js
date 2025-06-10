@@ -1326,13 +1326,13 @@ function App() {
 
                   {/* AI Compatibility Details */}
                   {discoveryMode === 'ai' && getCurrentCard()?.ai_compatibility && (
-                    <div className="mt-4 p-3 bg-purple-50 rounded-lg">
-                      <span className="text-sm font-medium text-purple-800 block mb-2">
-                        Why AI Recommends This Match:
+                    <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+                      <span className="text-sm font-medium text-blue-800 block mb-2">
+                        Why This Is A Good Match:
                       </span>
                       <div className="space-y-1">
                         {Object.entries(getCurrentCard().ai_compatibility.breakdown).map(([key, value]) => (
-                          <div key={key} className="text-xs text-purple-700">
+                          <div key={key} className="text-xs text-blue-700">
                             <span className="capitalize font-medium">{key}:</span> {value.reason}
                           </div>
                         ))}
