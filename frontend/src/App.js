@@ -57,6 +57,8 @@ function App() {
   const TRADING_PLATFORM_OPTIONS = ['Axiom', 'BullX', 'Photon', 'Padre', 'Jupiter', 'Raydium', 'Birdeye', 'DexScreener', 'Other'];
   const LOOKING_FOR_OPTIONS = ['Learning', 'Teaching', 'Alpha Sharing', 'Research Partner', 'Risk Management', 'Networking'];
 
+  const [showProfileManager, setShowProfileManager] = useState(false);
+
   // Handle auth callback on page load
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
