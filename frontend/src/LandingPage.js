@@ -289,19 +289,19 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* How It Works - Futuristic Process */}
-      <section id="how-it-works" className="relative z-10 py-24">
+      {/* How It Works - Clean Process */}
+      <section id="how-it-works" className="relative z-10 py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-20">
-            <h2 className="text-5xl font-black text-white mb-6">
+            <h2 className="text-5xl font-black text-black mb-6">
               ACTIVATION
-              <span className="block text-gray-300">
+              <span className="block text-gray-600">
                 PROTOCOL
               </span>
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
             {[
               { step: "01", title: "NEURAL SCAN", desc: "Connect your trading identity and let our AI analyze your profile" },
               { step: "02", title: "QUANTUM MATCH", desc: "Advanced algorithms find your perfect trading counterparts" },
@@ -309,18 +309,18 @@ const LandingPage = () => {
             ].map((step, index) => (
               <div key={index} className="text-center group">
                 <div className="relative mx-auto mb-8">
-                  {/* Hexagonal frame */}
+                  {/* Clean geometric frame */}
                   <div className="relative w-24 h-24 mx-auto">
-                    <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/20 to-purple-500/20 rotate-45 rounded-lg backdrop-blur-sm border border-cyan-500/30 group-hover:rotate-90 transition-transform duration-500"></div>
-                    <div className="absolute inset-2 bg-black/60 rotate-45 rounded-lg flex items-center justify-center group-hover:rotate-90 transition-transform duration-500">
-                      <span className="text-2xl font-black text-cyan-400 -rotate-45 group-hover:-rotate-90 transition-transform duration-500">
+                    <div className="absolute inset-0 bg-gradient-to-br from-gray-100 to-gray-200 rotate-45 rounded-lg backdrop-blur-sm border border-gray-300 group-hover:rotate-90 transition-transform duration-500"></div>
+                    <div className="absolute inset-2 bg-white rotate-45 rounded-lg flex items-center justify-center group-hover:rotate-90 transition-transform duration-500 border border-gray-200">
+                      <span className="text-2xl font-black text-black -rotate-45 group-hover:-rotate-90 transition-transform duration-500">
                         {step.step}
                       </span>
                     </div>
                   </div>
                 </div>
-                <h3 className="text-xl font-black text-white mb-4 tracking-wider">{step.title}</h3>
-                <p className="text-gray-300 leading-relaxed max-w-xs mx-auto">{step.desc}</p>
+                <h3 className="text-xl font-black text-black mb-4 tracking-wider">{step.title}</h3>
+                <p className="text-gray-600 leading-relaxed max-w-xs mx-auto">{step.desc}</p>
               </div>
             ))}
           </div>
