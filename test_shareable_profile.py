@@ -18,7 +18,7 @@ def create_test_image():
     return img_buffer
 
 def test_new_endpoints():
-    print("🚀 Testing New Shareable Profile Endpoints\n")
+    print("🚀 Testing New Shareable Profile Endpoints for Solm8\n")
     
     # Step 1: Create a demo user
     print("1. Creating demo user...")
