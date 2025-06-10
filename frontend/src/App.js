@@ -1160,16 +1160,16 @@ function App() {
             <div className="bg-white rounded-2xl overflow-hidden shadow-lg border border-gray-200">
               {/* AI Compatibility Banner */}
               {discoveryMode === 'ai' && getCurrentCard()?.ai_compatibility && (
-                <div className="bg-gradient-to-r from-purple-500 to-blue-600 text-white p-4">
+                <div className="bg-gradient-to-r from-blue-500 to-green-600 text-white p-4">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium">AI Compatibility</span>
+                    <span className="text-sm font-medium">Match Score</span>
                     <span className="text-2xl font-bold">
                       {getCurrentCard().ai_compatibility.compatibility_percentage}%
                     </span>
                   </div>
                   <div className="space-y-1">
                     {getCurrentCard().ai_compatibility.recommendations.map((rec, idx) => (
-                      <p key={idx} className="text-xs text-purple-100">{rec}</p>
+                      <p key={idx} className="text-xs text-blue-100">{rec}</p>
                     ))}
                   </div>
                 </div>
