@@ -25,8 +25,7 @@ function App() {
   const [profileForm, setProfileForm] = useState({
     bio: '',
     location: '',
-    show_twitter: true,
-    twitter_username: '',
+    timezone: '',
     trading_experience: '',
     years_trading: 0,
     preferred_tokens: [],
@@ -40,7 +39,13 @@ function App() {
     communication_style: '',
     preferred_communication_platform: '',
     preferred_trading_platform: '',
-    looking_for: []
+    looking_for: [],
+    show_twitter: true,
+    twitter_username: '',
+    interested_in_token_launch: false,
+    token_launch_experience: '',
+    launch_timeline: '',
+    launch_budget: ''
   });
 
   const messagesEndRef = useRef(null);
