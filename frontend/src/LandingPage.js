@@ -327,18 +327,18 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Community Section - Futuristic CTA */}
-      <section id="community" className="relative z-10 py-24">
+      {/* Community Section - Clean CTA */}
+      <section id="community" className="relative z-10 py-24 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="relative p-12 rounded-3xl backdrop-blur-md bg-gradient-to-br from-black/40 to-black/20 border border-white/20 overflow-hidden">
-            {/* Animated background elements */}
-            <div className="absolute inset-0 bg-gradient-to-r from-white/5 via-gray-500/5 to-white/5 animate-gradient"></div>
+          <div className="relative p-12 rounded-3xl backdrop-blur-md bg-white/80 border border-gray-200 overflow-hidden shadow-xl">
+            {/* Subtle background elements */}
+            <div className="absolute inset-0 bg-gradient-to-r from-gray-50/50 via-white/50 to-gray-50/50 animate-gradient"></div>
             
-            <div className="relative z-10 text-center text-white">
+            <div className="relative z-10 text-center text-black">
               <h2 className="text-5xl font-black mb-6">
                 JOIN THE REVOLUTION
               </h2>
-              <p className="text-xl mb-8 text-gray-300 max-w-3xl mx-auto">
+              <p className="text-xl mb-8 text-gray-600 max-w-3xl mx-auto">
                 Enter the future of crypto trading collaboration. Limited beta access available.
               </p>
               
@@ -349,19 +349,19 @@ const LandingPage = () => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="Enter your neural link..."
-                    className="flex-1 px-6 py-4 rounded-xl bg-black/60 text-white placeholder-gray-400 border border-white/20 focus:border-white focus:ring-2 focus:ring-white/20 backdrop-blur-sm transition-all"
+                    className="flex-1 px-6 py-4 rounded-xl bg-white text-black placeholder-gray-400 border border-gray-300 focus:border-black focus:ring-2 focus:ring-black/20 backdrop-blur-sm transition-all"
                     required
                   />
                   <button
                     type="submit"
-                    className="bg-white text-black px-8 py-4 rounded-xl font-bold hover:scale-105 transition-all duration-300 hover:shadow-lg hover:shadow-white/25"
+                    className="bg-black text-white px-8 py-4 rounded-xl font-bold hover:scale-105 transition-all duration-300 hover:shadow-lg hover:shadow-black/25"
                   >
                     ACTIVATE
                   </button>
                 </div>
               </form>
               
-              <p className="text-sm text-gray-400 mt-6 font-mono">
+              <p className="text-sm text-gray-500 mt-6 font-mono">
                 &gt; 1000+ TRADERS CONNECTED TO THE MATRIX
               </p>
             </div>
