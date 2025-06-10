@@ -361,6 +361,12 @@ function App() {
     const file = event.target.files[0];
     if (!file) return;
 
+    // Check if user is logged in
+    if (!currentUser || !currentUser.user_id) {
+      alert('Please log in to upload a profile picture');
+      return;
+    }
+
     // Validate file type
     if (!file.type.startsWith('image/')) {
       alert('Please select an image file');
