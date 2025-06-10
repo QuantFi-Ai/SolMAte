@@ -82,37 +82,36 @@ const LandingPage = () => {
       </div>
 
       {/* Navigation */}
-      <nav className="relative z-50 backdrop-blur-md bg-black/20 border-b border-cyan-500/20">
+      <nav className="relative z-50 backdrop-blur-md bg-black/20 border-b border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center">
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
+              <h1 className="text-2xl font-bold text-white">
                 Solm8
               </h1>
-              <div className="ml-3 px-2 py-1 text-xs bg-cyan-500/20 text-cyan-300 rounded-full border border-cyan-500/30">
+              <div className="ml-3 px-2 py-1 text-xs bg-white/10 text-gray-300 rounded-full border border-white/20">
                 BETA
               </div>
             </div>
             
             <div className="hidden md:flex items-center space-x-8">
-              <a href="#features" className="text-gray-300 hover:text-cyan-400 transition-all duration-300 relative group">
+              <a href="#features" className="text-gray-300 hover:text-white transition-all duration-300 relative group">
                 Features
-                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-cyan-400 group-hover:w-full transition-all duration-300"></span>
+                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-white group-hover:w-full transition-all duration-300"></span>
               </a>
-              <a href="#how-it-works" className="text-gray-300 hover:text-cyan-400 transition-all duration-300 relative group">
+              <a href="#how-it-works" className="text-gray-300 hover:text-white transition-all duration-300 relative group">
                 How it Works
-                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-cyan-400 group-hover:w-full transition-all duration-300"></span>
+                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-white group-hover:w-full transition-all duration-300"></span>
               </a>
-              <a href="#community" className="text-gray-300 hover:text-cyan-400 transition-all duration-300 relative group">
+              <a href="#community" className="text-gray-300 hover:text-white transition-all duration-300 relative group">
                 Community
-                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-cyan-400 group-hover:w-full transition-all duration-300"></span>
+                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-white group-hover:w-full transition-all duration-300"></span>
               </a>
               <button 
                 onClick={handleGetStarted}
-                className="relative px-6 py-2 bg-gradient-to-r from-cyan-500 to-purple-500 text-white rounded-lg font-medium overflow-hidden group transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/25"
+                className="relative px-6 py-2 bg-white text-black rounded-lg font-medium overflow-hidden group transition-all duration-300 hover:shadow-lg hover:shadow-white/25 hover:bg-gray-100"
               >
                 <span className="relative z-10">Launch App</span>
-                <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-cyan-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </button>
             </div>
             
