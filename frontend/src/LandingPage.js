@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 
 const LandingPage = () => {
   const [email, setEmail] = useState('');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleGetStarted = () => {
     // Redirect to the main app
