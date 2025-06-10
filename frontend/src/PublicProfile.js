@@ -35,7 +35,7 @@ const PublicProfile = () => {
   };
 
   const shareOnTwitter = () => {
-    const text = `Check out ${profile.display_name}'s trading profile on SolMatch!`;
+    const text = `Check out ${profile.display_name}'s trading profile on Solm8!`;
     const url = window.location.href;
     window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, '_blank');
   };
