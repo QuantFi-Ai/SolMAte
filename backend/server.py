@@ -735,7 +735,7 @@ async def twitter_callback(request: Request):
         return RedirectResponse(url=frontend_url)
         
     except Exception as e:
-        return RedirectResponse(url=f"{request.base_url.replace(request.base_url.path, '')}?auth_error=true")
+        return RedirectResponse(url=f"https://6d4fa949-a991-4f95-aa5c-530bff69c87b.preview.emergentagent.com/app?auth_error=true")
 
 @app.post("/api/upload-profile-image/{user_id}")
 async def upload_profile_image(user_id: str, file: UploadFile = File(...)):
