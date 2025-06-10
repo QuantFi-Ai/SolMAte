@@ -107,11 +107,11 @@ user_problem_statement: "Add user status system (active/offline) and token launc
 backend:
   - task: "User Status Management System"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
@@ -128,6 +128,9 @@ backend:
       - working: "NA"
         agent: "main"
         comment: "Implemented POST /api/user/{user_id}/update-activity - Update last activity timestamp"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: All user status management endpoints working correctly. Successfully tested status toggle between active/offline, auto-offline functionality, and active users filtering."
 
   - task: "Token Launch Profile System"
     implemented: true
