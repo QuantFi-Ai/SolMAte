@@ -445,6 +445,7 @@ test_plan:
     - "Token Launch Profile System" 
     - "Updated User Registration and Demo Data"
     - "Enhanced Public Profile API"
+    - "Email Authentication System"
     - "User Status Toggle and Indicators"
     - "Token Launch Profile Integration"
     - "Enhanced Profile Setup Form"
