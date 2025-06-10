@@ -26,6 +26,7 @@ swipes_collection = db.swipes
 profile_images_collection = db.profile_images
 trading_highlights_collection = db.trading_highlights
 social_links_collection = db.social_links
+token_launch_profiles_collection = db.token_launch_profiles
 
 # FastAPI app
 app = FastAPI(title="Solm8 API", version="1.0.0")
