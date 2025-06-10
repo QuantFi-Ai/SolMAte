@@ -1,17 +1,20 @@
 import os
 import uuid
 import base64
+import hashlib
+import secrets
 from datetime import datetime, timedelta, timedelta
 from typing import List, Optional
 from fastapi import FastAPI, HTTPException, Request, WebSocket, WebSocketDisconnect, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 from pymongo import MongoClient
 import asyncio
 import json
 from authlib.integrations.starlette_client import OAuth
 from starlette.config import Config
+import bcrypt
 
 # Database setup
 MONGO_URL = os.environ.get('MONGO_URL', 'mongodb://localhost:27017')
