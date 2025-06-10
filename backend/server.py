@@ -671,7 +671,7 @@ async def login_twitter(request: Request):
         print(f"Twitter OAuth error: {str(e)}")
         # For demo purposes, return a mock success for now
         mock_user_id = str(uuid.uuid4())
-        frontend_url = f"https://6d4fa949-a991-4f95-aa5c-530bff69c87b.preview.emergentagent.com?auth_success=true&user_id={mock_user_id}&demo=true"
+        frontend_url = f"https://6d4fa949-a991-4f95-aa5c-530bff69c87b.preview.emergentagent.com/app?auth_success=true&user_id={mock_user_id}&demo=true"
         return RedirectResponse(url=frontend_url)
 
 @app.get("/api/auth/twitter/callback")
