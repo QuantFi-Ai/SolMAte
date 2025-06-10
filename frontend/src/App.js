@@ -1421,7 +1421,7 @@ function App() {
                   {match.other_user.user_status === 'active' && (
                     <div className="absolute top-3 right-3 flex items-center space-x-1 bg-green-500 text-white px-2 py-1 rounded-full text-xs font-medium">
                       <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
-                      <span>Online</span>
+                      <span>Trading Now</span>
                     </div>
                   )}
                   
