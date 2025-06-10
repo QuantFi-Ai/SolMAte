@@ -572,27 +572,54 @@ function App() {
         <div className="max-w-md w-full bg-white border border-gray-200 rounded-2xl p-8 shadow-lg">
           <div className="text-center mb-8">
             <h1 className="text-4xl font-bold text-black mb-2">Solm8</h1>
-            <p className="text-gray-600">Find your perfect trading partner</p>
+            <p className="text-gray-600">Connect with like-minded Solana traders</p>
           </div>
           
-          <div className="space-y-4">
+          <div className="space-y-6">
             <div className="text-center">
-              <p className="text-gray-700 mb-6">Connect with Solana traders for collaborative trenching sessions</p>
-              <button
-                onClick={handleTwitterLogin}
-                className="w-full bg-black hover:bg-gray-800 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 flex items-center justify-center space-x-2 mb-4"
-              >
-                <span>🐦</span>
-                <span>Continue with Twitter</span>
-              </button>
-              <div className="text-gray-400 text-sm mb-4">or</div>
-              <button
-                onClick={handleDemoLogin}
-                className="w-full border border-gray-300 hover:bg-gray-50 text-black font-semibold py-3 px-6 rounded-xl transition-all duration-200 flex items-center justify-center space-x-2"
-              >
-                <span>🎮</span>
-                <span>Try Demo Mode</span>
-              </button>
+              <h2 className="text-xl font-semibold text-black mb-4">Join the Trading Community</h2>
+              <p className="text-gray-700 mb-6">Connect, collaborate, and profit together</p>
+              
+              {/* Sign Up Section */}
+              <div className="mb-6">
+                <h3 className="text-sm font-medium text-gray-800 mb-3">New to Solm8?</h3>
+                <button
+                  onClick={handleTwitterLogin}
+                  className="w-full bg-black hover:bg-gray-800 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 flex items-center justify-center space-x-2 mb-3"
+                >
+                  <span>🐦</span>
+                  <span>Sign Up with Twitter</span>
+                </button>
+                <button
+                  onClick={handleDemoLogin}
+                  className="w-full border border-gray-300 hover:bg-gray-50 text-black font-semibold py-3 px-6 rounded-xl transition-all duration-200 flex items-center justify-center space-x-2"
+                >
+                  <span>🎮</span>
+                  <span>Try Demo Account</span>
+                </button>
+              </div>
+
+              {/* Divider */}
+              <div className="relative my-6">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-300"></div>
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="px-2 bg-white text-gray-500">Already have an account?</span>
+                </div>
+              </div>
+
+              {/* Login Section */}
+              <div>
+                <h3 className="text-sm font-medium text-gray-800 mb-3">Welcome back!</h3>
+                <button
+                  onClick={handleTwitterLogin}
+                  className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 flex items-center justify-center space-x-2"
+                >
+                  <span>🐦</span>
+                  <span>Sign In with Twitter</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
