@@ -1580,9 +1580,9 @@ function App() {
       {showMatchModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-2xl p-8 max-w-md w-full text-center">
-            <div className="text-6xl mb-4">🎉</div>
-            <h3 className="text-2xl font-bold text-black mb-2">It's a Match!</h3>
-            <p className="text-gray-600 mb-6">You and another trader liked each other. Start trenching together!</p>
+            <div className="text-6xl mb-4">🤝</div>
+            <h3 className="text-2xl font-bold text-black mb-2">New Trading Connection!</h3>
+            <p className="text-gray-600 mb-6">You and another trader are interested in connecting. Start building your trading network!</p>
             <button
               onClick={() => {
                 setShowMatchModal(false);
