@@ -306,7 +306,7 @@ const PublicProfile = () => {
               href="/"
               className="bg-white text-purple-600 px-8 py-3 rounded-xl font-bold hover:bg-gray-100 transition-all inline-block"
             >
-              Join SolMatch
+              Join Solm8
             </a>
           </div>
         </div>
