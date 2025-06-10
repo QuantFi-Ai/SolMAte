@@ -423,11 +423,11 @@ frontend:
 
   - task: "Status Management Functions"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/frontend/src/App.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
@@ -438,6 +438,9 @@ frontend:
       - working: "NA"
         agent: "main"
         comment: "Enhanced fetchUserData to get status and update activity"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Status management functions work correctly. Successfully tested status toggle functionality and active user filtering."
 
   - task: "Public profile page component"
     implemented: true
