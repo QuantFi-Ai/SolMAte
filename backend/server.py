@@ -1179,41 +1179,16 @@ async def twitter_callback(request: Request):
             user_data = existing_user
         else:
             # Create new user profile
-            user_data = {
-                "user_id": str(uuid.uuid4()),
+            user_data = create_user_profile({
                 "twitter_id": twitter_user['id_str'],
                 "username": twitter_user['screen_name'],
                 "display_name": twitter_user['name'],
                 "avatar_url": twitter_user['profile_image_url_https'].replace('_normal', '_400x400'),
                 "bio": twitter_user.get('description', ''),
-                "location": "",
-                "timezone": "",
-                "user_status": "active",  # New users start as active
-                "last_activity": datetime.utcnow(),
                 "show_twitter": True,
                 "twitter_username": twitter_user['screen_name'],
-                "trading_experience": "",
-                "years_trading": 0,
-                "preferred_tokens": [],
-                "trading_style": "",
-                "portfolio_size": "",
-                "risk_tolerance": "",
-                "best_trade": "",
-                "worst_trade": "",
-                "favorite_project": "",
-                "trading_hours": "",
-                "communication_style": "",
-                "preferred_communication_platform": "",
-                "preferred_trading_platform": "",
-                "looking_for": [],
-                "interested_in_token_launch": False,
-                "token_launch_experience": "",
-                "launch_timeline": "",
-                "launch_budget": "",
-                "profile_complete": False,
-                "created_at": datetime.utcnow(),
-                "last_active": datetime.utcnow()
-            }
+                "auth_method": "twitter"
+            })
             users_collection.insert_one(user_data)
         
         # Redirect to frontend with user data
