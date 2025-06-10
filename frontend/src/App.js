@@ -8,12 +8,7 @@ import './App.css';
 const API_BASE_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
 
 // Solana wallet configuration
-const endpoint = clusterApiUrl('mainnet-beta');
-
 function AppContent() {
-  // Wallet setup
-  const { publicKey, signMessage, connected, connect, disconnect } = useWallet();
-  
   // State management
   const [currentUser, setCurrentUser] = useState(null);
   const [currentView, setCurrentView] = useState('login');
