@@ -1473,8 +1473,8 @@ function App() {
                     )}
                     {match.other_user.interested_in_token_launch && (
                       <div className="flex items-center space-x-2">
-                        <span className="bg-purple-100 text-purple-800 px-2 py-1 rounded-full text-xs">
-                          🚀 Token Launcher
+                        <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">
+                          💰 Project Builder
                         </span>
                       </div>
                     )}
