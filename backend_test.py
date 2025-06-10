@@ -17,6 +17,9 @@ class Solm8APITester:
         self.demo_user = None
         self.uploaded_image_id = None
         self.token_launch_profile = None
+        self.email_user = None
+        self.wallet_user = None
+        self.wallet_message = None
 
     def run_test(self, name, method, endpoint, expected_status, data=None, headers=None, files=None):
         """Run a single API test"""
