@@ -1268,41 +1268,13 @@ async def create_demo_user():
         "https://images.pexels.com/photos/31659353/pexels-photo-31659353.jpeg"
     ]
     
-    demo_user_data = {
-        "user_id": str(uuid.uuid4()),
-        "twitter_id": f"demo_{int(datetime.utcnow().timestamp())}",
+    demo_user_data = create_user_profile({
         "username": f"demo_trader_{int(datetime.utcnow().timestamp())}",
         "display_name": "Demo Solana Trader",
         "avatar_url": demo_avatars[0],
         "bio": "Demo trader looking for trenching buddies! 🚀",
-        "location": "",
-        "timezone": "",
-        "user_status": "active",
-        "last_activity": datetime.utcnow(),
-        "show_twitter": False,
-        "twitter_username": "",
-        "trading_experience": "",
-        "years_trading": 0,
-        "preferred_tokens": [],
-        "trading_style": "",
-        "portfolio_size": "",
-        "risk_tolerance": "",
-        "best_trade": "",
-        "worst_trade": "",
-        "favorite_project": "",
-        "trading_hours": "",
-        "communication_style": "",
-        "preferred_communication_platform": "",
-        "preferred_trading_platform": "",
-        "looking_for": [],
-        "interested_in_token_launch": False,
-        "token_launch_experience": "",
-        "launch_timeline": "",
-        "launch_budget": "",
-        "profile_complete": False,
-        "created_at": datetime.utcnow(),
-        "last_active": datetime.utcnow()
-    }
+        "auth_method": "demo"
+    })
     
     # Insert demo user
     users_collection.insert_one(demo_user_data)
