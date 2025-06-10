@@ -175,6 +175,84 @@ class Solm8APITester:
             f"messages/{match_id}",
             200
         )
+        
+    # User Status Management Tests
+    
+    def test_update_user_status(self, user_id, status):
+        """Test updating user status (active/offline)"""
+        return self.run_test(
+            f"Update User Status to {status}",
+            "POST",
+            f"user-status/{user_id}",
+            200,
+            data={"user_status": status}
+        )
+    
+    def test_get_user_status(self, user_id):
+        """Test getting user status"""
+        return self.run_test(
+            "Get User Status",
+            "GET",
+            f"user-status/{user_id}",
+            200
+        )
+    
+    def test_get_active_users(self):
+        """Test getting list of active users"""
+        return self.run_test(
+            "Get Active Users",
+            "GET",
+            "users/active",
+            200
+        )
+    
+    def test_update_user_activity(self, user_id):
+        """Test updating user's last activity timestamp"""
+        return self.run_test(
+            "Update User Activity",
+            "POST",
+            f"user/{user_id}/update-activity",
+            200
+        )
+    
+    # Token Launch Profile Tests
+    
+    def test_update_token_launch_profile(self, user_id, token_profile_data):
+        """Test updating token launch profile"""
+        return self.run_test(
+            "Update Token Launch Profile",
+            "POST",
+            f"token-launch-profile/{user_id}",
+            200,
+            data=token_profile_data
+        )
+    
+    def test_get_token_launch_profile(self, user_id):
+        """Test getting token launch profile"""
+        return self.run_test(
+            "Get Token Launch Profile",
+            "GET",
+            f"token-launch-profile/{user_id}",
+            200
+        )
+    
+    def test_get_token_launchers(self):
+        """Test getting users interested in token launches"""
+        return self.run_test(
+            "Get Token Launchers",
+            "GET",
+            "users/token-launchers",
+            200
+        )
+    
+    def test_get_public_profile(self, username):
+        """Test getting public profile with new fields"""
+        return self.run_test(
+            "Get Public Profile",
+            "GET",
+            f"public-profile/{username}",
+            200
+        )
 
     def create_test_image(self):
         """Create a temporary test image for upload testing"""
