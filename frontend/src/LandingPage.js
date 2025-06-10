@@ -119,7 +119,7 @@ const LandingPage = () => {
             <div className="md:hidden">
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="text-gray-300 hover:text-cyan-400 transition-all"
+                className="text-gray-300 hover:text-white transition-all"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
@@ -130,14 +130,14 @@ const LandingPage = () => {
           
           {/* Mobile menu */}
           {mobileMenuOpen && (
-            <div className="md:hidden backdrop-blur-md bg-black/40 border-t border-cyan-500/20 py-4">
+            <div className="md:hidden backdrop-blur-md bg-black/40 border-t border-white/10 py-4">
               <div className="space-y-4">
-                <a href="#features" className="block text-gray-300 hover:text-cyan-400 transition-all px-4">Features</a>
-                <a href="#how-it-works" className="block text-gray-300 hover:text-cyan-400 transition-all px-4">How it Works</a>
-                <a href="#community" className="block text-gray-300 hover:text-cyan-400 transition-all px-4">Community</a>
+                <a href="#features" className="block text-gray-300 hover:text-white transition-all px-4">Features</a>
+                <a href="#how-it-works" className="block text-gray-300 hover:text-white transition-all px-4">How it Works</a>
+                <a href="#community" className="block text-gray-300 hover:text-white transition-all px-4">Community</a>
                 <button 
                   onClick={handleGetStarted}
-                  className="mx-4 w-[calc(100%-2rem)] bg-gradient-to-r from-cyan-500 to-purple-500 text-white px-6 py-2 rounded-lg font-medium"
+                  className="mx-4 w-[calc(100%-2rem)] bg-white text-black px-6 py-2 rounded-lg font-medium hover:bg-gray-100 transition-all"
                 >
                   Launch App
                 </button>
