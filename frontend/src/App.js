@@ -455,7 +455,7 @@ function App() {
       <div className="min-h-screen bg-white flex items-center justify-center p-4">
         <div className="max-w-md w-full bg-white border border-gray-200 rounded-2xl p-8 shadow-lg">
           <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold text-black mb-2">SolMatch</h1>
+            <h1 className="text-4xl font-bold text-black mb-2">Solm8</h1>
             <p className="text-gray-600">Find your perfect trading partner</p>
           </div>
           
