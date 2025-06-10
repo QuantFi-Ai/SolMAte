@@ -2041,7 +2041,7 @@ function App() {
     <ConnectionProvider endpoint={endpoint}>
       <WalletProvider wallets={wallets} autoConnect>
         <WalletModalProvider>
-          <AppContent />
+          <AppWithRouter />
         </WalletModalProvider>
       </WalletProvider>
     </ConnectionProvider>
