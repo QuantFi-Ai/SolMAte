@@ -339,30 +339,18 @@ const LandingPage = () => {
                 JOIN THE REVOLUTION
               </h2>
               <p className="text-xl mb-8 text-gray-600 max-w-3xl mx-auto">
-                Enter the future of crypto trading collaboration. Limited beta access available.
+                Connect with like-minded Solana traders and build your trading network.
               </p>
               
-              <form onSubmit={handleEmailSignup} className="max-w-md mx-auto">
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Enter your neural link..."
-                    className="flex-1 px-6 py-4 rounded-xl bg-white text-black placeholder-gray-400 border border-gray-300 focus:border-black focus:ring-2 focus:ring-black/20 backdrop-blur-sm transition-all"
-                    required
-                  />
-                  <button
-                    type="submit"
-                    className="bg-black text-white px-8 py-4 rounded-xl font-bold hover:scale-105 transition-all duration-300 hover:shadow-lg hover:shadow-black/25"
-                  >
-                    ACTIVATE
-                  </button>
-                </div>
-              </form>
+              <button 
+                onClick={handleGetStarted}
+                className="bg-black text-white px-8 py-4 rounded-xl font-bold hover:scale-105 transition-all duration-300 hover:shadow-lg hover:shadow-black/25"
+              >
+                Launch SolM8
+              </button>
               
               <p className="text-sm text-gray-500 mt-6 font-mono">
-                &gt; 1000+ TRADERS CONNECTED TO THE MATRIX
+                &gt; 1000+ TRADERS BUILDING THEIR NETWORKS
               </p>
             </div>
           </div>
