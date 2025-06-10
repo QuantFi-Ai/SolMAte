@@ -287,8 +287,7 @@ function AppContent() {
     return cards.filter(card => card.user_status === 'active');
   };
 
-  // Email/Password Authentication Functions
-  const handleEmailSignup = async (e) => {
+  const fetchDiscoveryCards = async () => {
     e.preventDefault();
     if (!emailForm.email || !emailForm.password || !emailForm.display_name) {
       alert('Please fill in all fields');
