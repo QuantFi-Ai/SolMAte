@@ -3,6 +3,7 @@ import unittest
 import uuid
 import os
 import tempfile
+import time
 from datetime import datetime
 
 class Solm8APITester:
@@ -12,6 +13,7 @@ class Solm8APITester:
         self.tests_passed = 0
         self.demo_user = None
         self.uploaded_image_id = None
+        self.token_launch_profile = None
 
     def run_test(self, name, method, endpoint, expected_status, data=None, headers=None, files=None):
         """Run a single API test"""
