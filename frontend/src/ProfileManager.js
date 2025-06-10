@@ -180,7 +180,7 @@ const ProfileManager = ({ currentUser, onClose }) => {
   };
 
   const shareOnTwitter = () => {
-    const text = `Check out my trading profile on SolMatch! 🚀`;
+    const text = `Check out my trading profile on Solm8! 🚀`;
     const url = getPublicProfileLink();
     window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, '_blank');
   };
