@@ -1116,7 +1116,7 @@ function App() {
                   : 'text-gray-600 hover:text-black'
               }`}
             >
-              Browse All
+              Browse Traders
             </button>
             <button
               onClick={() => setDiscoveryMode('ai')}
@@ -1126,7 +1126,7 @@ function App() {
                   : 'text-gray-600 hover:text-black'
               }`}
             >
-              🤖 AI Recommended
+              💡 Best Matches
             </button>
           </div>
 
