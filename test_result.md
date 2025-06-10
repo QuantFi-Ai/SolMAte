@@ -424,9 +424,13 @@ metadata:
 test_plan:
   current_focus:
     - "User Status Management System"
-    - "Token Launch Profile System"
+    - "Token Launch Profile System" 
     - "Updated User Registration and Demo Data"
     - "Enhanced Public Profile API"
+    - "User Status Toggle and Indicators"
+    - "Token Launch Profile Integration"
+    - "Enhanced Profile Setup Form"
+    - "Status Management Functions"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
@@ -436,5 +440,7 @@ agent_communication:
     message: "✅ BACKEND IMPLEMENTATION COMPLETE: Added comprehensive user status system with active/offline toggle, auto-offline after 30min inactivity, timezone support, and complete token launch profile system with separate collection."
   - agent: "main"
     message: "🚀 NEW FEATURES ADDED: 7 new API endpoints for status management, 3 for token launch profiles, enhanced user registration with new fields, updated public profiles. Ready for backend testing."
+  - agent: "main"
+    message: "✅ FRONTEND IMPLEMENTATION COMPLETE: Added status toggle in navigation, active user filtering, token launch profile section, timezone selection, status indicators on cards, and enhanced UI/UX for all new features."
   - agent: "testing"
     message: "✅ BACKEND TESTING COMPLETE: All new features are working correctly. Successfully tested user status management, token launch profiles, and enhanced public profiles. All endpoints return expected responses and handle data correctly."
