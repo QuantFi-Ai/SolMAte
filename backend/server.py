@@ -1604,6 +1604,67 @@ async def get_match_messages(match_id: str, limit: int = 50):
     
     return list(reversed(messages))
 
+@app.post("/api/messages")
+async def send_message(message_data: dict):
+    """Send a message in a match"""
+    try:
+        # Validate required fields
+        required_fields = ["match_id", "sender_id", "content"]
+        for field in required_fields:
+            if field not in message_data:
+                raise HTTPException(status_code=400, detail=f"Missing required field: {field}")
+        
+        # Validate match exists
+        match = matches_collection.find_one({"match_id": message_data["match_id"]})
+        if not match:
+            raise HTTPException(status_code=404, detail="Match not found")
+        
+        # Validate sender is part of the match
+        if message_data["sender_id"] != match["user1_id"] and message_data["sender_id"] != match["user2_id"]:
+            raise HTTPException(status_code=403, detail="Sender is not part of this match")
+        
+        # Create message
+        msg = {
+            "message_id": str(uuid.uuid4()),
+            "match_id": message_data["match_id"],
+            "sender_id": message_data["sender_id"],
+            "content": message_data["content"],
+            "timestamp": datetime.utcnow()
+        }
+        
+        # Save message to database
+        messages_collection.insert_one(msg)
+        
+        # Update match last message time
+        matches_collection.update_one(
+            {"match_id": message_data["match_id"]},
+            {"$set": {"last_message_at": datetime.utcnow()}}
+        )
+        
+        # Find the other user in the match
+        other_user_id = match["user2_id"] if match["user1_id"] == message_data["sender_id"] else match["user1_id"]
+        
+        # Remove MongoDB _id field
+        msg_response = msg.copy()
+        msg_response.pop('_id', None)
+        
+        # Try to send real-time notification via WebSocket if user is connected
+        try:
+            await manager.send_message(json.dumps({
+                "type": "chat_message",
+                "message": msg_response
+            }), other_user_id)
+        except Exception as e:
+            # WebSocket delivery failure shouldn't fail the API request
+            print(f"WebSocket delivery failed: {str(e)}")
+        
+        return msg_response
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to send message: {str(e)}")
+
 @app.websocket("/api/ws/{user_id}")
 async def websocket_endpoint(websocket: WebSocket, user_id: str):
     """WebSocket connection for real-time chat"""
