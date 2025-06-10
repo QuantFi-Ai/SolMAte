@@ -42,10 +42,10 @@ const LandingPage = () => {
       {/* Hero Section */}
       <section className="pt-20 pb-32 bg-gradient-to-br from-gray-50 to-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
+          <div className="text-center animate-fade-in-up">
             <h1 className="text-5xl md:text-7xl font-bold text-black mb-8 leading-tight">
               Find Your Perfect
-              <span className="block bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+              <span className="block bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent animate-gradient">
                 Trading Partner
               </span>
             </h1>
