@@ -26,6 +26,14 @@ function AppContent() {
     new PhantomWalletAdapter(),
     new SolflareWalletAdapter(),
   ], []);
+  // Wallet setup
+  const { publicKey, signMessage, connected, connect, disconnect } = useWallet();
+  
+  // Wallet adapters (moved inside component to avoid SSR issues)
+  const wallets = useMemo(() => [
+    new PhantomWalletAdapter(),
+    new SolflareWalletAdapter(),
+  ], []);
   const [currentUser, setCurrentUser] = useState(null);
   const [currentView, setCurrentView] = useState('login');
   const [discoveryCards, setDiscoveryCards] = useState([]);
