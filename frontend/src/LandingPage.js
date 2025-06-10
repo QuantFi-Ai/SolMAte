@@ -223,16 +223,16 @@ const LandingPage = () => {
       </section>
 
       {/* Features Section */}
-      <section id="features" className="relative z-10 py-24">
+      <section id="features" className="relative z-10 py-24 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-20">
-            <h2 className="text-5xl font-black text-white mb-6">
+            <h2 className="text-5xl font-black text-black mb-6">
               NEXT-GEN
-              <span className="block text-gray-300">
+              <span className="block text-gray-600">
                 TRADING TECH
               </span>
             </h2>
-            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
               Cutting-edge features designed for the future of crypto trading collaboration
             </p>
           </div>
@@ -263,25 +263,25 @@ const LandingPage = () => {
                 className="group relative"
                 style={{ animationDelay: feature.delay }}
               >
-                <div className="relative p-8 rounded-2xl backdrop-blur-md bg-black/20 border border-white/10 hover:border-white/30 transition-all duration-500 hover:bg-black/40 hover:scale-105 overflow-hidden">
+                <div className="relative p-8 rounded-2xl backdrop-blur-md bg-white/80 border border-gray-200 hover:border-gray-400 transition-all duration-500 hover:bg-white hover:scale-105 overflow-hidden hover:shadow-xl">
                   {/* Animated background gradient */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                  <div className="absolute inset-0 bg-gradient-to-br from-gray-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                   
                   <div className="relative z-10">
                     <div className="text-6xl mb-6 group-hover:scale-110 transition-transform duration-300 grayscale">
                       {feature.icon}
                     </div>
-                    <h3 className="text-xl font-black text-white mb-4 tracking-wider">
+                    <h3 className="text-xl font-black text-black mb-4 tracking-wider">
                       {feature.title}
                     </h3>
-                    <p className="text-gray-300 leading-relaxed">
+                    <p className="text-gray-600 leading-relaxed">
                       {feature.desc}
                     </p>
                   </div>
                   
                   {/* Corner accents */}
-                  <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-white/10 to-transparent"></div>
-                  <div className="absolute bottom-0 left-0 w-16 h-16 bg-gradient-to-tr from-white/10 to-transparent"></div>
+                  <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-black/5 to-transparent"></div>
+                  <div className="absolute bottom-0 left-0 w-16 h-16 bg-gradient-to-tr from-black/5 to-transparent"></div>
                 </div>
               </div>
             ))}
