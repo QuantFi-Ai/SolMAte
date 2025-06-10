@@ -129,7 +129,7 @@ html {
     position: absolute;
     inset: 0;
     padding: 2px;
-    background: linear-gradient(45deg, #00ffff, #ff00ff, #ffff00, #00ffff);
+    background: linear-gradient(45deg, #ffffff, #cccccc, #ffffff, #ffffff);
     border-radius: inherit;
     mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     mask-composite: exclude;
