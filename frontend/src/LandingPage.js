@@ -66,6 +66,36 @@ const LandingPage = () => {
               </div>
             </div>
           )}
+            
+            {/* Mobile menu button */}
+            <div className="md:hidden">
+              <button
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="text-gray-600 hover:text-black transition-all"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              </button>
+            </div>
+          </div>
+          
+          {/* Mobile menu */}
+          {mobileMenuOpen && (
+            <div className="md:hidden bg-white border-t border-gray-100 py-4">
+              <div className="space-y-4">
+                <a href="#features" className="block text-gray-600 hover:text-black transition-all px-4">Features</a>
+                <a href="#how-it-works" className="block text-gray-600 hover:text-black transition-all px-4">How it Works</a>
+                <a href="#community" className="block text-gray-600 hover:text-black transition-all px-4">Community</a>
+                <button 
+                  onClick={handleGetStarted}
+                  className="mx-4 w-[calc(100%-2rem)] bg-black text-white px-6 py-2 rounded-lg hover:bg-gray-800 transition-all font-medium"
+                >
+                  Get Started
+                </button>
+              </div>
+            </div>
+          )}
           </div>
         </div>
       </nav>
