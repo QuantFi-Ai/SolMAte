@@ -102,9 +102,90 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Test the new shareable profile backend endpoints that I just added to Solm8"
+user_problem_statement: "Add user status system (active/offline) and token launch features to Solm8 trading platform. Users should be able to toggle status, see who's online for immediate trading, and indicate interest in token launches. Also add timezone field for better coordination."
 
 backend:
+  - task: "User Status Management System"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Added user_status field (active/offline), last_activity timestamp, timezone field to UserProfile model"
+      - working: "NA"
+        agent: "main"
+        comment: "Implemented POST /api/user-status/{user_id} - Update user status with auto-offline after 30min inactivity"
+      - working: "NA"
+        agent: "main"
+        comment: "Implemented GET /api/user-status/{user_id} - Get user status with auto-update logic"
+      - working: "NA"
+        agent: "main"
+        comment: "Implemented GET /api/users/active - Get list of currently active users"
+      - working: "NA"
+        agent: "main"
+        comment: "Implemented POST /api/user/{user_id}/update-activity - Update last activity timestamp"
+
+  - task: "Token Launch Profile System"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Added token launch fields to UserProfile: interested_in_token_launch, token_launch_experience, launch_timeline, launch_budget"
+      - working: "NA"
+        agent: "main"
+        comment: "Created TokenLaunchProfile model with additional fields: project_type, looking_for_help_with"
+      - working: "NA"
+        agent: "main"
+        comment: "Added token_launch_profiles_collection to database"
+      - working: "NA"
+        agent: "main"
+        comment: "Implemented POST /api/token-launch-profile/{user_id} - Update token launch profile"
+      - working: "NA"
+        agent: "main"
+        comment: "Implemented GET /api/token-launch-profile/{user_id} - Get token launch profile"
+      - working: "NA"
+        agent: "main"
+        comment: "Implemented GET /api/users/token-launchers - Get users interested in token launches"
+
+  - task: "Updated User Registration and Demo Data"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Updated Twitter OAuth callback to include new fields: timezone, user_status (default active), last_activity"
+      - working: "NA"
+        agent: "main"
+        comment: "Updated demo user creation with timezone, status, and token launch sample data"
+      - working: "NA"
+        agent: "main"
+        comment: "Added sample users with different statuses (active/offline) and token launch interests"
+
+  - task: "Enhanced Public Profile API"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Updated GET /api/public-profile/{username} to include timezone, user_status, and token launch fields"
+
   - task: "Get public profile by username"
     implemented: true
     working: true
@@ -249,25 +330,22 @@ frontend:
 
 metadata:
   created_by: "main_agent"
-  version: "1.0"
-  test_sequence: 0
+  version: "2.0"
+  test_sequence: 1
   run_ui: false
 
 test_plan:
   current_focus:
-    - "Get public profile by username"
-    - "Upload trading highlight image"
-    - "Save trading highlight with details"
-    - "Get all trading highlights for a user"
-    - "Delete a trading highlight"
-    - "Update user's social media links"
-    - "Get user's social media links"
+    - "User Status Management System"
+    - "Token Launch Profile System"
+    - "Updated User Registration and Demo Data"
+    - "Enhanced Public Profile API"
   stuck_tasks: []
-  test_all: true
+  test_all: false
   test_priority: "high_first"
 
 agent_communication:
   - agent: "main"
-    message: "✅ BACKEND TESTING COMPLETE: All 7 new shareable profile endpoints tested and working correctly. Users can now create public profiles with trading highlights and social links."
+    message: "✅ BACKEND IMPLEMENTATION COMPLETE: Added comprehensive user status system with active/offline toggle, auto-offline after 30min inactivity, timezone support, and complete token launch profile system with separate collection."
   - agent: "main"
-    message: "✅ FRONTEND IMPLEMENTATION COMPLETE: Created PublicProfile and ProfileManager components with React Router integration. Ready for frontend testing."
+    message: "🚀 NEW FEATURES ADDED: 7 new API endpoints for status management, 3 for token launch profiles, enhanced user registration with new fields, updated public profiles. Ready for backend testing."
