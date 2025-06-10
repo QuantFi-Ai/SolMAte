@@ -17,22 +17,15 @@ const API_BASE_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001
 // Solana wallet configuration
 const endpoint = clusterApiUrl('mainnet-beta');
 
-// Wallet adapters
-const wallets = useMemo(() => [
-  new PhantomWalletAdapter(),
-  new SolflareWalletAdapter(),
-], []);
-
-// Solana wallet configuration
-const endpoint = clusterApiUrl('mainnet-beta');
-
-// Wallet adapters
-const wallets = useMemo(() => [
-  new PhantomWalletAdapter(),
-  new SolflareWalletAdapter(),
-], []);
-
-function App() {
+function AppContent() {
+  // Wallet setup
+  const { publicKey, signMessage, connected, connect, disconnect } = useWallet();
+  
+  // Wallet adapters (moved inside component to avoid SSR issues)
+  const wallets = useMemo(() => [
+    new PhantomWalletAdapter(),
+    new SolflareWalletAdapter(),
+  ], []);
   const [currentUser, setCurrentUser] = useState(null);
   const [currentView, setCurrentView] = useState('login');
   const [discoveryCards, setDiscoveryCards] = useState([]);
