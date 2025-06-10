@@ -4,6 +4,9 @@ import uuid
 import os
 import tempfile
 import time
+import json
+import random
+import string
 from datetime import datetime
 
 class Solm8APITester:
