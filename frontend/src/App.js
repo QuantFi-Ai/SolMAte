@@ -1890,22 +1890,4 @@ const AppWithRouter = () => {
   );
 };
 
-// Main App component with wallet providers
-function App() {
-  const wallets = useMemo(() => [
-    new PhantomWalletAdapter(),
-    new SolflareWalletAdapter(),
-  ], []);
-
-  return (
-    <ConnectionProvider endpoint={endpoint}>
-      <WalletProvider wallets={wallets} autoConnect>
-        <WalletModalProvider>
-          <AppWithRouter />
-        </WalletModalProvider>
-      </WalletProvider>
-    </ConnectionProvider>
-  );
-}
-
-export default App;
+export default AppWithRouter;
