@@ -658,7 +658,7 @@ async def get_social_links(user_id: str):
 
 @app.get("/api/health")
 async def health_check():
-    return {"status": "healthy", "service": "SolMatch API"}
+    return {"status": "healthy", "service": "Solm8 API"}
 
 @app.get("/api/login/twitter")
 async def login_twitter(request: Request):
