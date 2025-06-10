@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Test the new shareable profile backend endpoints that I just added to SolMatch"
+user_problem_statement: "Test the new shareable profile backend endpoints that I just added to Solm8"
 
 backend:
   - task: "Get public profile by username"
