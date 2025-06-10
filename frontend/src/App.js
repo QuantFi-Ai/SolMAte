@@ -919,8 +919,8 @@ function App() {
               </div>
 
               {/* Token Launch Interest */}
-              <div className="p-6 bg-purple-50 rounded-2xl">
-                <h3 className="text-lg font-semibold text-black mb-4">Token Launch Interest</h3>
+              <div className="p-6 bg-blue-50 rounded-2xl">
+                <h3 className="text-lg font-semibold text-black mb-4">Token Launch & Project Interest</h3>
                 <div className="space-y-4">
                   <div className="flex items-center space-x-3">
                     <input
@@ -931,7 +931,7 @@ function App() {
                       className="w-4 h-4 text-black bg-gray-100 border-gray-300 rounded focus:ring-black focus:ring-2"
                     />
                     <label htmlFor="interested_in_token_launch" className="text-black font-medium">
-                      I'm interested in launching a token/project
+                      I'm interested in launching a token or crypto project
                     </label>
                   </div>
                   
@@ -982,7 +982,7 @@ function App() {
                   )}
                 </div>
                 <p className="text-sm text-gray-600 mt-3">
-                  Enabling this helps connect you with other traders interested in early-stage projects and potential collaborators.
+                  Connect with traders interested in early projects, find collaborators, and discover investment opportunities.
                 </p>
               </div>
 
