@@ -591,7 +591,7 @@ function App() {
   }
 
   // Profile Setup/Edit View (keeping same as before)
-  if (currentView === 'profile-setup' || currentView === 'profile-edit') {
+  if ((currentView === 'profile-setup' || currentView === 'profile-edit') && currentUser) {
     const isEditing = currentView === 'profile-edit';
     
     return (
