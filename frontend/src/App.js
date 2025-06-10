@@ -1078,12 +1078,12 @@ function App() {
                     ? 'bg-green-100 text-green-800 hover:bg-green-200' 
                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                 }`}
-                title={`Click to switch to ${userStatus === 'active' ? 'offline' : 'active'}`}
+                title={`Currently ${userStatus} - Click to ${userStatus === 'active' ? 'go offline' : 'go active'}`}
               >
                 <div className={`w-2 h-2 rounded-full ${
                   userStatus === 'active' ? 'bg-green-500' : 'bg-gray-400'
                 }`}></div>
-                <span>{userStatus === 'active' ? 'Active' : 'Offline'}</span>
+                <span>{userStatus === 'active' ? 'Trading Active' : 'Offline'}</span>
               </button>
             </div>
             
