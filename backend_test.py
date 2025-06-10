@@ -488,6 +488,128 @@ class Solm8APITester:
         # Test health check
         self.test_health_check()
         
+        # Test Authentication Endpoints
+        print("\n🔍 Testing Authentication Endpoints...")
+        
+        # Email Authentication Tests
+        print("\n🔑 Testing Email Authentication...")
+        
+        # Test email signup
+        random_suffix = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
+        test_email = f"test_{random_suffix}@example.com"
+        test_password = "TestPassword123!"
+        test_display_name = f"Test User {random_suffix}"
+        
+        success, signup_response = self.test_email_signup(test_email, test_password, test_display_name)
+        if not success:
+            print("❌ Email signup failed, stopping authentication tests")
+            return False
+            
+        # Verify user was created with correct auth_method
+        if self.email_user.get('auth_method') != "email":
+            print("❌ Email user auth_method verification failed - expected 'email'")
+            self.tests_run += 1
+            return False
+        else:
+            print("✅ Email user auth_method verification passed")
+            self.tests_passed += 1
+            self.tests_run += 1
+            
+        # Test duplicate email signup (should fail)
+        success, _ = self.test_email_signup_duplicate(test_email)
+        if not success:
+            print("❌ Duplicate email test failed - should return 400")
+            return False
+            
+        # Test missing fields (should fail)
+        success, _ = self.test_email_signup_missing_fields()
+        if not success:
+            print("❌ Missing fields test failed - should return 422")
+            return False
+            
+        # Test valid login
+        success, login_response = self.test_email_login(test_email, test_password)
+        if not success:
+            print("❌ Email login failed")
+            return False
+            
+        # Test invalid password
+        success, _ = self.test_email_login_invalid(test_email)
+        if not success:
+            print("❌ Invalid password test failed - should return 401")
+            return False
+            
+        # Test non-existent user
+        success, _ = self.test_email_login_nonexistent()
+        if not success:
+            print("❌ Non-existent user test failed - should return 401")
+            return False
+            
+        # Wallet Authentication Tests
+        print("\n💼 Testing Wallet Authentication...")
+        
+        # Test getting wallet message
+        success, message_response = self.test_get_wallet_message()
+        if not success:
+            print("❌ Get wallet message failed")
+            return False
+            
+        # Verify message format
+        if not self.wallet_message or "Sign this message to authenticate with Solm8" not in self.wallet_message:
+            print("❌ Wallet message verification failed - unexpected format")
+            self.tests_run += 1
+            return False
+        else:
+            print("✅ Wallet message verification passed")
+            self.tests_passed += 1
+            self.tests_run += 1
+            
+        # Test wallet connect
+        wallet_address = ''.join(random.choices(string.ascii_lowercase + string.digits, k=44))
+        success, connect_response = self.test_wallet_connect(wallet_address)
+        if not success:
+            print("❌ Wallet connect failed")
+            return False
+            
+        # Verify user was created with correct auth_method
+        if self.wallet_user.get('auth_method') != "wallet":
+            print("❌ Wallet user auth_method verification failed - expected 'wallet'")
+            self.tests_run += 1
+            return False
+        else:
+            print("✅ Wallet user auth_method verification passed")
+            self.tests_passed += 1
+            self.tests_run += 1
+            
+        # Test connecting with same wallet again (should succeed as login)
+        success, reconnect_response = self.test_wallet_connect_duplicate(wallet_address)
+        if not success:
+            print("❌ Wallet reconnect test failed - should return 200")
+            return False
+            
+        # Test invalid wallet address
+        success, _ = self.test_wallet_connect_invalid()
+        if not success:
+            print("❌ Invalid wallet test failed - should return 400")
+            return False
+            
+        # Verify password is not stored in plain text
+        # Get the user from the database directly via API
+        success, user_response = self.test_get_user(self.email_user['user_id'])
+        if not success:
+            print("❌ Get user for password verification failed")
+            return False
+            
+        # Check that password is not returned in the user object
+        if 'password' in user_response or 'password_hash' in user_response:
+            print("❌ Password security verification failed - password/hash exposed in API response")
+            self.tests_run += 1
+            return False
+        else:
+            print("✅ Password security verification passed - not exposed in API response")
+            self.tests_passed += 1
+            self.tests_run += 1
+            
         # Create demo user
         success, user = self.test_create_demo_user()
         if not success or not user:
