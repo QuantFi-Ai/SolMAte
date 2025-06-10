@@ -828,27 +828,6 @@ function AppContent() {
               </form>
             )}
 
-            {/* Wallet Authentication */}
-            {authMode === 'wallet' && (
-              <div className="space-y-4">
-                <div className="text-center">
-                  <h3 className="text-lg font-semibold text-black mb-4">Connect Your Solana Wallet</h3>
-                  <div className="flex justify-center mb-4">
-                    <WalletMultiButton className="!bg-purple-600 hover:!bg-purple-700 !rounded-xl" />
-                  </div>
-                  {connected && (
-                    <button
-                      onClick={handleWalletConnect}
-                      disabled={authLoading}
-                      className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 disabled:opacity-50"
-                    >
-                      {authLoading ? 'Authenticating...' : 'Continue with Wallet'}
-                    </button>
-                  )}
-                </div>
-              </div>
-            )}
-
             {/* Divider */}
             <div className="relative my-6">
               <div className="absolute inset-0 flex items-center">
