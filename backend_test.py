@@ -282,6 +282,7 @@ class Solm8APITester:
             return False
         
         user_id = user['user_id']
+        username = user['username']
         
         # Test getting user profile
         success, _ = self.test_get_user(user_id)
@@ -358,6 +359,157 @@ class Solm8APITester:
             return False
         else:
             print("✅ Twitter settings verification passed")
+            self.tests_passed += 1
+            self.tests_run += 1
+        
+        # Test User Status Management
+        print("\n🔍 Testing User Status Management...")
+        
+        # Test updating user status to active
+        success, _ = self.test_update_user_status(user_id, "active")
+        if not success:
+            print("❌ Update user status to active failed")
+            return False
+        
+        # Test getting user status
+        success, status_response = self.test_get_user_status(user_id)
+        if not success:
+            print("❌ Get user status failed")
+            return False
+        
+        # Verify status was set to active
+        if status_response.get('user_status') != "active":
+            print("❌ User status verification failed - expected 'active'")
+            self.tests_run += 1
+            return False
+        else:
+            print("✅ User status verification passed - status is 'active'")
+            self.tests_passed += 1
+            self.tests_run += 1
+        
+        # Test getting active users
+        success, active_users_response = self.test_get_active_users()
+        if not success:
+            print("❌ Get active users failed")
+            return False
+        
+        # Verify our user is in the active users list
+        user_found = False
+        for active_user in active_users_response.get('active_users', []):
+            if active_user.get('user_id') == user_id:
+                user_found = True
+                break
+        
+        if not user_found:
+            print("❌ Active users verification failed - user not found in active list")
+            self.tests_run += 1
+            return False
+        else:
+            print("✅ Active users verification passed - user found in active list")
+            self.tests_passed += 1
+            self.tests_run += 1
+        
+        # Test updating user activity
+        success, _ = self.test_update_user_activity(user_id)
+        if not success:
+            print("❌ Update user activity failed")
+            return False
+        
+        # Test updating user status to offline
+        success, _ = self.test_update_user_status(user_id, "offline")
+        if not success:
+            print("❌ Update user status to offline failed")
+            return False
+        
+        # Test getting user status again
+        success, status_response = self.test_get_user_status(user_id)
+        if not success:
+            print("❌ Get user status after offline update failed")
+            return False
+        
+        # Verify status was set to offline
+        if status_response.get('user_status') != "offline":
+            print("❌ User status verification failed - expected 'offline'")
+            self.tests_run += 1
+            return False
+        else:
+            print("✅ User status verification passed - status is 'offline'")
+            self.tests_passed += 1
+            self.tests_run += 1
+        
+        # Test Token Launch Profile
+        print("\n🔍 Testing Token Launch Profile...")
+        
+        # Create token launch profile
+        token_profile_data = {
+            "interested_in_token_launch": True,
+            "token_launch_experience": "Experienced",
+            "launch_timeline": "3-6 months",
+            "launch_budget": "$50K-$100K",
+            "project_type": "DeFi Protocol",
+            "looking_for_help_with": ["Technical Development", "Marketing", "Community Building"]
+        }
+        
+        success, _ = self.test_update_token_launch_profile(user_id, token_profile_data)
+        if not success:
+            print("❌ Update token launch profile failed")
+            return False
+        
+        # Test getting token launch profile
+        success, token_profile_response = self.test_get_token_launch_profile(user_id)
+        if not success:
+            print("❌ Get token launch profile failed")
+            return False
+        
+        # Verify token launch profile was created correctly
+        if not token_profile_response.get('interested_in_token_launch') or token_profile_response.get('token_launch_experience') != "Experienced":
+            print("❌ Token launch profile verification failed")
+            self.tests_run += 1
+            return False
+        else:
+            print("✅ Token launch profile verification passed")
+            self.tests_passed += 1
+            self.tests_run += 1
+            self.token_launch_profile = token_profile_response
+        
+        # Test getting token launchers
+        success, token_launchers_response = self.test_get_token_launchers()
+        if not success:
+            print("❌ Get token launchers failed")
+            return False
+        
+        # Verify our user is in the token launchers list
+        user_found = False
+        for launcher in token_launchers_response.get('token_launchers', []):
+            if launcher.get('user_id') == user_id:
+                user_found = True
+                break
+        
+        if not user_found:
+            print("❌ Token launchers verification failed - user not found in launchers list")
+            self.tests_run += 1
+            return False
+        else:
+            print("✅ Token launchers verification passed - user found in launchers list")
+            self.tests_passed += 1
+            self.tests_run += 1
+        
+        # Test Enhanced Public Profile
+        print("\n🔍 Testing Enhanced Public Profile...")
+        
+        # Test getting public profile
+        success, public_profile = self.test_get_public_profile(username)
+        if not success:
+            print("❌ Get public profile failed")
+            return False
+        
+        # Verify public profile includes new fields
+        if 'timezone' not in public_profile or 'user_status' not in public_profile or 'interested_in_token_launch' not in public_profile:
+            print("❌ Public profile verification failed - missing new fields")
+            self.tests_run += 1
+            return False
+        else:
+            print("✅ Public profile verification passed - includes new fields")
             self.tests_passed += 1
             self.tests_run += 1
         
