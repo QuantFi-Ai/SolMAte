@@ -231,7 +231,7 @@ const LandingPage = () => {
           <div className="text-center mb-20">
             <h2 className="text-5xl font-black text-white mb-6">
               NEXT-GEN
-              <span className="block bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
+              <span className="block text-gray-300">
                 TRADING TECH
               </span>
             </h2>
@@ -246,21 +246,18 @@ const LandingPage = () => {
                 icon: "🤖",
                 title: "AI NEURAL MATCHING",
                 desc: "Advanced machine learning algorithms analyze trading patterns, risk profiles, and compatibility factors to create perfect partnerships.",
-                accent: "cyan",
                 delay: "0s"
               },
               {
                 icon: "📱",
                 title: "HOLOGRAPHIC PROFILES",
                 desc: "3D interactive trading profiles with real-time P&L visualization, achievement showcases, and social proof integration.",
-                accent: "purple", 
                 delay: "0.2s"
               },
               {
                 icon: "⚡",
                 title: "QUANTUM CHAT",
                 desc: "Encrypted, real-time communication with built-in strategy sharing, market analysis tools, and collaborative trading features.",
-                accent: "pink",
                 delay: "0.4s"
               }
             ].map((feature, index) => (
@@ -269,15 +266,15 @@ const LandingPage = () => {
                 className="group relative"
                 style={{ animationDelay: feature.delay }}
               >
-                <div className="relative p-8 rounded-2xl backdrop-blur-md bg-black/20 border border-cyan-500/20 hover:border-cyan-500/50 transition-all duration-500 hover:bg-black/40 hover:scale-105 overflow-hidden">
+                <div className="relative p-8 rounded-2xl backdrop-blur-md bg-black/20 border border-white/10 hover:border-white/30 transition-all duration-500 hover:bg-black/40 hover:scale-105 overflow-hidden">
                   {/* Animated background gradient */}
-                  <div className={`absolute inset-0 bg-gradient-to-br from-${feature.accent}-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500`}></div>
+                  <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                   
                   <div className="relative z-10">
-                    <div className="text-6xl mb-6 group-hover:scale-110 transition-transform duration-300">
+                    <div className="text-6xl mb-6 group-hover:scale-110 transition-transform duration-300 grayscale">
                       {feature.icon}
                     </div>
-                    <h3 className={`text-xl font-black text-${feature.accent}-400 mb-4 tracking-wider`}>
+                    <h3 className="text-xl font-black text-white mb-4 tracking-wider">
                       {feature.title}
                     </h3>
                     <p className="text-gray-300 leading-relaxed">
@@ -286,8 +283,8 @@ const LandingPage = () => {
                   </div>
                   
                   {/* Corner accents */}
-                  <div className={`absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-${feature.accent}-400/20 to-transparent`}></div>
-                  <div className={`absolute bottom-0 left-0 w-16 h-16 bg-gradient-to-tr from-${feature.accent}-400/20 to-transparent`}></div>
+                  <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-white/10 to-transparent"></div>
+                  <div className="absolute bottom-0 left-0 w-16 h-16 bg-gradient-to-tr from-white/10 to-transparent"></div>
                 </div>
               </div>
             ))}
