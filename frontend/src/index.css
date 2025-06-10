@@ -325,22 +325,22 @@ html {
 /* Loading Animation */
 @keyframes loading-dots {
     0%, 20% {
-        color: rgba(0, 255, 255, 0.4);
-        text-shadow: 0.25em 0 0 rgba(0, 255, 255, 0.4),
-                     0.5em 0 0 rgba(0, 255, 255, 0.4);
+        color: rgba(255, 255, 255, 0.4);
+        text-shadow: 0.25em 0 0 rgba(255, 255, 255, 0.4),
+                     0.5em 0 0 rgba(255, 255, 255, 0.4);
     }
     40% {
-        color: #00ffff;
-        text-shadow: 0.25em 0 0 rgba(0, 255, 255, 0.4),
-                     0.5em 0 0 rgba(0, 255, 255, 0.4);
+        color: #ffffff;
+        text-shadow: 0.25em 0 0 rgba(255, 255, 255, 0.4),
+                     0.5em 0 0 rgba(255, 255, 255, 0.4);
     }
     60% {
-        text-shadow: 0.25em 0 0 #00ffff,
-                     0.5em 0 0 rgba(0, 255, 255, 0.4);
+        text-shadow: 0.25em 0 0 #ffffff,
+                     0.5em 0 0 rgba(255, 255, 255, 0.4);
     }
     80%, 100% {
-        text-shadow: 0.25em 0 0 #00ffff,
-                     0.5em 0 0 #00ffff;
+        text-shadow: 0.25em 0 0 #ffffff,
+                     0.5em 0 0 #ffffff;
     }
 }
 
