@@ -918,6 +918,74 @@ function App() {
                 </div>
               </div>
 
+              {/* Token Launch Interest */}
+              <div className="p-6 bg-purple-50 rounded-2xl">
+                <h3 className="text-lg font-semibold text-black mb-4">Token Launch Interest</h3>
+                <div className="space-y-4">
+                  <div className="flex items-center space-x-3">
+                    <input
+                      type="checkbox"
+                      id="interested_in_token_launch"
+                      checked={profileForm.interested_in_token_launch}
+                      onChange={(e) => setProfileForm(prev => ({ ...prev, interested_in_token_launch: e.target.checked }))}
+                      className="w-4 h-4 text-black bg-gray-100 border-gray-300 rounded focus:ring-black focus:ring-2"
+                    />
+                    <label htmlFor="interested_in_token_launch" className="text-black font-medium">
+                      I'm interested in launching a token/project
+                    </label>
+                  </div>
+                  
+                  {profileForm.interested_in_token_launch && (
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Experience Level</label>
+                        <select
+                          value={profileForm.token_launch_experience}
+                          onChange={(e) => setProfileForm(prev => ({ ...prev, token_launch_experience: e.target.value }))}
+                          className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+                        >
+                          <option value="">Select experience</option>
+                          {TOKEN_LAUNCH_EXPERIENCE_OPTIONS.map(exp => (
+                            <option key={exp} value={exp}>{exp}</option>
+                          ))}
+                        </select>
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Timeline</label>
+                        <select
+                          value={profileForm.launch_timeline}
+                          onChange={(e) => setProfileForm(prev => ({ ...prev, launch_timeline: e.target.value }))}
+                          className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+                        >
+                          <option value="">Select timeline</option>
+                          {LAUNCH_TIMELINE_OPTIONS.map(timeline => (
+                            <option key={timeline} value={timeline}>{timeline}</option>
+                          ))}
+                        </select>
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Budget</label>
+                        <select
+                          value={profileForm.launch_budget}
+                          onChange={(e) => setProfileForm(prev => ({ ...prev, launch_budget: e.target.value }))}
+                          className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+                        >
+                          <option value="">Select budget</option>
+                          {LAUNCH_BUDGET_OPTIONS.map(budget => (
+                            <option key={budget} value={budget}>{budget}</option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                  )}
+                </div>
+                <p className="text-sm text-gray-600 mt-3">
+                  Enabling this helps connect you with other traders interested in early-stage projects and potential collaborators.
+                </p>
+              </div>
+
               {/* Trading Stories */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
