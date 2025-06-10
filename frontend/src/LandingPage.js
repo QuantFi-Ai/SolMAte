@@ -370,45 +370,45 @@ const LandingPage = () => {
       </section>
 
       {/* Footer */}
-      <footer className="relative z-10 bg-black/60 backdrop-blur-md border-t border-white/10 py-16">
+      <footer className="relative z-10 bg-white backdrop-blur-md border-t border-gray-200 py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div className="col-span-1 md:col-span-2">
-              <h3 className="text-3xl font-black text-white mb-4">
+              <h3 className="text-3xl font-black text-black mb-4">
                 Solm8
               </h3>
-              <p className="text-gray-400 max-w-md leading-relaxed">
+              <p className="text-gray-600 max-w-md leading-relaxed">
                 The neural network for crypto traders. Connect, collaborate, and conquer the markets together.
               </p>
             </div>
             
             <div>
-              <h4 className="font-bold text-white mb-4 tracking-wider">MATRIX</h4>
-              <ul className="space-y-3 text-gray-400 font-mono text-sm">
-                <li><a href="#" className="hover:text-white transition-all">&gt; FEATURES</a></li>
-                <li><a href="#" className="hover:text-white transition-all">&gt; PROTOCOLS</a></li>
-                <li><a href="#" className="hover:text-white transition-all">&gt; SECURITY</a></li>
-                <li><a href="#" className="hover:text-white transition-all">&gt; NEURAL_NET</a></li>
+              <h4 className="font-bold text-black mb-4 tracking-wider">MATRIX</h4>
+              <ul className="space-y-3 text-gray-600 font-mono text-sm">
+                <li><a href="#" className="hover:text-black transition-all">&gt; FEATURES</a></li>
+                <li><a href="#" className="hover:text-black transition-all">&gt; PROTOCOLS</a></li>
+                <li><a href="#" className="hover:text-black transition-all">&gt; SECURITY</a></li>
+                <li><a href="#" className="hover:text-black transition-all">&gt; NEURAL_NET</a></li>
               </ul>
             </div>
             
             <div>
-              <h4 className="font-bold text-gray-300 mb-4 tracking-wider">NETWORK</h4>
-              <ul className="space-y-3 text-gray-400 font-mono text-sm">
-                <li><a href="#" className="hover:text-gray-300 transition-all">&gt; DISCORD_NODE</a></li>
-                <li><a href="#" className="hover:text-gray-300 transition-all">&gt; TWITTER_FEED</a></li>
-                <li><a href="#" className="hover:text-gray-300 transition-all">&gt; TELEGRAM_NET</a></li>
-                <li><a href="#" className="hover:text-gray-300 transition-all">&gt; DATA_STREAM</a></li>
+              <h4 className="font-bold text-gray-800 mb-4 tracking-wider">NETWORK</h4>
+              <ul className="space-y-3 text-gray-600 font-mono text-sm">
+                <li><a href="#" className="hover:text-gray-800 transition-all">&gt; DISCORD_NODE</a></li>
+                <li><a href="#" className="hover:text-gray-800 transition-all">&gt; TWITTER_FEED</a></li>
+                <li><a href="#" className="hover:text-gray-800 transition-all">&gt; TELEGRAM_NET</a></li>
+                <li><a href="#" className="hover:text-gray-800 transition-all">&gt; DATA_STREAM</a></li>
               </ul>
             </div>
           </div>
           
-          <div className="border-t border-white/10 mt-12 pt-8 flex flex-col md:flex-row items-center justify-between">
-            <p className="text-gray-400 text-sm font-mono">© 2024 SOLM8.NETWORK // ALL_RIGHTS_RESERVED</p>
+          <div className="border-t border-gray-200 mt-12 pt-8 flex flex-col md:flex-row items-center justify-between">
+            <p className="text-gray-500 text-sm font-mono">© 2024 SOLM8.NETWORK // ALL_RIGHTS_RESERVED</p>
             <div className="flex space-x-6 mt-4 md:mt-0 font-mono text-sm">
-              <a href="#" className="text-gray-400 hover:text-white transition-all">&gt; PRIVACY_PROTOCOL</a>
-              <a href="#" className="text-gray-400 hover:text-white transition-all">&gt; TERMS_MATRIX</a>
-              <a href="#" className="text-gray-400 hover:text-white transition-all">&gt; SUPPORT_NET</a>
+              <a href="#" className="text-gray-500 hover:text-black transition-all">&gt; PRIVACY_PROTOCOL</a>
+              <a href="#" className="text-gray-500 hover:text-black transition-all">&gt; TERMS_MATRIX</a>
+              <a href="#" className="text-gray-500 hover:text-black transition-all">&gt; SUPPORT_NET</a>
             </div>
           </div>
         </div>
