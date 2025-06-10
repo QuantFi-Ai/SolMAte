@@ -201,22 +201,22 @@ const LandingPage = () => {
             {/* Futuristic Stats Grid */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
               {[
-                { value: "1K+", label: "ACTIVE TRADERS", accent: "cyan" },
-                { value: "95%", label: "MATCH SUCCESS", accent: "purple" },
-                { value: "24/7", label: "GLOBAL NETWORK", accent: "pink" },
-                { value: "AI", label: "POWERED", accent: "cyan" }
+                { value: "1K+", label: "ACTIVE TRADERS" },
+                { value: "95%", label: "MATCH SUCCESS" },
+                { value: "24/7", label: "GLOBAL NETWORK" },
+                { value: "AI", label: "POWERED" }
               ].map((stat, index) => (
                 <div key={index} className="group">
-                  <div className="relative p-6 rounded-xl backdrop-blur-md bg-black/20 border border-cyan-500/20 hover:border-cyan-500/50 transition-all duration-300 hover:bg-black/40">
-                    <div className={`text-3xl font-black text-${stat.accent}-400 mb-2 group-hover:scale-110 transition-transform`}>
+                  <div className="relative p-6 rounded-xl backdrop-blur-md bg-black/20 border border-white/10 hover:border-white/30 transition-all duration-300 hover:bg-black/40">
+                    <div className="text-3xl font-black text-white mb-2 group-hover:scale-110 transition-transform">
                       {stat.value}
                     </div>
                     <div className="text-xs text-gray-400 font-mono tracking-wider">
                       {stat.label}
                     </div>
                     {/* Animated corner accents */}
-                    <div className={`absolute top-0 left-0 w-2 h-2 bg-${stat.accent}-400 opacity-0 group-hover:opacity-100 transition-opacity`}></div>
-                    <div className={`absolute bottom-0 right-0 w-2 h-2 bg-${stat.accent}-400 opacity-0 group-hover:opacity-100 transition-opacity`}></div>
+                    <div className="absolute top-0 left-0 w-2 h-2 bg-white opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <div className="absolute bottom-0 right-0 w-2 h-2 bg-white opacity-0 group-hover:opacity-100 transition-opacity"></div>
                   </div>
                 </div>
               ))}
