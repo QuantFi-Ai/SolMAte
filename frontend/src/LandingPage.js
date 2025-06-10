@@ -151,36 +151,33 @@ const LandingPage = () => {
       <section className="relative z-10 pt-20 pb-32 min-h-screen flex items-center">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
           <div className="text-center">
-            {/* Glitch effect heading */}
+            {/* Clean heading */}
             <div className="relative mb-8">
-              <h1 className="text-6xl md:text-8xl font-black text-white mb-4 leading-tight tracking-tight">
+              <h1 className="text-6xl md:text-8xl font-black text-black mb-4 leading-tight tracking-tight">
                 FIND YOUR
               </h1>
               <div className="relative inline-block">
-                <h1 className="text-6xl md:text-8xl font-black text-white leading-tight tracking-tight">
+                <h1 className="text-6xl md:text-8xl font-black text-black leading-tight tracking-tight">
                   TRADING M8
                 </h1>
-                {/* Glitch layers in grayscale */}
-                <h1 className="absolute inset-0 text-6xl md:text-8xl font-black text-gray-400 opacity-30 animate-pulse leading-tight tracking-tight" style={{ transform: 'translate(2px, 0)' }}>
-                  TRADING M8
-                </h1>
-                <h1 className="absolute inset-0 text-6xl md:text-8xl font-black text-gray-600 opacity-20 animate-pulse leading-tight tracking-tight" style={{ transform: 'translate(-2px, 0)', animationDelay: '0.1s' }}>
+                {/* Subtle shadow layers */}
+                <h1 className="absolute inset-0 text-6xl md:text-8xl font-black text-gray-300 opacity-30 animate-pulse leading-tight tracking-tight" style={{ transform: 'translate(2px, 2px)' }}>
                   TRADING M8
                 </h1>
               </div>
             </div>
             
-            <p className="text-xl md:text-2xl text-gray-300 mb-12 max-w-4xl mx-auto leading-relaxed">
+            <p className="text-xl md:text-2xl text-gray-600 mb-12 max-w-4xl mx-auto leading-relaxed">
               AI-powered matching system connecting crypto traders worldwide. 
-              <span className="text-white font-semibold"> Share strategies</span>, 
-              <span className="text-gray-100 font-semibold"> build networks</span>, 
-              <span className="text-white font-semibold"> dominate markets</span>.
+              <span className="text-black font-semibold"> Share strategies</span>, 
+              <span className="text-gray-800 font-semibold"> build networks</span>, 
+              <span className="text-black font-semibold"> dominate markets</span>.
             </p>
             
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-16">
               <button 
                 onClick={handleGetStarted}
-                className="group relative px-8 py-4 bg-white text-black text-lg font-bold rounded-xl overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-white/25"
+                className="group relative px-8 py-4 bg-black text-white text-lg font-bold rounded-xl overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-black/25"
               >
                 <span className="relative z-10 flex items-center">
                   <span>ENTER THE MATRIX</span>
@@ -190,15 +187,15 @@ const LandingPage = () => {
                 </span>
               </button>
               
-              <button className="group text-gray-300 px-8 py-4 rounded-xl border border-white/20 hover:border-white hover:text-white transition-all duration-300 hover:bg-white/5 backdrop-blur-sm">
+              <button className="group text-gray-600 px-8 py-4 rounded-xl border border-gray-300 hover:border-black hover:text-black transition-all duration-300 hover:bg-gray-50 backdrop-blur-sm">
                 <span className="flex items-center text-lg font-medium">
                   <span>WATCH DEMO</span>
-                  <div className="ml-2 w-0 h-0 border-l-4 border-l-white border-t-2 border-t-transparent border-b-2 border-b-transparent group-hover:translate-x-1 transition-transform"></div>
+                  <div className="ml-2 w-0 h-0 border-l-4 border-l-black border-t-2 border-t-transparent border-b-2 border-b-transparent group-hover:translate-x-1 transition-transform"></div>
                 </span>
               </button>
             </div>
 
-            {/* Futuristic Stats Grid */}
+            {/* Clean Stats Grid */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
               {[
                 { value: "1K+", label: "ACTIVE TRADERS" },
@@ -207,16 +204,16 @@ const LandingPage = () => {
                 { value: "AI", label: "POWERED" }
               ].map((stat, index) => (
                 <div key={index} className="group">
-                  <div className="relative p-6 rounded-xl backdrop-blur-md bg-black/20 border border-white/10 hover:border-white/30 transition-all duration-300 hover:bg-black/40">
-                    <div className="text-3xl font-black text-white mb-2 group-hover:scale-110 transition-transform">
+                  <div className="relative p-6 rounded-xl backdrop-blur-md bg-white/50 border border-gray-200 hover:border-gray-400 transition-all duration-300 hover:bg-white/80 hover:shadow-lg">
+                    <div className="text-3xl font-black text-black mb-2 group-hover:scale-110 transition-transform">
                       {stat.value}
                     </div>
-                    <div className="text-xs text-gray-400 font-mono tracking-wider">
+                    <div className="text-xs text-gray-500 font-mono tracking-wider">
                       {stat.label}
                     </div>
                     {/* Animated corner accents */}
-                    <div className="absolute top-0 left-0 w-2 h-2 bg-white opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                    <div className="absolute bottom-0 right-0 w-2 h-2 bg-white opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <div className="absolute top-0 left-0 w-2 h-2 bg-black opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <div className="absolute bottom-0 right-0 w-2 h-2 bg-black opacity-0 group-hover:opacity-100 transition-opacity"></div>
                   </div>
                 </div>
               ))}
