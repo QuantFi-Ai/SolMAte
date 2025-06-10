@@ -231,6 +231,24 @@ backend:
         agent: "testing"
         comment: "✅ TESTED: Email authentication endpoints working correctly. Successfully tested signup with valid data, duplicate email validation, missing field validation, and login with valid/invalid credentials. Passwords are properly hashed and not exposed in API responses."
 
+  - task: "Wallet Authentication System"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implemented GET /api/auth/wallet/message endpoint for generating wallet signature messages"
+      - working: "NA"
+        agent: "main"
+        comment: "Implemented POST /api/auth/wallet/connect endpoint for wallet authentication"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Wallet authentication endpoints working correctly. Successfully tested message generation, wallet connection with valid data, reconnection with existing wallet, and validation for invalid wallet addresses."
+
   - task: "Upload trading highlight image"
     implemented: true
     working: true
