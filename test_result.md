@@ -213,6 +213,24 @@ backend:
         agent: "main"
         comment: "✅ TESTED: Public profile endpoint working correctly - retrieves user data with social links and highlights"
 
+  - task: "Email Authentication System"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implemented POST /api/auth/email/signup endpoint for user registration with email/password"
+      - working: "NA"
+        agent: "main"
+        comment: "Implemented POST /api/auth/email/login endpoint for user authentication with email/password"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Email authentication endpoints working correctly. Successfully tested signup with valid data, duplicate email validation, missing field validation, and login with valid/invalid credentials. Passwords are properly hashed and not exposed in API responses."
+
   - task: "Upload trading highlight image"
     implemented: true
     working: true
