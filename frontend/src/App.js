@@ -330,10 +330,15 @@ function App() {
         method: 'POST'
       });
       const demoUser = await response.json();
+      
+      console.log('Demo user created:', demoUser); // Debug log
+      
       setCurrentUser(demoUser);
       setProfileForm({
+        display_name: demoUser.display_name || '',
         bio: demoUser.bio || '',
         location: demoUser.location || '',
+        timezone: demoUser.timezone || '',
         show_twitter: demoUser.show_twitter !== undefined ? demoUser.show_twitter : false,
         twitter_username: demoUser.twitter_username || '',
         trading_experience: demoUser.trading_experience || '',
@@ -349,7 +354,11 @@ function App() {
         communication_style: demoUser.communication_style || '',
         preferred_communication_platform: demoUser.preferred_communication_platform || '',
         preferred_trading_platform: demoUser.preferred_trading_platform || '',
-        looking_for: demoUser.looking_for || []
+        looking_for: demoUser.looking_for || [],
+        interested_in_token_launch: demoUser.interested_in_token_launch || false,
+        token_launch_experience: demoUser.token_launch_experience || '',
+        launch_timeline: demoUser.launch_timeline || '',
+        launch_budget: demoUser.launch_budget || ''
       });
       setCurrentView('profile-setup');
     } catch (error) {
