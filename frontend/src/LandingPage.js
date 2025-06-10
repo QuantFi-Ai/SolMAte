@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
 const LandingPage = () => {
-  const [email, setEmail] = useState('');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
