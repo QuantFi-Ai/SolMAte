@@ -1360,12 +1360,12 @@ function App() {
           ) : (
             <div className="text-center text-gray-600 py-12">
               <h3 className="text-2xl font-bold mb-4">
-                No more {discoveryMode === 'ai' ? 'AI recommendations' : 'traders to discover'}!
+                No more {discoveryMode === 'ai' ? 'recommended matches' : 'traders to discover'}!
               </h3>
               <p className="text-gray-500 mb-6">
                 {discoveryMode === 'ai' 
-                  ? 'Try browsing all traders or check back later for new AI recommendations.'
-                  : 'Check back later for new potential matches.'
+                  ? 'Try browsing all traders or check back later for new recommendations.'
+                  : 'Check back later for new potential trading partners.'
                 }
               </p>
               <div className="space-x-4">
