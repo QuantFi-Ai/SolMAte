@@ -145,6 +145,21 @@ class TokenLaunchProfile(BaseModel):
     project_type: str = ""  # "Meme Coin", "Utility Token", "DeFi Protocol", "GameFi", "NFT Project", "Other"
     looking_for_help_with: List[str] = []  # ["Technical Development", "Marketing", "Community Building", "Funding", "Legal/Compliance"]
 
+# New Authentication Models
+class EmailSignup(BaseModel):
+    email: EmailStr
+    password: str
+    display_name: str
+
+class EmailLogin(BaseModel):
+    email: EmailStr
+    password: str
+
+class WalletAuth(BaseModel):
+    wallet_address: str
+    signature: str
+    message: str
+
 # AI Matching Algorithm
 class AIMatchingService:
     @staticmethod
