@@ -650,6 +650,33 @@ function App() {
               {/* Basic Info */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
+                  <label className="block text-black font-medium mb-2">Display Name</label>
+                  <input
+                    type="text"
+                    value={profileForm.display_name}
+                    onChange={(e) => setProfileForm(prev => ({ ...prev, display_name: e.target.value }))}
+                    className="w-full border border-gray-300 rounded-xl px-4 py-3 text-black placeholder-gray-500 focus:ring-2 focus:ring-black focus:border-transparent"
+                    placeholder="Your display name"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-black font-medium mb-2">Timezone</label>
+                  <select
+                    value={profileForm.timezone}
+                    onChange={(e) => setProfileForm(prev => ({ ...prev, timezone: e.target.value }))}
+                    className="w-full border border-gray-300 rounded-xl px-4 py-3 text-black bg-white focus:ring-2 focus:ring-black focus:border-transparent"
+                  >
+                    <option value="">Select your timezone</option>
+                    {TIMEZONE_OPTIONS.map(tz => (
+                      <option key={tz} value={tz}>{tz.replace('_', ' ')}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
                   <label className="block text-black font-medium mb-2">Bio</label>
                   <textarea
                     value={profileForm.bio}
