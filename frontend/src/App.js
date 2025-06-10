@@ -188,13 +188,25 @@ function App() {
       const user = await response.json();
       setCurrentUser(user);
       
+      // Fetch user status
+      const statusResponse = await fetch(`${API_BASE_URL}/api/user-status/${userId}`);
+      if (statusResponse.ok) {
+        const statusData = await statusResponse.json();
+        setUserStatus(statusData.user_status);
+      }
+      
+      // Update user's last activity
+      await fetch(`${API_BASE_URL}/api/user/${userId}/update-activity`, {
+        method: 'POST'
+      });
+      
       // Check if profile is complete
       if (!user.profile_complete) {
         setProfileForm({
+          display_name: user.display_name || '',
           bio: user.bio || '',
           location: user.location || '',
-          show_twitter: user.show_twitter !== undefined ? user.show_twitter : true,
-          twitter_username: user.twitter_username || '',
+          timezone: user.timezone || '',
           trading_experience: user.trading_experience || '',
           years_trading: user.years_trading || 0,
           preferred_tokens: user.preferred_tokens || [],
@@ -208,7 +220,13 @@ function App() {
           communication_style: user.communication_style || '',
           preferred_communication_platform: user.preferred_communication_platform || '',
           preferred_trading_platform: user.preferred_trading_platform || '',
-          looking_for: user.looking_for || []
+          looking_for: user.looking_for || [],
+          show_twitter: user.show_twitter !== undefined ? user.show_twitter : true,
+          twitter_username: user.twitter_username || '',
+          interested_in_token_launch: user.interested_in_token_launch || false,
+          token_launch_experience: user.token_launch_experience || '',
+          launch_timeline: user.launch_timeline || '',
+          launch_budget: user.launch_budget || ''
         });
         setCurrentView('profile-setup');
       } else {
@@ -217,9 +235,45 @@ function App() {
         fetchAiRecommendations();
         fetchMatches();
       }
+      
+      // Fetch token launch profile if user is interested
+      if (user.interested_in_token_launch) {
+        const tokenResponse = await fetch(`${API_BASE_URL}/api/token-launch-profile/${userId}`);
+        if (tokenResponse.ok) {
+          const tokenData = await tokenResponse.json();
+          setTokenLaunchProfile(tokenData);
+        }
+      }
     } catch (error) {
       console.error('Error fetching user profile:', error);
     }
+  };
+
+  // Handle user status toggle
+  const handleStatusToggle = async () => {
+    if (!currentUser) return;
+    
+    const newStatus = userStatus === 'active' ? 'offline' : 'active';
+    
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/user-status/${currentUser.user_id}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_status: newStatus })
+      });
+      
+      if (response.ok) {
+        setUserStatus(newStatus);
+      }
+    } catch (error) {
+      console.error('Error updating status:', error);
+    }
+  };
+
+  // Filter cards based on active status
+  const filterCardsByStatus = (cards) => {
+    if (!showOnlyActive) return cards;
+    return cards.filter(card => card.user_status === 'active');
   };
 
   const fetchDiscoveryCards = async () => {
