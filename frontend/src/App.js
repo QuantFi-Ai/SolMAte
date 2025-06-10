@@ -1185,7 +1185,7 @@ function App() {
                 {getCurrentCard()?.user_status === 'active' && (
                   <div className="absolute top-4 right-4 flex items-center space-x-1 bg-green-500 text-white px-2 py-1 rounded-full text-xs font-medium">
                     <div className="w-2 h-2 bg-white rounded-full"></div>
-                    <span>Active</span>
+                    <span>Trading Now</span>
                   </div>
                 )}
                 {getCurrentCard()?.timezone && (
