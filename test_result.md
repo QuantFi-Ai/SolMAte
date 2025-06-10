@@ -164,11 +164,11 @@ backend:
 
   - task: "Updated User Registration and Demo Data"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
@@ -179,6 +179,9 @@ backend:
       - working: "NA"
         agent: "main"
         comment: "Added sample users with different statuses (active/offline) and token launch interests"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Demo user creation working correctly with new fields. Successfully created users with different statuses and token launch interests."
 
   - task: "Enhanced Public Profile API"
     implemented: true
