@@ -1807,7 +1807,7 @@ const AppWithRouter = () => {
     <Router>
       <Routes>
         <Route path="/" element={<LandingPage />} />
-        <Route path="/app" element={<App />} />
+        <Route path="/app" element={<AppContent />} />
         <Route path="/profile/:username" element={<PublicProfile />} />
       </Routes>
     </Router>
