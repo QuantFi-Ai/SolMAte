@@ -1302,6 +1302,28 @@ function App() {
                     </div>
                   )}
 
+                  {/* Token Launch Interest */}
+                  {getCurrentCard()?.interested_in_token_launch && (
+                    <div>
+                      <span className="text-sm font-medium text-gray-500 block mb-2">Token Launch Interest:</span>
+                      <div className="flex flex-wrap gap-1">
+                        <span className="bg-purple-100 text-purple-800 px-2 py-1 rounded-full text-xs font-medium">
+                          🚀 Token Launcher
+                        </span>
+                        {getCurrentCard()?.token_launch_experience && (
+                          <span className="bg-purple-50 text-purple-700 px-2 py-1 rounded-full text-xs">
+                            {getCurrentCard().token_launch_experience} Experience
+                          </span>
+                        )}
+                        {getCurrentCard()?.launch_timeline && (
+                          <span className="bg-purple-50 text-purple-700 px-2 py-1 rounded-full text-xs">
+                            Timeline: {getCurrentCard().launch_timeline}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
                   {/* AI Compatibility Details */}
                   {discoveryMode === 'ai' && getCurrentCard()?.ai_compatibility && (
                     <div className="mt-4 p-3 bg-purple-50 rounded-lg">
