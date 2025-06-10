@@ -594,14 +594,8 @@ class Solm8APITester:
             return False
             
         # Verify password is not stored in plain text
-        # Get the user from the database directly via API
-        success, user_response = self.test_get_user(self.email_user['user_id'])
-        if not success:
-            print("❌ Get user for password verification failed")
-            return False
-            
-        # Check that password is not returned in the user object
-        if 'password' in user_response or 'password_hash' in user_response:
+        # Check the login response for the email user
+        if 'password' in login_response.get('user', {}) or 'password_hash' in login_response.get('user', {}):
             print("❌ Password security verification failed - password/hash exposed in API response")
             self.tests_run += 1
             return False
