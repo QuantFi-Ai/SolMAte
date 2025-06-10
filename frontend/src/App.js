@@ -1415,8 +1415,16 @@ function App() {
                     setSelectedMatch(match);
                     fetchMessages(match.match_id);
                   }}
-                  className="bg-white border border-gray-200 rounded-2xl p-6 cursor-pointer hover:shadow-lg transition-all"
+                  className="bg-white border border-gray-200 rounded-2xl p-6 cursor-pointer hover:shadow-lg transition-all relative"
                 >
+                  {/* Status Indicator */}
+                  {match.other_user.user_status === 'active' && (
+                    <div className="absolute top-3 right-3 flex items-center space-x-1 bg-green-500 text-white px-2 py-1 rounded-full text-xs font-medium">
+                      <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
+                      <span>Online</span>
+                    </div>
+                  )}
+                  
                   <div className="flex items-center space-x-4 mb-4">
                     <img
                       src={match.other_user.avatar_url}
@@ -1438,6 +1446,11 @@ function App() {
                             📱 {match.other_user.preferred_communication_platform}
                           </p>
                         )}
+                        {match.other_user.timezone && (
+                          <p className="text-xs text-gray-500">
+                            🌍 {match.other_user.timezone.replace('_', ' ')}
+                          </p>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -1455,6 +1468,13 @@ function App() {
                       <div className="flex items-center space-x-2">
                         <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">
                           ⚡ {match.other_user.preferred_trading_platform}
+                        </span>
+                      </div>
+                    )}
+                    {match.other_user.interested_in_token_launch && (
+                      <div className="flex items-center space-x-2">
+                        <span className="bg-purple-100 text-purple-800 px-2 py-1 rounded-full text-xs">
+                          🚀 Token Launcher
                         </span>
                       </div>
                     )}
