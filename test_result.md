@@ -464,6 +464,7 @@ test_plan:
     - "Updated User Registration and Demo Data"
     - "Enhanced Public Profile API"
     - "Email Authentication System"
+    - "Wallet Authentication System"
     - "User Status Toggle and Indicators"
     - "Token Launch Profile Integration"
     - "Enhanced Profile Setup Form"
