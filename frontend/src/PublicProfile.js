@@ -301,7 +301,7 @@ const PublicProfile = () => {
         <div className="text-center mt-12">
           <div className="bg-gradient-to-r from-purple-600 to-blue-600 rounded-2xl p-8 text-white">
             <h3 className="text-2xl font-bold mb-4">Ready to Connect with Crypto Traders?</h3>
-            <p className="text-lg mb-6">Join SolMatch to find your perfect trading partner!</p>
+            <p className="text-lg mb-6">Join Solm8 to find your perfect trading partner!</p>
             <a
               href="/"
               className="bg-white text-purple-600 px-8 py-3 rounded-xl font-bold hover:bg-gray-100 transition-all inline-block"
