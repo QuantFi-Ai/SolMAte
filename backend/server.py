@@ -66,6 +66,10 @@ class UserProfile(BaseModel):
     avatar_url: str
     bio: str = ""
     location: str = ""
+    timezone: str = ""  # User's timezone (e.g., "America/New_York", "UTC")
+    # Status tracking
+    user_status: str = "offline"  # "active", "offline"
+    last_activity: datetime
     # Twitter settings
     show_twitter: bool = True
     twitter_username: str = ""
@@ -86,6 +90,11 @@ class UserProfile(BaseModel):
     preferred_communication_platform: str = ""  # "Discord", "Telegram", "Twitter DM", "Signal", "WhatsApp", "In-App Only"
     preferred_trading_platform: str = ""  # "Axiom", "BullX", "Photon", "Padre", "Jupiter", "Raydium", "Other"
     looking_for: List[str] = []  # ["Learning", "Teaching", "Alpha Sharing", "Research Partner", "Risk Management"]
+    # Token launch interest
+    interested_in_token_launch: bool = False
+    token_launch_experience: str = ""  # "None", "Beginner", "Experienced", "Expert"
+    launch_timeline: str = ""  # "Immediate", "1-3 months", "3-6 months", "6+ months", "Just researching"
+    launch_budget: str = ""  # "Under $10K", "$10K-$50K", "$50K-$100K", "$100K+", "Prefer not to say"
     # Profile completion
     profile_complete: bool = False
     created_at: datetime
