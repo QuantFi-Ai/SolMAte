@@ -16,7 +16,7 @@ from starlette.config import Config
 # Database setup
 MONGO_URL = os.environ.get('MONGO_URL', 'mongodb://localhost:27017')
 client = MongoClient(MONGO_URL)
-db = client.solmatch_db
+db = client.solm8_db
 
 # Collections
 users_collection = db.users
