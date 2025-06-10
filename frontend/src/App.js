@@ -444,11 +444,6 @@ function AppContent() {
     }
   };
 
-  // Solana Wallet Authentication
-  const handleWalletConnect = async () => {
-    alert('Wallet authentication coming soon! Please use email/password for now.');
-  };
-
   const fetchDiscoveryCards = async () => {
     try {
       const response = await fetch(`${API_BASE_URL}/api/discover/${currentUser.user_id}`);
