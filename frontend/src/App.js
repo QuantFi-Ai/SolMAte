@@ -21,19 +21,7 @@ function AppContent() {
   // Wallet setup
   const { publicKey, signMessage, connected, connect, disconnect } = useWallet();
   
-  // Wallet adapters (moved inside component to avoid SSR issues)
-  const wallets = useMemo(() => [
-    new PhantomWalletAdapter(),
-    new SolflareWalletAdapter(),
-  ], []);
-  // Wallet setup
-  const { publicKey, signMessage, connected, connect, disconnect } = useWallet();
-  
-  // Wallet adapters (moved inside component to avoid SSR issues)
-  const wallets = useMemo(() => [
-    new PhantomWalletAdapter(),
-    new SolflareWalletAdapter(),
-  ], []);
+  // State management
   const [currentUser, setCurrentUser] = useState(null);
   const [currentView, setCurrentView] = useState('login');
   const [discoveryCards, setDiscoveryCards] = useState([]);
