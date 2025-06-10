@@ -555,6 +555,12 @@ function App() {
     return discoveryMode === 'ai' ? aiRecommendations : discoveryCards;
   };
 
+  // Redirect to login if not authenticated
+  if (!currentUser && currentView !== 'login') {
+    setCurrentView('login');
+    return null;
+  }
+
   // Login View
   if (currentView === 'login') {
     return (
