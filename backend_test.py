@@ -6,7 +6,7 @@ import tempfile
 from datetime import datetime
 
 class Solm8APITester:
-    def __init__(self, base_url="https://6d4fa949-a991-4f95-aa5c-530bff69c87b.preview.emergentagent.com"):
+    def __init__(self, base_url="https://abc11984-1ed0-4743-b061-3045e146cf6a.preview.emergentagent.com"):
         self.base_url = base_url
         self.tests_run = 0
         self.tests_passed = 0
