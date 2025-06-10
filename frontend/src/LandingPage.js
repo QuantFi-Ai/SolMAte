@@ -157,14 +157,14 @@ const LandingPage = () => {
                 FIND YOUR
               </h1>
               <div className="relative inline-block">
-                <h1 className="text-6xl md:text-8xl font-black bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent animate-gradient leading-tight tracking-tight">
+                <h1 className="text-6xl md:text-8xl font-black text-white leading-tight tracking-tight">
                   TRADING M8
                 </h1>
-                {/* Glitch layers */}
-                <h1 className="absolute inset-0 text-6xl md:text-8xl font-black text-cyan-400 opacity-30 animate-pulse leading-tight tracking-tight" style={{ transform: 'translate(2px, 0)' }}>
+                {/* Glitch layers in grayscale */}
+                <h1 className="absolute inset-0 text-6xl md:text-8xl font-black text-gray-400 opacity-30 animate-pulse leading-tight tracking-tight" style={{ transform: 'translate(2px, 0)' }}>
                   TRADING M8
                 </h1>
-                <h1 className="absolute inset-0 text-6xl md:text-8xl font-black text-purple-400 opacity-20 animate-pulse leading-tight tracking-tight" style={{ transform: 'translate(-2px, 0)', animationDelay: '0.1s' }}>
+                <h1 className="absolute inset-0 text-6xl md:text-8xl font-black text-gray-600 opacity-20 animate-pulse leading-tight tracking-tight" style={{ transform: 'translate(-2px, 0)', animationDelay: '0.1s' }}>
                   TRADING M8
                 </h1>
               </div>
@@ -172,9 +172,9 @@ const LandingPage = () => {
             
             <p className="text-xl md:text-2xl text-gray-300 mb-12 max-w-4xl mx-auto leading-relaxed">
               AI-powered matching system connecting crypto traders worldwide. 
-              <span className="text-cyan-400"> Share strategies</span>, 
-              <span className="text-purple-400"> build networks</span>, 
-              <span className="text-pink-400"> dominate markets</span>.
+              <span className="text-white font-semibold"> Share strategies</span>, 
+              <span className="text-gray-100 font-semibold"> build networks</span>, 
+              <span className="text-white font-semibold"> dominate markets</span>.
             </p>
             
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-16">
