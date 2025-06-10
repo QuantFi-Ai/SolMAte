@@ -206,7 +206,7 @@ html {
     left: 0;
     width: 100%;
     height: 2px;
-    background: linear-gradient(90deg, transparent, #00ffff, transparent);
+    background: linear-gradient(90deg, transparent, #ffffff, transparent);
     animation: scan-line 3s linear infinite;
     z-index: 1000;
     pointer-events: none;
