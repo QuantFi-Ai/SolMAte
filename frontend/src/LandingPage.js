@@ -82,34 +82,34 @@ const LandingPage = () => {
       </div>
 
       {/* Navigation */}
-      <nav className="relative z-50 backdrop-blur-md bg-black/20 border-b border-white/10">
+      <nav className="relative z-50 backdrop-blur-md bg-white/80 border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center">
-              <h1 className="text-2xl font-bold text-white">
+              <h1 className="text-2xl font-bold text-black">
                 Solm8
               </h1>
-              <div className="ml-3 px-2 py-1 text-xs bg-white/10 text-gray-300 rounded-full border border-white/20">
+              <div className="ml-3 px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded-full border border-gray-200">
                 BETA
               </div>
             </div>
             
             <div className="hidden md:flex items-center space-x-8">
-              <a href="#features" className="text-gray-300 hover:text-white transition-all duration-300 relative group">
+              <a href="#features" className="text-gray-600 hover:text-black transition-all duration-300 relative group">
                 Features
-                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-white group-hover:w-full transition-all duration-300"></span>
+                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-black group-hover:w-full transition-all duration-300"></span>
               </a>
-              <a href="#how-it-works" className="text-gray-300 hover:text-white transition-all duration-300 relative group">
+              <a href="#how-it-works" className="text-gray-600 hover:text-black transition-all duration-300 relative group">
                 How it Works
-                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-white group-hover:w-full transition-all duration-300"></span>
+                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-black group-hover:w-full transition-all duration-300"></span>
               </a>
-              <a href="#community" className="text-gray-300 hover:text-white transition-all duration-300 relative group">
+              <a href="#community" className="text-gray-600 hover:text-black transition-all duration-300 relative group">
                 Community
-                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-white group-hover:w-full transition-all duration-300"></span>
+                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-black group-hover:w-full transition-all duration-300"></span>
               </a>
               <button 
                 onClick={handleGetStarted}
-                className="relative px-6 py-2 bg-white text-black rounded-lg font-medium overflow-hidden group transition-all duration-300 hover:shadow-lg hover:shadow-white/25 hover:bg-gray-100"
+                className="relative px-6 py-2 bg-black text-white rounded-lg font-medium overflow-hidden group transition-all duration-300 hover:shadow-lg hover:shadow-black/25 hover:bg-gray-800"
               >
                 <span className="relative z-10">Launch App</span>
               </button>
@@ -119,7 +119,7 @@ const LandingPage = () => {
             <div className="md:hidden">
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="text-gray-300 hover:text-white transition-all"
+                className="text-gray-600 hover:text-black transition-all"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
@@ -130,14 +130,14 @@ const LandingPage = () => {
           
           {/* Mobile menu */}
           {mobileMenuOpen && (
-            <div className="md:hidden backdrop-blur-md bg-black/40 border-t border-white/10 py-4">
+            <div className="md:hidden backdrop-blur-md bg-white/90 border-t border-gray-200 py-4">
               <div className="space-y-4">
-                <a href="#features" className="block text-gray-300 hover:text-white transition-all px-4">Features</a>
-                <a href="#how-it-works" className="block text-gray-300 hover:text-white transition-all px-4">How it Works</a>
-                <a href="#community" className="block text-gray-300 hover:text-white transition-all px-4">Community</a>
+                <a href="#features" className="block text-gray-600 hover:text-black transition-all px-4">Features</a>
+                <a href="#how-it-works" className="block text-gray-600 hover:text-black transition-all px-4">How it Works</a>
+                <a href="#community" className="block text-gray-600 hover:text-black transition-all px-4">Community</a>
                 <button 
                   onClick={handleGetStarted}
-                  className="mx-4 w-[calc(100%-2rem)] bg-white text-black px-6 py-2 rounded-lg font-medium hover:bg-gray-100 transition-all"
+                  className="mx-4 w-[calc(100%-2rem)] bg-black text-white px-6 py-2 rounded-lg font-medium hover:bg-gray-800 transition-all"
                 >
                   Launch App
                 </button>
