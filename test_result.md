@@ -304,12 +304,87 @@ backend:
         comment: "✅ TESTED: Get social links working correctly - retrieves all user social media links"
 
 frontend:
+  - task: "User Status Toggle and Indicators"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Added status toggle button in navigation with green/gray indicator"
+      - working: "NA"
+        agent: "main"
+        comment: "Added 'Show only active traders' filter toggle in discovery view"
+      - working: "NA"
+        agent: "main"
+        comment: "Added status indicators on user cards (green 'Active' badge)"
+      - working: "NA"
+        agent: "main"
+        comment: "Added timezone display on user cards and matches"
+
+  - task: "Token Launch Profile Integration"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Added token launch interest section in profile setup with experience, timeline, budget fields"
+      - working: "NA"
+        agent: "main"
+        comment: "Added purple 'Token Launcher' badges on user cards and matches"
+      - working: "NA"
+        agent: "main"
+        comment: "Integrated token launch options constants (experience, timeline, budget, project type)"
+
+  - task: "Enhanced Profile Setup Form"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Added timezone selection field with popular timezone options"
+      - working: "NA"
+        agent: "main"
+        comment: "Added display name field to profile form"
+      - working: "NA"
+        agent: "main"
+        comment: "Extended profileForm state to include all new fields"
+
+  - task: "Status Management Functions"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implemented handleStatusToggle function for active/offline switching"
+      - working: "NA"
+        agent: "main"
+        comment: "Added filterCardsByStatus function for active user filtering"
+      - working: "NA"
+        agent: "main"
+        comment: "Enhanced fetchUserData to get status and update activity"
+
   - task: "Public profile page component"
     implemented: true
     working: "NA"
     file: "/app/frontend/src/PublicProfile.js"
     stuck_count: 0
-    priority: "high"
+    priority: "medium"
     needs_retesting: true
     status_history:
       - working: "NA"
@@ -321,7 +396,7 @@ frontend:
     working: "NA"
     file: "/app/frontend/src/ProfileManager.js"
     stuck_count: 0
-    priority: "high"
+    priority: "medium"
     needs_retesting: true
     status_history:
       - working: "NA"
@@ -333,7 +408,7 @@ frontend:
     working: "NA"
     file: "/app/frontend/src/App.js"
     stuck_count: 0
-    priority: "high"
+    priority: "medium"
     needs_retesting: true
     status_history:
       - working: "NA"
