@@ -70,7 +70,7 @@ const PublicProfile = () => {
       {/* Header */}
       <div className="bg-white border-b border-gray-200 p-4">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <a href="/" className="text-2xl font-bold text-black">SolMatch</a>
+          <a href="/" className="text-2xl font-bold text-black">Solm8</a>
           <div className="flex space-x-2">
             <button
               onClick={copyProfileLink}
