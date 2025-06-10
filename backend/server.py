@@ -678,6 +678,265 @@ async def get_social_links(user_id: str):
         return social_links
     return {}
 
+# User Status Management Endpoints
+
+@app.post("/api/user-status/{user_id}")
+async def update_user_status(user_id: str, status_update: UserStatusUpdate):
+    """Update user's online/offline status"""
+    try:
+        # Validate user exists
+        user = users_collection.find_one({"user_id": user_id})
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        # Validate status value
+        if status_update.user_status not in ["active", "offline"]:
+            raise HTTPException(status_code=400, detail="Status must be 'active' or 'offline'")
+        
+        # Update user status and last activity
+        users_collection.update_one(
+            {"user_id": user_id},
+            {
+                "$set": {
+                    "user_status": status_update.user_status,
+                    "last_activity": datetime.utcnow()
+                }
+            }
+        )
+        
+        return {"message": "Status updated successfully", "status": status_update.user_status}
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to update status: {str(e)}")
+
+@app.get("/api/user-status/{user_id}")
+async def get_user_status(user_id: str):
+    """Get user's current status"""
+    user = users_collection.find_one({"user_id": user_id})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Auto-update status if user has been inactive for more than 30 minutes
+    last_activity = user.get('last_activity', datetime.utcnow())
+    if isinstance(last_activity, str):
+        last_activity = datetime.fromisoformat(last_activity.replace('Z', '+00:00'))
+    
+    inactive_threshold = datetime.utcnow() - timedelta(minutes=30)
+    
+    if last_activity < inactive_threshold and user.get('user_status') == 'active':
+        # Auto-switch to offline
+        users_collection.update_one(
+            {"user_id": user_id},
+            {"$set": {"user_status": "offline"}}
+        )
+        user['user_status'] = 'offline'
+    
+    return {
+        "user_id": user_id,
+        "user_status": user.get('user_status', 'offline'),
+        "last_activity": user.get('last_activity'),
+        "display_name": user.get('display_name', ''),
+        "timezone": user.get('timezone', '')
+    }
+
+@app.get("/api/users/active")
+async def get_active_users():
+    """Get list of currently active users"""
+    try:
+        # Get all users who are marked as active
+        active_users = list(users_collection.find({"user_status": "active"}))
+        
+        # Filter out users who have been inactive for more than 30 minutes
+        inactive_threshold = datetime.utcnow() - timedelta(minutes=30)
+        truly_active_users = []
+        users_to_update = []
+        
+        for user in active_users:
+            last_activity = user.get('last_activity', datetime.utcnow())
+            if isinstance(last_activity, str):
+                last_activity = datetime.fromisoformat(last_activity.replace('Z', '+00:00'))
+            
+            if last_activity >= inactive_threshold:
+                # Remove sensitive data and MongoDB ObjectId
+                user.pop('_id', None)
+                user.pop('twitter_id', None)
+                truly_active_users.append({
+                    "user_id": user['user_id'],
+                    "username": user['username'],
+                    "display_name": user['display_name'],
+                    "avatar_url": user['avatar_url'],
+                    "bio": user.get('bio', ''),
+                    "location": user.get('location', ''),
+                    "timezone": user.get('timezone', ''),
+                    "trading_experience": user.get('trading_experience', ''),
+                    "trading_style": user.get('trading_style', ''),
+                    "preferred_tokens": user.get('preferred_tokens', []),
+                    "looking_for": user.get('looking_for', []),
+                    "interested_in_token_launch": user.get('interested_in_token_launch', False),
+                    "last_activity": user.get('last_activity')
+                })
+            else:
+                # Mark for status update
+                users_to_update.append(user['user_id'])
+        
+        # Bulk update inactive users to offline status
+        if users_to_update:
+            users_collection.update_many(
+                {"user_id": {"$in": users_to_update}},
+                {"$set": {"user_status": "offline"}}
+            )
+        
+        return {
+            "active_users": truly_active_users,
+            "count": len(truly_active_users),
+            "last_updated": datetime.utcnow()
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get active users: {str(e)}")
+
+@app.post("/api/user/{user_id}/update-activity")
+async def update_user_activity(user_id: str):
+    """Update user's last activity timestamp (called on app usage)"""
+    try:
+        result = users_collection.update_one(
+            {"user_id": user_id},
+            {"$set": {"last_activity": datetime.utcnow()}}
+        )
+        
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        return {"message": "Activity updated"}
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to update activity: {str(e)}")
+
+# Token Launch Management Endpoints
+
+@app.post("/api/token-launch-profile/{user_id}")
+async def update_token_launch_profile(user_id: str, token_profile: TokenLaunchProfile):
+    """Update user's token launch interests and profile"""
+    try:
+        # Validate user exists
+        user = users_collection.find_one({"user_id": user_id})
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        # Update user's token launch fields in main profile
+        users_collection.update_one(
+            {"user_id": user_id},
+            {
+                "$set": {
+                    "interested_in_token_launch": token_profile.interested_in_token_launch,
+                    "token_launch_experience": token_profile.token_launch_experience,
+                    "launch_timeline": token_profile.launch_timeline,
+                    "launch_budget": token_profile.launch_budget,
+                    "last_activity": datetime.utcnow()
+                }
+            }
+        )
+        
+        # Create or update detailed token launch profile
+        token_launch_data = {
+            "user_id": user_id,
+            "interested_in_token_launch": token_profile.interested_in_token_launch,
+            "token_launch_experience": token_profile.token_launch_experience,
+            "launch_timeline": token_profile.launch_timeline,
+            "launch_budget": token_profile.launch_budget,
+            "project_type": token_profile.project_type,
+            "looking_for_help_with": token_profile.looking_for_help_with,
+            "updated_at": datetime.utcnow()
+        }
+        
+        # Upsert token launch profile
+        token_launch_profiles_collection.replace_one(
+            {"user_id": user_id},
+            token_launch_data,
+            upsert=True
+        )
+        
+        return {"message": "Token launch profile updated successfully"}
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to update token launch profile: {str(e)}")
+
+@app.get("/api/token-launch-profile/{user_id}")
+async def get_token_launch_profile(user_id: str):
+    """Get user's token launch profile"""
+    token_profile = token_launch_profiles_collection.find_one({"user_id": user_id})
+    if token_profile:
+        token_profile.pop('_id', None)
+        return token_profile
+    
+    # Return basic info from user profile if detailed profile doesn't exist
+    user = users_collection.find_one({"user_id": user_id})
+    if user:
+        return {
+            "user_id": user_id,
+            "interested_in_token_launch": user.get('interested_in_token_launch', False),
+            "token_launch_experience": user.get('token_launch_experience', ''),
+            "launch_timeline": user.get('launch_timeline', ''),
+            "launch_budget": user.get('launch_budget', ''),
+            "project_type": '',
+            "looking_for_help_with": []
+        }
+    
+    raise HTTPException(status_code=404, detail="User not found")
+
+@app.get("/api/users/token-launchers")
+async def get_token_launchers():
+    """Get users interested in token launches"""
+    try:
+        # Get users who are interested in token launches
+        token_launchers = list(users_collection.find({
+            "interested_in_token_launch": True,
+            "profile_complete": True
+        }))
+        
+        result_users = []
+        for user in token_launchers:
+            # Remove sensitive data
+            user.pop('_id', None)
+            user.pop('twitter_id', None)
+            
+            # Get detailed token launch profile if exists
+            token_profile = token_launch_profiles_collection.find_one({"user_id": user['user_id']})
+            
+            user_data = {
+                "user_id": user['user_id'],
+                "username": user['username'],
+                "display_name": user['display_name'],
+                "avatar_url": user['avatar_url'],
+                "bio": user.get('bio', ''),
+                "location": user.get('location', ''),
+                "timezone": user.get('timezone', ''),
+                "user_status": user.get('user_status', 'offline'),
+                "trading_experience": user.get('trading_experience', ''),
+                "years_trading": user.get('years_trading', 0),
+                "token_launch_experience": user.get('token_launch_experience', ''),
+                "launch_timeline": user.get('launch_timeline', ''),
+                "launch_budget": user.get('launch_budget', ''),
+                "last_activity": user.get('last_activity')
+            }
+            
+            # Add detailed token launch info if available
+            if token_profile:
+                user_data.update({
+                    "project_type": token_profile.get('project_type', ''),
+                    "looking_for_help_with": token_profile.get('looking_for_help_with', [])
+                })
+            
+            result_users.append(user_data)
+        
+        return {
+            "token_launchers": result_users,
+            "count": len(result_users)
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get token launchers: {str(e)}")
+
 @app.get("/api/health")
 async def health_check():
     return {"status": "healthy", "service": "Solm8 API"}
