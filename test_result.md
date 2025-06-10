@@ -357,11 +357,11 @@ backend:
 frontend:
   - task: "User Status Toggle and Indicators"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/frontend/src/App.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
@@ -375,6 +375,9 @@ frontend:
       - working: "NA"
         agent: "main"
         comment: "Added timezone display on user cards and matches"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Status toggle button works correctly, changing between 'Trading Active' (green) and 'Offline' (gray). The 'Show only active traders' filter toggle also works as expected."
 
   - task: "Token Launch Profile Integration"
     implemented: true
