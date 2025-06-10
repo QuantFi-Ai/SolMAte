@@ -180,7 +180,7 @@ const LandingPage = () => {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-16">
               <button 
                 onClick={handleGetStarted}
-                className="group relative px-8 py-4 bg-gradient-to-r from-cyan-500 to-purple-500 text-white text-lg font-bold rounded-xl overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-cyan-500/25"
+                className="group relative px-8 py-4 bg-white text-black text-lg font-bold rounded-xl overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-white/25"
               >
                 <span className="relative z-10 flex items-center">
                   <span>ENTER THE MATRIX</span>
@@ -188,13 +188,12 @@ const LandingPage = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                   </svg>
                 </span>
-                <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-cyan-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </button>
               
-              <button className="group text-gray-300 px-8 py-4 rounded-xl border border-cyan-500/30 hover:border-cyan-500 transition-all duration-300 hover:bg-cyan-500/10 backdrop-blur-sm">
+              <button className="group text-gray-300 px-8 py-4 rounded-xl border border-white/20 hover:border-white hover:text-white transition-all duration-300 hover:bg-white/5 backdrop-blur-sm">
                 <span className="flex items-center text-lg font-medium">
                   <span>WATCH DEMO</span>
-                  <div className="ml-2 w-0 h-0 border-l-4 border-l-cyan-400 border-t-2 border-t-transparent border-b-2 border-b-transparent group-hover:translate-x-1 transition-transform"></div>
+                  <div className="ml-2 w-0 h-0 border-l-4 border-l-white border-t-2 border-t-transparent border-b-2 border-b-transparent group-hover:translate-x-1 transition-transform"></div>
                 </span>
               </button>
             </div>
