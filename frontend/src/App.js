@@ -775,16 +775,6 @@ function AppContent() {
               >
                 Sign Up
               </button>
-              <button
-                onClick={() => setAuthMode('wallet')}
-                className={`flex-1 py-2 px-4 rounded-lg font-medium transition-all ${
-                  authMode === 'wallet' 
-                    ? 'bg-white text-black shadow-sm' 
-                    : 'text-gray-600 hover:text-black'
-                }`}
-              >
-                Wallet
-              </button>
             </div>
 
             {/* Email/Password Forms */}
