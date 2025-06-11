@@ -1356,6 +1356,13 @@ function AppContent() {
             >
               🔄 Refresh
             </button>
+            <button
+              onClick={refreshDiscovery}
+              className="px-4 py-2 rounded-lg font-medium text-gray-600 hover:text-black transition-all"
+              title="Refresh to see new profiles"
+            >
+              🔄 Refresh
+            </button>
           </div>
           <div className="flex items-center space-x-3">
             {/* Status Toggle */}
