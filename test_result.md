@@ -527,3 +527,5 @@ agent_communication:
     message: "✅ USER MATCHING TESTING COMPLETE: Successfully tested the complete user matching flow. Added POST /api/messages endpoint to enable message sending between matched users. Verified that users can like each other, matches are created correctly, and messages can be sent and received between matched users."
   - agent: "testing"
     message: "✅ FRONTEND TESTING COMPLETE: Successfully tested all frontend components. The user status toggle, active traders filter, token launch profile integration, enhanced profile setup form, and status management functions are all working correctly. The application has proper routing between pages and all components are accessible."
+  - agent: "testing"
+    message: "❌ DISCOVERY SYSTEM ISSUE IDENTIFIED: Users cannot see each other in the discovery feed. The MongoDB queries in both the discover_users and get_ai_recommendations endpoints don't include any sorting, so results are returned in insertion order (oldest first). Since the default limit is 10, only the oldest 10 users are returned. Newly created users don't appear in discovery because they're not in the first 10 users."
