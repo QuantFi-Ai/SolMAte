@@ -765,14 +765,6 @@ function AppContent() {
             {/* Social Login Options */}
             <div className="space-y-3">
               <button
-                onClick={handleTwitterLogin}
-                className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 flex items-center justify-center space-x-2"
-              >
-                <span>🐦</span>
-                <span>Continue with Twitter</span>
-              </button>
-              
-              <button
                 onClick={handleDemoLogin}
                 className="w-full border border-gray-300 hover:bg-gray-50 text-black font-semibold py-3 px-6 rounded-xl transition-all duration-200 flex items-center justify-center space-x-2"
               >
