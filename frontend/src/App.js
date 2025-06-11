@@ -116,6 +116,39 @@ function AppContent() {
   });
   const [authLoading, setAuthLoading] = useState(false);
 
+  // Validate session with backend
+  const validateSession = async (userData) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/user/${userData.user_id}`);
+      if (response.ok) {
+        const currentUserData = await response.json();
+        // Update localStorage with latest user data
+        localStorage.setItem('solm8_user', JSON.stringify(currentUserData));
+        return currentUserData;
+      } else {
+        // User no longer exists on backend, clear session
+        localStorage.removeItem('solm8_user');
+        return null;
+      }
+    } catch (error) {
+      console.error('Session validation failed:', error);
+      return userData; // Fallback to stored data if network fails
+    }
+  };
+
+  // Logout function
+  const handleLogout = () => {
+    localStorage.removeItem('solm8_user');
+    setCurrentUser(null);
+    setCurrentView('login');
+    setUserStatus('offline');
+    // Close WebSocket if open
+    if (ws) {
+      ws.close();
+      setWs(null);
+    }
+  };
+
   // Handle auth callback and session restoration on page load
   useEffect(() => {
     // First, check for stored user session
@@ -124,23 +157,34 @@ function AppContent() {
       try {
         const userData = JSON.parse(storedUser);
         console.log('Restoring user session:', userData);
-        setCurrentUser(userData);
         
-        // Update user activity
-        fetch(`${API_BASE_URL}/api/user/${userData.user_id}/update-activity`, {
-          method: 'POST'
-        }).catch(err => console.error('Failed to update activity:', err));
+        // Validate session with backend
+        validateSession(userData).then((validatedUser) => {
+          if (validatedUser) {
+            setCurrentUser(validatedUser);
+            
+            // Update user activity
+            fetch(`${API_BASE_URL}/api/user/${validatedUser.user_id}/update-activity`, {
+              method: 'POST'
+            }).catch(err => console.error('Failed to update activity:', err));
+            
+            // Set appropriate view based on profile completion
+            if (!validatedUser.profile_complete) {
+              setCurrentView('profile-setup');
+            } else {
+              setCurrentView('discover');
+            }
+          } else {
+            // Invalid session, go to login
+            setCurrentView('login');
+          }
+        });
         
-        // Set appropriate view based on profile completion
-        if (!userData.profile_complete) {
-          setCurrentView('profile-setup');
-        } else {
-          setCurrentView('discover');
-        }
         return; // Don't process URL params if we restored session
       } catch (error) {
         console.error('Error parsing stored user:', error);
         localStorage.removeItem('solm8_user');
+        setCurrentView('login');
       }
     }
 
