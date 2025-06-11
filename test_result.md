@@ -339,20 +339,23 @@ backend:
         agent: "main"
         comment: "✅ TESTED: Get social links working correctly - retrieves all user social media links"
         
-  - task: "User Matching System"
+  - task: "Discovery System"
     implemented: true
-    working: true
+    working: false
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
     needs_retesting: false
     status_history:
       - working: "NA"
+        agent: "main"
+        comment: "Implemented GET /api/discover/{user_id} - Get potential matches for swiping"
+      - working: "NA"
+        agent: "main"
+        comment: "Implemented GET /api/ai-recommendations/{user_id} - Get AI-recommended matches"
+      - working: false
         agent: "testing"
-        comment: "Added POST /api/messages endpoint to enable message sending between matched users"
-      - working: true
-        agent: "testing"
-        comment: "✅ TESTED: Complete user matching flow working correctly. Successfully tested: 1) Creating two users, 2) User A likes User B, 3) User B likes User A back creating a match, 4) Match appears in both users' match lists with correct data structure, 5) Users can send and receive messages in the match."
+        comment: "❌ ISSUE IDENTIFIED: Users cannot see each other in the discovery feed. The MongoDB queries in both endpoints don't include any sorting, so results are returned in insertion order (oldest first). Since the default limit is 10, only the oldest 10 users are returned. Newly created users don't appear in discovery because they're not in the first 10 users."
 
 frontend:
   - task: "User Status Toggle and Indicators"
