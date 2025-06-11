@@ -1411,6 +1411,8 @@ class Solm8APITester:
             print("❌ Failed to get user profile")
             return False
         
+        print(f"User data after update: {json.dumps(user_data, default=str)}")
+        
         if user_data.get('profile_complete'):
             print("❌ Profile incorrectly marked as complete with missing portfolio_size")
             return False
