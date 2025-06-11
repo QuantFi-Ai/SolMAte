@@ -415,10 +415,10 @@ function AppContent() {
 
   const fetchAiRecommendations = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/ai-matches/${currentUser.user_id}`);
+      const response = await fetch(`${API_BASE_URL}/api/ai-recommendations/${currentUser.user_id}`);
       if (response.ok) {
         const data = await response.json();
-        setAiRecommendations(filterCardsByStatus(data.ai_matches || []));
+        setAiRecommendations(filterCardsByStatus(data || []));
       }
     } catch (error) {
       console.error('Error fetching AI recommendations:', error);
