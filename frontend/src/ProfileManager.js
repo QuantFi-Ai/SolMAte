@@ -187,6 +187,14 @@ const ProfileManager = ({ currentUser, onClose }) => {
 
   // Profile Preview Component (similar to PublicProfile but editable)
   const ProfilePreview = () => {
+    if (!currentUser) {
+      return (
+        <div className="text-center py-8">
+          <p className="text-gray-600">Loading profile...</p>
+        </div>
+      );
+    }
+
     // Add safety check for currentUser
     if (!currentUser) {
       return (
