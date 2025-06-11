@@ -1063,9 +1063,299 @@ class Solm8APITester:
         print("\n✅ User matching flow test completed successfully!")
         return True
 
+    def check_database_users(self):
+        """Check user data directly in the database"""
+        print("\n🔍 Checking Database Users...")
+        
+        # Connect to MongoDB
+        from pymongo import MongoClient
+        client = MongoClient("mongodb://localhost:27017")
+        db = client.solm8_db
+        users_collection = db.users
+        
+        # Count total users
+        total_users = users_collection.count_documents({})
+        print(f"Total users in database: {total_users}")
+        
+        # Count users by auth method
+        auth_methods = ["email", "wallet", "twitter", "demo"]
+        for method in auth_methods:
+            count = users_collection.count_documents({"auth_method": method})
+            print(f"Users with auth_method '{method}': {count}")
+        
+        # Count users with complete profiles
+        complete_profiles = users_collection.count_documents({"profile_complete": True})
+        print(f"Users with complete profiles: {complete_profiles}")
+        
+        # Count users with incomplete profiles
+        incomplete_profiles = users_collection.count_documents({"profile_complete": False})
+        print(f"Users with incomplete profiles: {incomplete_profiles}")
+        
+        # Check required fields for profile completion
+        missing_fields = {
+            "trading_experience": users_collection.count_documents({"profile_complete": True, "$or": [{"trading_experience": ""}, {"trading_experience": {"$exists": False}}]}),
+            "preferred_tokens": users_collection.count_documents({"profile_complete": True, "$or": [{"preferred_tokens": []}, {"preferred_tokens": {"$exists": False}}]}),
+            "trading_style": users_collection.count_documents({"profile_complete": True, "$or": [{"trading_style": ""}, {"trading_style": {"$exists": False}}]}),
+            "portfolio_size": users_collection.count_documents({"profile_complete": True, "$or": [{"portfolio_size": ""}, {"portfolio_size": {"$exists": False}}]})
+        }
+        
+        print("\nUsers with complete profiles but missing required fields:")
+        for field, count in missing_fields.items():
+            print(f"- Missing {field}: {count}")
+        
+        # Check for inconsistencies in profile_complete flag
+        should_be_complete = users_collection.count_documents({
+            "profile_complete": False,
+            "trading_experience": {"$ne": ""},
+            "preferred_tokens": {"$ne": []},
+            "trading_style": {"$ne": ""},
+            "portfolio_size": {"$ne": ""}
+        })
+        
+        should_be_incomplete = users_collection.count_documents({
+            "profile_complete": True,
+            "$or": [
+                {"trading_experience": ""},
+                {"preferred_tokens": []},
+                {"trading_style": ""},
+                {"portfolio_size": ""}
+            ]
+        })
+        
+        print(f"\nUsers that should be marked complete but aren't: {should_be_complete}")
+        print(f"Users that should be marked incomplete but are marked complete: {should_be_incomplete}")
+        
+        # Get sample of real users with complete profiles
+        real_complete_users = list(users_collection.find({
+            "auth_method": {"$ne": "demo"},
+            "profile_complete": True
+        }).limit(5))
+        
+        print("\nSample of real users with complete profiles:")
+        for user in real_complete_users:
+            print(f"- User ID: {user.get('user_id')}, Username: {user.get('username')}, Auth Method: {user.get('auth_method')}")
+        
+        # Get sample of real users with incomplete profiles
+        real_incomplete_users = list(users_collection.find({
+            "auth_method": {"$ne": "demo"},
+            "profile_complete": False
+        }).limit(5))
+        
+        print("\nSample of real users with incomplete profiles:")
+        for user in real_incomplete_users:
+            print(f"- User ID: {user.get('user_id')}, Username: {user.get('username')}, Auth Method: {user.get('auth_method')}")
+        
+        return [user.get('user_id') for user in real_complete_users]
+
+    def test_profile_completion_flow(self):
+        """Test the complete profile completion flow"""
+        print("\n🔍 Testing Profile Completion Flow...")
+        
+        # Step 1: Create a new email user
+        print("\n1️⃣ Creating a new email user...")
+        random_suffix = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
+        test_email = f"test_{random_suffix}@example.com"
+        test_password = "TestPassword123!"
+        test_display_name = f"Test User {random_suffix}"
+        
+        success, signup_response = self.test_email_signup(test_email, test_password, test_display_name)
+        if not success:
+            print("❌ Email signup failed, stopping test")
+            return False
+        
+        user_id = self.email_user['user_id']
+        
+        # Step 2: Verify initial profile is incomplete
+        print("\n2️⃣ Verifying initial profile is incomplete...")
+        success, user_data = self.test_get_user(user_id)
+        if not success:
+            print("❌ Failed to get user profile")
+            return False
+        
+        if user_data.get('profile_complete'):
+            print("❌ New user profile incorrectly marked as complete")
+            return False
+        else:
+            print("✅ New user profile correctly marked as incomplete")
+        
+        # Step 3: Update profile with minimum required fields
+        print("\n3️⃣ Updating profile with minimum required fields...")
+        min_profile_data = {
+            "trading_experience": "Intermediate",
+            "preferred_tokens": ["Meme Coins", "DeFi"],
+            "trading_style": "Day Trader",
+            "portfolio_size": "$10K-$100K"
+        }
+        
+        success, _ = self.test_update_user_profile(user_id, min_profile_data)
+        if not success:
+            print("❌ Failed to update user profile")
+            return False
+        
+        # Step 4: Verify profile is now complete
+        print("\n4️⃣ Verifying profile is now complete...")
+        success, updated_user = self.test_get_user(user_id)
+        if not success:
+            print("❌ Failed to get updated user profile")
+            return False
+        
+        if not updated_user.get('profile_complete'):
+            print("❌ Profile not marked as complete after adding required fields")
+            print(f"Profile data: {json.dumps(updated_user, default=str)}")
+            return False
+        else:
+            print("✅ Profile correctly marked as complete after adding required fields")
+        
+        # Step 5: Test discovery with the new user
+        print("\n5️⃣ Testing discovery with the new user...")
+        success, discover_results = self.test_discover_users(user_id)
+        if not success:
+            print("❌ Failed to get discovery results")
+            return False
+        
+        print(f"Discovery returned {len(discover_results)} potential matches")
+        
+        # Step 6: Test AI recommendations with the new user
+        print("\n6️⃣ Testing AI recommendations with the new user...")
+        try:
+            success, ai_results = self.test_ai_recommendations(user_id)
+            if not success:
+                print("❌ Failed to get AI recommendations")
+            else:
+                print(f"AI recommendations returned {len(ai_results)} potential matches")
+        except Exception as e:
+            print(f"❌ Error getting AI recommendations: {str(e)}")
+        
+        # Step 7: Check if other users can discover this user
+        print("\n7️⃣ Checking if other users can discover this new user...")
+        
+        # Create another test user
+        print("Creating another test user to check discovery...")
+        random_suffix2 = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
+        test_email2 = f"test_{random_suffix2}@example.com"
+        test_display_name2 = f"Test User {random_suffix2}"
+        
+        success, signup_response2 = self.test_email_signup(test_email2, test_password, test_display_name2)
+        if not success:
+            print("❌ Second email signup failed")
+            return False
+        
+        user_id2 = signup_response2.get("user")['user_id']
+        
+        # Update second user's profile
+        success, _ = self.test_update_user_profile(user_id2, min_profile_data)
+        if not success:
+            print("❌ Failed to update second user's profile")
+            return False
+        
+        # Check if second user can discover first user
+        success, discover_results2 = self.test_discover_users(user_id2)
+        if not success:
+            print("❌ Failed to get discovery results for second user")
+            return False
+        
+        # Check if first user is in the discovery results
+        first_user_found = False
+        for user in discover_results2:
+            if user.get('user_id') == user_id:
+                first_user_found = True
+                break
+        
+        if first_user_found:
+            print("✅ First user successfully found in second user's discovery results")
+        else:
+            print("❌ First user NOT found in second user's discovery results")
+            print(f"Discovery returned {len(discover_results2)} users, but first user (ID: {user_id}) was not among them")
+        
+        return True
+
+    def test_discovery_with_real_users(self, real_user_ids):
+        """Test discovery with real user IDs from the database"""
+        print("\n🔍 Testing Discovery with Real Users...")
+        
+        if not real_user_ids or len(real_user_ids) == 0:
+            print("❌ No real user IDs provided for testing")
+            return False
+        
+        results = []
+        
+        for user_id in real_user_ids:
+            print(f"\nTesting discovery for user ID: {user_id}")
+            
+            # Get user details
+            success, user_data = self.test_get_user(user_id)
+            if not success:
+                print(f"❌ Failed to get user data for ID: {user_id}")
+                continue
+            
+            print(f"User: {user_data.get('username')}, Profile Complete: {user_data.get('profile_complete')}")
+            
+            # Test regular discovery
+            success, discover_results = self.test_discover_users(user_id)
+            if not success:
+                print(f"❌ Failed to get discovery results for user ID: {user_id}")
+                continue
+            
+            print(f"Discovery returned {len(discover_results)} potential matches")
+            
+            # Test AI recommendations
+            try:
+                success, ai_results = self.test_ai_recommendations(user_id)
+                if not success:
+                    print(f"❌ Failed to get AI recommendations for user ID: {user_id}")
+                    ai_count = 0
+                else:
+                    ai_count = len(ai_results)
+                    print(f"AI recommendations returned {ai_count} potential matches")
+            except Exception as e:
+                print(f"❌ Error getting AI recommendations: {str(e)}")
+                ai_count = 0
+            
+            results.append({
+                "user_id": user_id,
+                "username": user_data.get('username'),
+                "profile_complete": user_data.get('profile_complete'),
+                "discover_count": len(discover_results),
+                "ai_recommendations_count": ai_count
+            })
+        
+        print("\nDiscovery Test Results Summary:")
+        for result in results:
+            print(f"User: {result['username']}, Profile Complete: {result['profile_complete']}, Discovery: {result['discover_count']}, AI Recommendations: {result['ai_recommendations_count']}")
+        
+        return results
+
+    def test_ai_recommendations(self, user_id):
+        """Test getting AI recommendations"""
+        return self.run_test(
+            "AI Recommendations",
+            "GET",
+            f"ai-recommendations/{user_id}",
+            200
+        )
+
+    def run_discovery_debug_tests(self):
+        """Run all tests related to debugging discovery issues"""
+        print("🚀 Starting Solm8 Discovery Debug Tests")
+        
+        # Step 1: Check database users
+        real_user_ids = self.check_database_users()
+        
+        # Step 2: Test profile completion flow
+        self.test_profile_completion_flow()
+        
+        # Step 3: Test discovery with real users
+        if real_user_ids:
+            self.test_discovery_with_real_users(real_user_ids)
+        
+        # Print results
+        print(f"\n📊 Tests passed: {self.tests_passed}/{self.tests_run}")
+        return self.tests_passed == self.tests_run
+
 if __name__ == "__main__":
     tester = Solm8APITester()
-    # Test the user matching flow
-    tester.test_user_matching_flow()
-    # Alternatively, run all tests
+    # Run discovery debug tests
+    tester.run_discovery_debug_tests()
+    # Alternatively, run other tests
+    # tester.test_user_matching_flow()
     # tester.run_all_tests()
