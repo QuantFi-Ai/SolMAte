@@ -358,6 +358,14 @@ function AppContent() {
     return cards.filter(card => card.user_status === 'active');
   };
 
+  // Refresh discovery to see new profiles (like buddies who just joined)
+  const refreshDiscovery = () => {
+    setCurrentCardIndex(0);
+    setCurrentAiIndex(0);
+    fetchDiscoveryCards();
+    fetchAiRecommendations();
+  };
+
   // Email/Password Authentication Functions
   const handleEmailSignup = async (e) => {
     e.preventDefault();
