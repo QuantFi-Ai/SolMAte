@@ -1376,7 +1376,7 @@ function AppContent() {
                   : 'text-gray-600 hover:text-black'
               }`}
             >
-              💡 Best Matches
+              🤖 AI Matches
             </button>
           </div>
 
