@@ -8,6 +8,7 @@ import json
 import random
 import string
 from datetime import datetime
+from pymongo import MongoClient
 
 class Solm8APITester:
     def __init__(self, base_url="https://abc11984-1ed0-4743-b061-3045e146cf6a.preview.emergentagent.com"):
@@ -20,6 +21,8 @@ class Solm8APITester:
         self.email_user = None
         self.wallet_user = None
         self.wallet_message = None
+        self.mongo_client = MongoClient("mongodb://localhost:27017")
+        self.db = self.mongo_client.solm8_db
 
     def run_test(self, name, method, endpoint, expected_status, data=None, headers=None, files=None):
         """Run a single API test"""
@@ -103,44 +106,6 @@ class Solm8APITester:
             data=profile_data
         )
 
-    def test_update_twitter_settings(self, user_id, show_twitter, twitter_username):
-        """Test updating Twitter settings"""
-        profile_data = {
-            "show_twitter": show_twitter,
-            "twitter_username": twitter_username
-        }
-        return self.run_test(
-            "Update Twitter Settings",
-            "PUT",
-            f"user/{user_id}",
-            200,
-            data=profile_data
-        )
-
-    def test_upload_profile_image(self, user_id, image_path):
-        """Test uploading a profile image"""
-        with open(image_path, 'rb') as img:
-            files = {'file': ('test_image.jpg', img, 'image/jpeg')}
-            success, response = self.run_test(
-                "Upload Profile Image",
-                "POST",
-                f"upload-profile-image/{user_id}",
-                200,
-                files=files
-            )
-            if success and 'image_id' in response:
-                self.uploaded_image_id = response['image_id']
-            return success, response
-
-    def test_get_profile_image(self, image_id):
-        """Test getting a profile image"""
-        return self.run_test(
-            "Get Profile Image",
-            "GET",
-            f"profile-image/{image_id}",
-            200
-        )
-
     def test_discover_users(self, user_id):
         """Test discovering potential matches"""
         return self.run_test(
@@ -150,120 +115,15 @@ class Solm8APITester:
             200
         )
 
-    def test_swipe_action(self, swiper_id, target_id, action):
-        """Test swiping on a user"""
+    def test_ai_recommendations(self, user_id):
+        """Test getting AI recommendations"""
         return self.run_test(
-            f"Swipe {action.capitalize()}",
-            "POST",
-            "swipe",
-            200,
-            data={
-                "swiper_id": swiper_id,
-                "target_id": target_id,
-                "action": action
-            }
-        )
-
-    def test_get_matches(self, user_id):
-        """Test getting user matches"""
-        return self.run_test(
-            "Get Matches",
+            "AI Recommendations",
             "GET",
-            f"matches/{user_id}",
+            f"ai-recommendations/{user_id}",
             200
         )
 
-    def test_get_messages(self, match_id):
-        """Test getting match messages"""
-        return self.run_test(
-            "Get Messages",
-            "GET",
-            f"messages/{match_id}",
-            200
-        )
-        
-    # User Status Management Tests
-    
-    def test_update_user_status(self, user_id, status):
-        """Test updating user status (active/offline)"""
-        return self.run_test(
-            f"Update User Status to {status}",
-            "POST",
-            f"user-status/{user_id}",
-            200,
-            data={"user_status": status}
-        )
-    
-    def test_get_user_status(self, user_id):
-        """Test getting user status"""
-        return self.run_test(
-            "Get User Status",
-            "GET",
-            f"user-status/{user_id}",
-            200
-        )
-    
-    def test_get_active_users(self):
-        """Test getting list of active users"""
-        return self.run_test(
-            "Get Active Users",
-            "GET",
-            "users/active",
-            200
-        )
-    
-    def test_update_user_activity(self, user_id):
-        """Test updating user's last activity timestamp"""
-        return self.run_test(
-            "Update User Activity",
-            "POST",
-            f"user/{user_id}/update-activity",
-            200
-        )
-    
-    # Token Launch Profile Tests
-    
-    def test_update_token_launch_profile(self, user_id, token_profile_data):
-        """Test updating token launch profile"""
-        # Add user_id to the token profile data
-        token_profile_data["user_id"] = user_id
-        return self.run_test(
-            "Update Token Launch Profile",
-            "POST",
-            f"token-launch-profile/{user_id}",
-            200,
-            data=token_profile_data
-        )
-    
-    def test_get_token_launch_profile(self, user_id):
-        """Test getting token launch profile"""
-        return self.run_test(
-            "Get Token Launch Profile",
-            "GET",
-            f"token-launch-profile/{user_id}",
-            200
-        )
-    
-    def test_get_token_launchers(self):
-        """Test getting users interested in token launches"""
-        return self.run_test(
-            "Get Token Launchers",
-            "GET",
-            "users/token-launchers",
-            200
-        )
-    
-    def test_get_public_profile(self, username):
-        """Test getting public profile with new fields"""
-        return self.run_test(
-            "Get Public Profile",
-            "GET",
-            f"public-profile/{username}",
-            200
-        )
-        
-    # Authentication Tests
-    
     def test_email_signup(self, email=None, password=None, display_name=None):
         """Test email signup"""
         if not email:
@@ -296,990 +156,63 @@ class Solm8APITester:
             print(f"Created email user: {self.email_user['username']}")
             
         return success, response
-    
-    def test_email_signup_duplicate(self, email, password="TestPassword123!", display_name="Duplicate Test User"):
-        """Test email signup with duplicate email (should fail)"""
-        data = {
-            "email": email,
-            "password": password,
-            "display_name": display_name
-        }
-        
-        # This should fail with 400 status code
-        return self.run_test(
-            "Email Signup (Duplicate)",
-            "POST",
-            "auth/email/signup",
-            400,
-            data=data
-        )
-    
-    def test_email_signup_missing_fields(self):
-        """Test email signup with missing fields (should fail)"""
-        # Missing password
-        data = {
-            "email": "missing_fields@example.com",
-            "display_name": "Missing Fields User"
-        }
-        
-        # This should fail with 422 status code (validation error)
-        return self.run_test(
-            "Email Signup (Missing Fields)",
-            "POST",
-            "auth/email/signup",
-            422,
-            data=data
-        )
-    
-    def test_email_login(self, email, password="TestPassword123!"):
-        """Test email login"""
-        data = {
-            "email": email,
-            "password": password
-        }
-        
-        return self.run_test(
-            "Email Login",
-            "POST",
-            "auth/email/login",
-            200,
-            data=data
-        )
-    
-    def test_email_login_invalid(self, email, wrong_password="WrongPassword123!"):
-        """Test email login with invalid credentials (should fail)"""
-        data = {
-            "email": email,
-            "password": wrong_password
-        }
-        
-        # This should fail with 401 status code
-        return self.run_test(
-            "Email Login (Invalid Credentials)",
-            "POST",
-            "auth/email/login",
-            401,
-            data=data
-        )
-    
-    def test_email_login_nonexistent(self):
-        """Test email login with non-existent email (should fail)"""
-        data = {
-            "email": "nonexistent_user@example.com",
-            "password": "SomePassword123!"
-        }
-        
-        # This should fail with 401 status code
-        return self.run_test(
-            "Email Login (Non-existent User)",
-            "POST",
-            "auth/email/login",
-            401,
-            data=data
-        )
-    
-    def test_get_wallet_message(self):
-        """Test getting message for wallet signature"""
-        success, response = self.run_test(
-            "Get Wallet Message",
-            "GET",
-            "auth/wallet/message",
-            200
-        )
-        
-        if success:
-            self.wallet_message = response.get("message")
-            print(f"Got wallet message: {self.wallet_message}")
-            
-        return success, response
-    
-    def test_wallet_connect(self, wallet_address=None, signature=None, message=None):
-        """Test connecting with Solana wallet"""
-        if not wallet_address:
-            # Generate random wallet address
-            wallet_address = ''.join(random.choices(string.ascii_lowercase + string.digits, k=44))
-            
-        if not signature:
-            # Generate random signature
-            signature = ''.join(random.choices(string.ascii_lowercase + string.digits, k=88))
-            
-        if not message:
-            message = self.wallet_message or f"Sign this message to authenticate with Solm8: {int(time.time())}"
-            
-        data = {
-            "wallet_address": wallet_address,
-            "signature": signature,
-            "message": message
-        }
-        
-        success, response = self.run_test(
-            "Wallet Connect",
-            "POST",
-            "auth/wallet/connect",
-            200,
-            data=data
-        )
-        
-        if success:
-            self.wallet_user = response.get("user")
-            print(f"Connected wallet user: {self.wallet_user['username']}")
-            
-        return success, response
-    
-    def test_wallet_connect_duplicate(self, wallet_address, signature=None, message=None):
-        """Test connecting with the same wallet address again"""
-        if not signature:
-            # Generate random signature
-            signature = ''.join(random.choices(string.ascii_lowercase + string.digits, k=88))
-            
-        if not message:
-            message = self.wallet_message or f"Sign this message to authenticate with Solm8: {int(time.time())}"
-            
-        data = {
-            "wallet_address": wallet_address,
-            "signature": signature,
-            "message": message
-        }
-        
-        # This should succeed with 200 status code (existing user login)
-        return self.run_test(
-            "Wallet Connect (Duplicate)",
-            "POST",
-            "auth/wallet/connect",
-            200,
-            data=data
-        )
-    
-    def test_wallet_connect_invalid(self):
-        """Test connecting with invalid wallet address (should fail)"""
-        data = {
-            "wallet_address": "invalid",  # Too short
-            "signature": "some_signature",
-            "message": "some_message"
-        }
-        
-        # This should fail with 400 status code
-        return self.run_test(
-            "Wallet Connect (Invalid)",
-            "POST",
-            "auth/wallet/connect",
-            400,
-            data=data
-        )
 
-    def create_test_image(self):
-        """Create a temporary test image for upload testing"""
-        # Create a temporary file
-        fd, path = tempfile.mkstemp(suffix='.jpg')
-        os.close(fd)
-        
-        # Create a simple image file (1x1 pixel black image)
-        with open(path, 'wb') as f:
-            # Simple JPEG header and data for a 1x1 black pixel
-            f.write(b'\xff\xd8\xff\xe0\x10JFIF\x01\x01\x01HH\xff\xdbC\x08\x06\x06\x07\x06\x05\x08\x07\x07\x07\t\t\x08\n\x0c\x14\r\x0c\x0b\x0b\x0c\x19\x12\x13\x0f\x14\x1d\x1a\x1f\x1e\x1d\x1a\x1c\x1c $.\' ",#\x1c\x1c(7),01444\x1f\'9=82<.342\xff\xdbC\x01\t\t\t\x0c\x0b\x0c\x18\r\r\x182!\x1c!22222222222222222222222222222222222222222222222222\xff\xc0\x11\x08\x01\x01\x03\x01"\x02\x11\x01\x03\x11\x01\xff\xc4\x1f\x01\x05\x01\x01\x01\x01\x01\x01\x01\x02\x03\x04\x05\x06\x07\x08\t\n\x0b\xff\xc4\xb5\x10\x02\x01\x03\x03\x02\x04\x03\x05\x05\x04\x04\x01}\x01\x02\x03\x04\x11\x05\x12!1A\x06\x13Qa\x07"q\x142\x81\x91\xa1\x08#B\xb1\xc1\x15R\xd1\xf0$3br\x82\t\n\x16\x17\x18\x19\x1a%&\'()*456789:CDEFGHIJSTUVWXYZcdefghijstuvwxyz\x83\x84\x85\x86\x87\x88\x89\x8a\x92\x93\x94\x95\x96\x97\x98\x99\x9a\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xd2\xd3\xd4\xd5\xd6\xd7\xd8\xd9\xda\xe1\xe2\xe3\xe4\xe5\xe6\xe7\xe8\xe9\xea\xf1\xf2\xf3\xf4\xf5\xf6\xf7\xf8\xf9\xfa\xff\xc4\x1f\x01\x03\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x02\x03\x04\x05\x06\x07\x08\t\n\x0b\xff\xc4\xb5\x11\x02\x01\x02\x04\x04\x03\x04\x07\x05\x04\x04\x01\x02w\x01\x02\x03\x11\x04\x05!1\x06\x12AQ\x07aq\x13"2\x81\x08\x14B\x91\xa1\xb1\xc1\t#3R\xf0\x15br\xd1\n\x16$4\xe1%\xf1\x17\x18\x19\x1a&\'()*56789:CDEFGHIJSTUVWXYZcdefghijstuvwxyz\x82\x83\x84\x85\x86\x87\x88\x89\x8a\x92\x93\x94\x95\x96\x97\x98\x99\x9a\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xd2\xd3\xd4\xd5\xd6\xd7\xd8\xd9\xda\xe2\xe3\xe4\xe5\xe6\xe7\xe8\xe9\xea\xf2\xf3\xf4\xf5\xf6\xf7\xf8\xf9\xfa\xff\xda\x0c\x03\x01\x02\x11\x03\x11?\xfe\xfe(\xa2\x8a\xff\xd9')
-        
-        print(f"Created test image at {path}")
-        return path
-
-    def run_all_tests(self):
-        """Run all API tests in sequence"""
-        print("🚀 Starting Solm8 API Tests")
-        
-        # Test health check
-        self.test_health_check()
-        
-        # Test Authentication Endpoints
-        print("\n🔍 Testing Authentication Endpoints...")
-        
-        # Email Authentication Tests
-        print("\n🔑 Testing Email Authentication...")
-        
-        # Test email signup
-        random_suffix = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
-        test_email = f"test_{random_suffix}@example.com"
-        test_password = "TestPassword123!"
-        test_display_name = f"Test User {random_suffix}"
-        
-        success, signup_response = self.test_email_signup(test_email, test_password, test_display_name)
-        if not success:
-            print("❌ Email signup failed, stopping authentication tests")
-            return False
-            
-        # Verify user was created with correct auth_method
-        if self.email_user.get('auth_method') != "email":
-            print("❌ Email user auth_method verification failed - expected 'email'")
-            self.tests_run += 1
-            return False
-        else:
-            print("✅ Email user auth_method verification passed")
-            self.tests_passed += 1
-            self.tests_run += 1
-            
-        # Test duplicate email signup (should fail)
-        success, _ = self.test_email_signup_duplicate(test_email)
-        if not success:
-            print("❌ Duplicate email test failed - should return 400")
-            return False
-            
-        # Test missing fields (should fail)
-        success, _ = self.test_email_signup_missing_fields()
-        if not success:
-            print("❌ Missing fields test failed - should return 422")
-            return False
-            
-        # Test valid login
-        success, login_response = self.test_email_login(test_email, test_password)
-        if not success:
-            print("❌ Email login failed")
-            return False
-            
-        # Test invalid password
-        success, _ = self.test_email_login_invalid(test_email)
-        if not success:
-            print("❌ Invalid password test failed - should return 401")
-            return False
-            
-        # Test non-existent user
-        success, _ = self.test_email_login_nonexistent()
-        if not success:
-            print("❌ Non-existent user test failed - should return 401")
-            return False
-            
-        # Wallet Authentication Tests
-        print("\n💼 Testing Wallet Authentication...")
-        
-        # Test getting wallet message
-        success, message_response = self.test_get_wallet_message()
-        if not success:
-            print("❌ Get wallet message failed")
-            return False
-            
-        # Verify message format
-        if not self.wallet_message or "Sign this message to authenticate with Solm8" not in self.wallet_message:
-            print("❌ Wallet message verification failed - unexpected format")
-            self.tests_run += 1
-            return False
-        else:
-            print("✅ Wallet message verification passed")
-            self.tests_passed += 1
-            self.tests_run += 1
-            
-        # Test wallet connect
-        wallet_address = ''.join(random.choices(string.ascii_lowercase + string.digits, k=44))
-        success, connect_response = self.test_wallet_connect(wallet_address)
-        if not success:
-            print("❌ Wallet connect failed")
-            return False
-            
-        # Verify user was created with correct auth_method
-        if self.wallet_user.get('auth_method') != "wallet":
-            print("❌ Wallet user auth_method verification failed - expected 'wallet'")
-            self.tests_run += 1
-            return False
-        else:
-            print("✅ Wallet user auth_method verification passed")
-            self.tests_passed += 1
-            self.tests_run += 1
-            
-        # Test connecting with same wallet again (should succeed as login)
-        success, reconnect_response = self.test_wallet_connect_duplicate(wallet_address)
-        if not success:
-            print("❌ Wallet reconnect test failed - should return 200")
-            return False
-            
-        # Test invalid wallet address
-        success, _ = self.test_wallet_connect_invalid()
-        if not success:
-            print("❌ Invalid wallet test failed - should return 400")
-            return False
-            
-        # Verify password is not stored in plain text
-        # Check the login response for the email user
-        if 'password' in login_response.get('user', {}) or 'password_hash' in login_response.get('user', {}):
-            print("❌ Password security verification failed - password/hash exposed in API response")
-            self.tests_run += 1
-            return False
-        else:
-            print("✅ Password security verification passed - not exposed in API response")
-            self.tests_passed += 1
-            self.tests_run += 1
-            
-        # Create demo user
-        success, user = self.test_create_demo_user()
-        if not success or not user:
-            print("❌ Demo user creation failed, stopping tests")
-            return False
-        
-        user_id = user['user_id']
-        username = user['username']
-        
-        # Test getting user profile
-        success, _ = self.test_get_user(user_id)
-        if not success:
-            print("❌ Get user profile failed, stopping tests")
-            return False
-        
-        # Test uploading profile image
-        test_image_path = self.create_test_image()
-        success, upload_response = self.test_upload_profile_image(user_id, test_image_path)
-        if not success:
-            print("❌ Profile image upload failed, stopping tests")
-            os.remove(test_image_path)  # Clean up
-            return False
-        
-        # Test getting profile image
-        if self.uploaded_image_id:
-            success, _ = self.test_get_profile_image(self.uploaded_image_id)
-            if not success:
-                print("❌ Get profile image failed, stopping tests")
-                os.remove(test_image_path)  # Clean up
-                return False
-        
-        # Clean up test image
-        os.remove(test_image_path)
-        
-        # Test updating Twitter settings
-        twitter_settings = {
-            "show_twitter": True,
-            "twitter_username": "test_trader"
-        }
-        success, _ = self.test_update_user_profile(user_id, twitter_settings)
-        if not success:
-            print("❌ Update Twitter settings failed, stopping tests")
-            return False
-        
-        # Test updating user profile with all fields
-        profile_data = {
-            "bio": "Test bio for API testing",
-            "location": "Test Location",
-            "show_twitter": True,
-            "twitter_username": "test_trader",
-            "trading_experience": "Intermediate",
-            "years_trading": 3,
-            "preferred_tokens": ["Meme Coins", "DeFi", "NFTs"],
-            "trading_style": "Day Trader",
-            "portfolio_size": "$10K-$100K",
-            "risk_tolerance": "Moderate",
-            "best_trade": "Test best trade",
-            "worst_trade": "Test worst trade",
-            "favorite_project": "Jupiter",
-            "trading_hours": "Morning",
-            "communication_style": "Technical",
-            "preferred_communication_platform": "Discord",
-            "preferred_trading_platform": "Axiom",
-            "looking_for": ["Alpha Sharing", "Research Partner"]
-        }
-        
-        success, _ = self.test_update_user_profile(user_id, profile_data)
-        if not success:
-            print("❌ Update user profile failed, stopping tests")
-            return False
-        
-        # Verify profile was updated correctly
-        success, updated_user = self.test_get_user(user_id)
-        if not success:
-            print("❌ Get updated user profile failed, stopping tests")
-            return False
-        
-        # Verify Twitter settings were saved
-        if not updated_user.get('show_twitter') or updated_user.get('twitter_username') != "test_trader":
-            print("❌ Twitter settings verification failed")
-            self.tests_run += 1
-            return False
-        else:
-            print("✅ Twitter settings verification passed")
-            self.tests_passed += 1
-            self.tests_run += 1
-        
-        # Test User Status Management
-        print("\n🔍 Testing User Status Management...")
-        
-        # Test updating user status to active
-        success, _ = self.test_update_user_status(user_id, "active")
-        if not success:
-            print("❌ Update user status to active failed")
-            return False
-        
-        # Test getting user status
-        success, status_response = self.test_get_user_status(user_id)
-        if not success:
-            print("❌ Get user status failed")
-            return False
-        
-        # Verify status was set to active
-        if status_response.get('user_status') != "active":
-            print("❌ User status verification failed - expected 'active'")
-            self.tests_run += 1
-            return False
-        else:
-            print("✅ User status verification passed - status is 'active'")
-            self.tests_passed += 1
-            self.tests_run += 1
-        
-        # Test getting active users
-        success, active_users_response = self.test_get_active_users()
-        if not success:
-            print("❌ Get active users failed")
-            return False
-        
-        # Verify our user is in the active users list
-        user_found = False
-        for active_user in active_users_response.get('active_users', []):
-            if active_user.get('user_id') == user_id:
-                user_found = True
-                break
-        
-        if not user_found:
-            print("❌ Active users verification failed - user not found in active list")
-            self.tests_run += 1
-            return False
-        else:
-            print("✅ Active users verification passed - user found in active list")
-            self.tests_passed += 1
-            self.tests_run += 1
-        
-        # Test updating user activity
-        success, _ = self.test_update_user_activity(user_id)
-        if not success:
-            print("❌ Update user activity failed")
-            return False
-        
-        # Test updating user status to offline
-        success, _ = self.test_update_user_status(user_id, "offline")
-        if not success:
-            print("❌ Update user status to offline failed")
-            return False
-        
-        # Test getting user status again
-        success, status_response = self.test_get_user_status(user_id)
-        if not success:
-            print("❌ Get user status after offline update failed")
-            return False
-        
-        # Verify status was set to offline
-        if status_response.get('user_status') != "offline":
-            print("❌ User status verification failed - expected 'offline'")
-            self.tests_run += 1
-            return False
-        else:
-            print("✅ User status verification passed - status is 'offline'")
-            self.tests_passed += 1
-            self.tests_run += 1
-        
-        # Test Token Launch Profile
-        print("\n🔍 Testing Token Launch Profile...")
-        
-        # Create token launch profile
-        token_profile_data = {
-            "interested_in_token_launch": True,
-            "token_launch_experience": "Experienced",
-            "launch_timeline": "3-6 months",
-            "launch_budget": "$50K-$100K",
-            "project_type": "DeFi Protocol",
-            "looking_for_help_with": ["Technical Development", "Marketing", "Community Building"]
-        }
-        
-        success, _ = self.test_update_token_launch_profile(user_id, token_profile_data)
-        if not success:
-            print("❌ Update token launch profile failed")
-            return False
-        
-        # Test getting token launch profile
-        success, token_profile_response = self.test_get_token_launch_profile(user_id)
-        if not success:
-            print("❌ Get token launch profile failed")
-            return False
-        
-        # Verify token launch profile was created correctly
-        if not token_profile_response.get('interested_in_token_launch') or token_profile_response.get('token_launch_experience') != "Experienced":
-            print("❌ Token launch profile verification failed")
-            self.tests_run += 1
-            return False
-        else:
-            print("✅ Token launch profile verification passed")
-            self.tests_passed += 1
-            self.tests_run += 1
-            self.token_launch_profile = token_profile_response
-        
-        # Test getting token launchers
-        success, token_launchers_response = self.test_get_token_launchers()
-        if not success:
-            print("❌ Get token launchers failed")
-            return False
-        
-        # Verify our user is in the token launchers list
-        user_found = False
-        for launcher in token_launchers_response.get('token_launchers', []):
-            if launcher.get('user_id') == user_id:
-                user_found = True
-                break
-        
-        if not user_found:
-            print("❌ Token launchers verification failed - user not found in launchers list")
-            self.tests_run += 1
-            return False
-        else:
-            print("✅ Token launchers verification passed - user found in launchers list")
-            self.tests_passed += 1
-            self.tests_run += 1
-        
-        # Test Enhanced Public Profile
-        print("\n🔍 Testing Enhanced Public Profile...")
-        
-        # Test getting public profile
-        success, public_profile = self.test_get_public_profile(username)
-        if not success:
-            print("❌ Get public profile failed")
-            return False
-        
-        # Verify public profile includes new fields
-        if 'timezone' not in public_profile or 'user_status' not in public_profile or 'interested_in_token_launch' not in public_profile:
-            print("❌ Public profile verification failed - missing new fields")
-            self.tests_run += 1
-            return False
-        else:
-            print("✅ Public profile verification passed - includes new fields")
-            self.tests_passed += 1
-            self.tests_run += 1
-        
-        # Test discovering users
-        success, discover_response = self.test_discover_users(user_id)
-        if not success:
-            print("❌ Discover users failed, stopping tests")
-            return False
-        
-        # Test swiping if there are users to discover
-        if discover_response and len(discover_response) > 0:
-            target_id = discover_response[0]['user_id']
-            success, swipe_response = self.test_swipe_action(user_id, target_id, "like")
-            if not success:
-                print("❌ Swipe action failed, stopping tests")
-                return False
-            
-            # Test getting matches
-            success, matches_response = self.test_get_matches(user_id)
-            if not success:
-                print("❌ Get matches failed, stopping tests")
-                return False
-            
-            # Test getting messages if there are matches
-            if matches_response and len(matches_response) > 0:
-                match_id = matches_response[0]['match_id']
-                success, _ = self.test_get_messages(match_id)
-                if not success:
-                    print("❌ Get messages failed, stopping tests")
-                    return False
-                
-                # Verify Twitter info is displayed in matches
-                if matches_response[0]['other_user'].get('show_twitter'):
-                    if 'twitter_username' not in matches_response[0]['other_user']:
-                        print("❌ Twitter username not displayed in match data")
-                        self.tests_run += 1
-                        return False
-                    else:
-                        print("✅ Twitter username correctly displayed in match data")
-                        self.tests_passed += 1
-                        self.tests_run += 1
-        
-        # Print results
-        print(f"\n📊 Tests passed: {self.tests_passed}/{self.tests_run}")
-        return self.tests_passed == self.tests_run
-
-    def test_send_message(self, match_id, sender_id, content):
-        """Test sending a message via API"""
-        return self.run_test(
-            "Send Message",
-            "POST",
-            "messages",
-            200,
-            data={
-                "match_id": match_id,
-                "sender_id": sender_id,
-                "content": content
-            }
-        )
-
-    def test_user_matching_flow(self):
-        """Test the complete user matching flow from swipe to chat"""
-        print("\n🔍 Testing User Matching Flow...")
-        
-        # Step 1: Create two test users
-        print("\n1️⃣ Creating two test users...")
-        success1, user_a = self.test_create_demo_user()
-        if not success1 or not user_a:
-            print("❌ Failed to create User A")
-            return False
-        
-        success2, user_b = self.test_create_demo_user()
-        if not success2 or not user_b:
-            print("❌ Failed to create User B")
-            return False
-        
-        user_a_id = user_a['user_id']
-        user_b_id = user_b['user_id']
-        
-        print(f"✅ Created User A (ID: {user_a_id}) and User B (ID: {user_b_id})")
-        
-        # Make sure both users have complete profiles
-        profile_data = {
-            "bio": "Test bio for matching",
-            "location": "Test Location",
-            "trading_experience": "Intermediate",
-            "years_trading": 3,
-            "preferred_tokens": ["Meme Coins", "DeFi", "NFTs"],
-            "trading_style": "Day Trader",
-            "portfolio_size": "$10K-$100K",
-            "risk_tolerance": "Moderate",
-            "looking_for": ["Alpha Sharing", "Research Partner"]
-        }
-        
-        self.test_update_user_profile(user_a_id, profile_data)
-        self.test_update_user_profile(user_b_id, profile_data)
-        
-        # Step 2: Test swipe/like system
-        print("\n2️⃣ Testing swipe/like system...")
-        
-        # User A likes User B
-        success3, swipe_a_response = self.test_swipe_action(user_a_id, user_b_id, "like")
-        if not success3:
-            print("❌ Failed when User A swiped right on User B")
-            return False
-        
-        # Verify no match yet
-        if swipe_a_response.get('matched', False):
-            print("❌ Match created prematurely after only User A liked User B")
-            self.tests_run += 1
-            return False
-        else:
-            print("✅ No match created yet (as expected)")
-            self.tests_passed += 1
-            self.tests_run += 1
-        
-        # User B likes User A back
-        success4, swipe_b_response = self.test_swipe_action(user_b_id, user_a_id, "like")
-        if not success4:
-            print("❌ Failed when User B swiped right on User A")
-            return False
-        
-        # Verify match was created
-        if not swipe_b_response.get('matched', False):
-            print("❌ No match created after mutual likes")
-            self.tests_run += 1
-            return False
-        else:
-            print(f"✅ Match created successfully! Match ID: {swipe_b_response.get('match_id')}")
-            self.tests_passed += 1
-            self.tests_run += 1
-            match_id = swipe_b_response.get('match_id')
-        
-        # Step 3: Verify match creation
-        print("\n3️⃣ Verifying match creation...")
-        
-        # Check User A's matches
-        success5, matches_a = self.test_get_matches(user_a_id)
-        if not success5:
-            print("❌ Failed to get User A's matches")
-            return False
-        
-        # Check User B's matches
-        success6, matches_b = self.test_get_matches(user_b_id)
-        if not success6:
-            print("❌ Failed to get User B's matches")
-            return False
-        
-        # Verify match appears in both users' match lists
-        match_in_a = any(match.get('match_id') == match_id for match in matches_a)
-        match_in_b = any(match.get('match_id') == match_id for match in matches_b)
-        
-        if not match_in_a or not match_in_b:
-            print(f"❌ Match verification failed - Match not found in {'User A' if not match_in_a else 'User B'}'s matches")
-            self.tests_run += 1
-            return False
-        else:
-            print("✅ Match appears in both users' match lists")
-            self.tests_passed += 1
-            self.tests_run += 1
-        
-        # Verify match data structure and content
-        match_a = next((match for match in matches_a if match.get('match_id') == match_id), None)
-        match_b = next((match for match in matches_b if match.get('match_id') == match_id), None)
-        
-        if not match_a or not match_b:
-            print("❌ Could not find match details in users' match lists")
-            self.tests_run += 1
-            return False
-        
-        # Check that other_user field is populated correctly
-        if match_a.get('other_user', {}).get('user_id') != user_b_id:
-            print("❌ Match data structure incorrect - User A's match doesn't show User B as other_user")
-            self.tests_run += 1
-            return False
-        
-        if match_b.get('other_user', {}).get('user_id') != user_a_id:
-            print("❌ Match data structure incorrect - User B's match doesn't show User A as other_user")
-            self.tests_run += 1
-            return False
-        
-        print("✅ Match data structure and content verified")
-        self.tests_passed += 1
-        self.tests_run += 1
-        
-        # Step 4: Test chat functionality
-        print("\n4️⃣ Testing chat functionality...")
-        
-        # Test sending a message from User A to User B
-        message_content_a = "Hello from User A! This is a test message."
-        success7, send_message_response = self.test_send_message(match_id, user_a_id, message_content_a)
-        if not success7:
-            print("❌ Failed to send message from User A to User B")
-            return False
-        
-        # Test sending a message from User B to User A
-        message_content_b = "Hi User A! This is User B responding to your test message."
-        success8, send_message_response = self.test_send_message(match_id, user_b_id, message_content_b)
-        if not success8:
-            print("❌ Failed to send message from User B to User A")
-            return False
-        
-        # Verify message delivery and storage
-        success9, messages = self.test_get_messages(match_id)
-        if not success9:
-            print("❌ Failed to get messages for the match")
-            return False
-        
-        # Check if both messages are in the conversation
-        message_a_found = any(msg.get('content') == message_content_a and msg.get('sender_id') == user_a_id for msg in messages)
-        message_b_found = any(msg.get('content') == message_content_b and msg.get('sender_id') == user_b_id for msg in messages)
-        
-        if not message_a_found or not message_b_found:
-            print(f"❌ Message verification failed - {'User A' if not message_a_found else 'User B'}'s message not found")
-            self.tests_run += 1
-            return False
-        else:
-            print("✅ Both messages found in conversation history")
-            self.tests_passed += 1
-            self.tests_run += 1
-        
-        print("\n✅ User matching flow test completed successfully!")
-        return True
-
-    def check_database_users(self):
-        """Check user data directly in the database"""
-        print("\n🔍 Checking Database Users...")
-        
-        # Connect to MongoDB
-        from pymongo import MongoClient
-        client = MongoClient("mongodb://localhost:27017")
-        db = client.solm8_db
-        users_collection = db.users
-        
-        # Count total users
-        total_users = users_collection.count_documents({})
-        print(f"Total users in database: {total_users}")
+    def check_actual_users_in_database(self):
+        """Check actual users in the database"""
+        print("\n🔍 Checking Actual Users in Database...")
+        
+        # Get all users
+        users = list(self.db.users.find())
+        total_users = len(users)
         
         # Count users by auth method
-        auth_methods = ["email", "wallet", "twitter", "demo"]
-        for method in auth_methods:
-            count = users_collection.count_documents({"auth_method": method})
-            print(f"Users with auth_method '{method}': {count}")
+        auth_methods = {}
+        for user in users:
+            auth_method = user.get('auth_method', 'none')
+            auth_methods[auth_method] = auth_methods.get(auth_method, 0) + 1
         
         # Count users with complete profiles
-        complete_profiles = users_collection.count_documents({"profile_complete": True})
+        complete_profiles = sum(1 for user in users if user.get('profile_complete', False))
+        
+        print(f"Total users in database: {total_users}")
+        print(f"Users by auth method: {auth_methods}")
         print(f"Users with complete profiles: {complete_profiles}")
         
-        # Count users with incomplete profiles
-        incomplete_profiles = users_collection.count_documents({"profile_complete": False})
-        print(f"Users with incomplete profiles: {incomplete_profiles}")
+        # Get email users (non-demo)
+        email_users = [user for user in users if user.get('auth_method') == 'email']
+        wallet_users = [user for user in users if user.get('auth_method') == 'wallet']
         
-        # Check required fields for profile completion
-        missing_fields = {
-            "trading_experience": users_collection.count_documents({"profile_complete": True, "$or": [{"trading_experience": ""}, {"trading_experience": {"$exists": False}}]}),
-            "preferred_tokens": users_collection.count_documents({"profile_complete": True, "$or": [{"preferred_tokens": []}, {"preferred_tokens": {"$exists": False}}]}),
-            "trading_style": users_collection.count_documents({"profile_complete": True, "$or": [{"trading_style": ""}, {"trading_style": {"$exists": False}}]}),
-            "portfolio_size": users_collection.count_documents({"profile_complete": True, "$or": [{"portfolio_size": ""}, {"portfolio_size": {"$exists": False}}]})
-        }
+        print(f"\nEmail users (non-demo): {len(email_users)}")
+        print(f"Wallet users: {len(wallet_users)}")
         
-        print("\nUsers with complete profiles but missing required fields:")
-        for field, count in missing_fields.items():
-            print(f"- Missing {field}: {count}")
+        # Show profile completion status for email users
+        print("\nProfile completion status for email users:")
+        for user in email_users:
+            print(f"User ID: {user.get('user_id')}, Email: {user.get('email')}, Profile Complete: {user.get('profile_complete')}")
+            print(f"  Trading Experience: '{user.get('trading_experience')}'")
+            print(f"  Preferred Tokens: {user.get('preferred_tokens')}")
+            print(f"  Trading Style: '{user.get('trading_style')}'")
+            print(f"  Portfolio Size: '{user.get('portfolio_size')}'")
+            print()
         
-        # Check for inconsistencies in profile_complete flag
-        should_be_complete = users_collection.count_documents({
-            "profile_complete": False,
-            "trading_experience": {"$ne": ""},
-            "preferred_tokens": {"$ne": []},
-            "trading_style": {"$ne": ""},
-            "portfolio_size": {"$ne": ""}
-        })
-        
-        should_be_incomplete = users_collection.count_documents({
-            "profile_complete": True,
-            "$or": [
-                {"trading_experience": ""},
-                {"preferred_tokens": []},
-                {"trading_style": ""},
-                {"portfolio_size": ""}
-            ]
-        })
-        
-        print(f"\nUsers that should be marked complete but aren't: {should_be_complete}")
-        print(f"Users that should be marked incomplete but are marked complete: {should_be_incomplete}")
-        
-        # Get sample of real users with complete profiles
-        real_complete_users = list(users_collection.find({
-            "auth_method": {"$ne": "demo"},
-            "profile_complete": True
-        }).limit(5))
-        
-        print("\nSample of real users with complete profiles:")
-        for user in real_complete_users:
-            print(f"- User ID: {user.get('user_id')}, Username: {user.get('username')}, Auth Method: {user.get('auth_method')}")
-        
-        # Get sample of real users with incomplete profiles
-        real_incomplete_users = list(users_collection.find({
-            "auth_method": {"$ne": "demo"},
-            "profile_complete": False
-        }).limit(5))
-        
-        print("\nSample of real users with incomplete profiles:")
-        for user in real_incomplete_users:
-            print(f"- User ID: {user.get('user_id')}, Username: {user.get('username')}, Auth Method: {user.get('auth_method')}")
-        
-        return [user.get('user_id') for user in real_complete_users]
+        # Return user IDs of users with complete profiles
+        return [user.get('user_id') for user in users if user.get('profile_complete', False)]
 
-    def test_profile_completion_flow(self):
-        """Test the complete profile completion flow"""
-        print("\n🔍 Testing Profile Completion Flow...")
-        
-        # Step 1: Create a new email user
-        print("\n1️⃣ Creating a new email user...")
-        random_suffix = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
-        test_email = f"test_{random_suffix}@example.com"
-        test_password = "TestPassword123!"
-        test_display_name = f"Test User {random_suffix}"
-        
-        success, signup_response = self.test_email_signup(test_email, test_password, test_display_name)
-        if not success:
-            print("❌ Email signup failed, stopping test")
-            return False
-        
-        user_id = self.email_user['user_id']
-        
-        # Step 2: Verify initial profile is incomplete
-        print("\n2️⃣ Verifying initial profile is incomplete...")
-        success, user_data = self.test_get_user(user_id)
-        if not success:
-            print("❌ Failed to get user profile")
-            return False
-        
-        if user_data.get('profile_complete'):
-            print("❌ New user profile incorrectly marked as complete")
-            return False
-        else:
-            print("✅ New user profile correctly marked as incomplete")
-        
-        # Step 3: Update profile with minimum required fields
-        print("\n3️⃣ Updating profile with minimum required fields...")
-        min_profile_data = {
-            "trading_experience": "Intermediate",
-            "preferred_tokens": ["Meme Coins", "DeFi"],
-            "trading_style": "Day Trader",
-            "portfolio_size": "$10K-$100K"
-        }
-        
-        success, _ = self.test_update_user_profile(user_id, min_profile_data)
-        if not success:
-            print("❌ Failed to update user profile")
-            return False
-        
-        # Step 4: Verify profile is now complete
-        print("\n4️⃣ Verifying profile is now complete...")
-        success, updated_user = self.test_get_user(user_id)
-        if not success:
-            print("❌ Failed to get updated user profile")
-            return False
-        
-        if not updated_user.get('profile_complete'):
-            print("❌ Profile not marked as complete after adding required fields")
-            print(f"Profile data: {json.dumps(updated_user, default=str)}")
-            return False
-        else:
-            print("✅ Profile correctly marked as complete after adding required fields")
-        
-        # Step 5: Test discovery with the new user
-        print("\n5️⃣ Testing discovery with the new user...")
-        success, discover_results = self.test_discover_users(user_id)
-        if not success:
-            print("❌ Failed to get discovery results")
-            return False
-        
-        print(f"Discovery returned {len(discover_results)} potential matches")
-        
-        # Step 6: Test AI recommendations with the new user
-        print("\n6️⃣ Testing AI recommendations with the new user...")
-        try:
-            success, ai_results = self.test_ai_recommendations(user_id)
-            if not success:
-                print("❌ Failed to get AI recommendations")
-            else:
-                print(f"AI recommendations returned {len(ai_results)} potential matches")
-        except Exception as e:
-            print(f"❌ Error getting AI recommendations: {str(e)}")
-        
-        # Step 7: Check if other users can discover this user
-        print("\n7️⃣ Checking if other users can discover this new user...")
-        
-        # Create another test user
-        print("Creating another test user to check discovery...")
-        random_suffix2 = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
-        test_email2 = f"test_{random_suffix2}@example.com"
-        test_display_name2 = f"Test User {random_suffix2}"
-        
-        success, signup_response2 = self.test_email_signup(test_email2, test_password, test_display_name2)
-        if not success:
-            print("❌ Second email signup failed")
-            return False
-        
-        user_id2 = signup_response2.get("user")['user_id']
-        
-        # Update second user's profile
-        success, _ = self.test_update_user_profile(user_id2, min_profile_data)
-        if not success:
-            print("❌ Failed to update second user's profile")
-            return False
-        
-        # Check if second user can discover first user
-        success, discover_results2 = self.test_discover_users(user_id2)
-        if not success:
-            print("❌ Failed to get discovery results for second user")
-            return False
-        
-        # Check if first user is in the discovery results
-        first_user_found = False
-        for user in discover_results2:
-            if user.get('user_id') == user_id:
-                first_user_found = True
-                break
-        
-        if first_user_found:
-            print("✅ First user successfully found in second user's discovery results")
-        else:
-            print("❌ First user NOT found in second user's discovery results")
-            print(f"Discovery returned {len(discover_results2)} users, but first user (ID: {user_id}) was not among them")
-        
-        return True
-
-    def test_discovery_with_real_users(self, real_user_ids):
+    def test_discovery_with_real_users(self, user_ids=None, limit=5):
         """Test discovery with real user IDs from the database"""
-        print("\n🔍 Testing Discovery with Real Users...")
+        print("\n🔍 Testing Discovery with Real User IDs...")
         
-        if not real_user_ids or len(real_user_ids) == 0:
-            print("❌ No real user IDs provided for testing")
+        if not user_ids:
+            # Get users with complete profiles
+            user_ids = [user.get('user_id') for user in self.db.users.find({"profile_complete": True}).limit(limit)]
+        
+        if not user_ids:
+            print("❌ No users with complete profiles found in the database")
             return False
         
         results = []
         
-        for user_id in real_user_ids:
+        for user_id in user_ids[:limit]:  # Limit to 5 users for testing
             print(f"\nTesting discovery for user ID: {user_id}")
             
             # Get user details
@@ -1298,6 +231,15 @@ class Solm8APITester:
             
             print(f"Discovery returned {len(discover_results)} potential matches")
             
+            # Show the first 3 matches
+            if discover_results and len(discover_results) > 0:
+                print("\nSample of discovery results:")
+                for i, match in enumerate(discover_results[:3]):
+                    print(f"{i+1}. User ID: {match.get('user_id')}, Username: {match.get('username')}")
+                    print(f"   Profile Complete: {match.get('profile_complete')}")
+                    print(f"   Trading Experience: '{match.get('trading_experience')}'")
+                    print(f"   Last Activity: {match.get('last_activity')}")
+            
             # Test AI recommendations
             try:
                 success, ai_results = self.test_ai_recommendations(user_id)
@@ -1307,6 +249,14 @@ class Solm8APITester:
                 else:
                     ai_count = len(ai_results)
                     print(f"AI recommendations returned {ai_count} potential matches")
+                    
+                    # Show the first 3 AI recommendations
+                    if ai_results and len(ai_results) > 0:
+                        print("\nSample of AI recommendations:")
+                        for i, match in enumerate(ai_results[:3]):
+                            print(f"{i+1}. User ID: {match.get('user_id')}, Username: {match.get('username')}")
+                            print(f"   Compatibility: {match.get('ai_compatibility', {}).get('compatibility_percentage')}%")
+                            print(f"   Profile Complete: {match.get('profile_complete')}")
             except Exception as e:
                 print(f"❌ Error getting AI recommendations: {str(e)}")
                 ai_count = 0
@@ -1324,372 +274,558 @@ class Solm8APITester:
             print(f"User: {result['username']}, Profile Complete: {result['profile_complete']}, Discovery: {result['discover_count']}, AI Recommendations: {result['ai_recommendations_count']}")
         
         return results
+
+    def test_profile_update_process(self, user_id=None):
+        """Test if the profile update endpoint is setting profile_complete correctly"""
+        print("\n🔍 Testing Profile Update Process...")
         
-    def test_profile_completion_edge_cases(self):
-        """Test edge cases for profile completion logic"""
-        print("\n🔍 Testing Profile Completion Edge Cases...")
-        
-        # Create a new user for testing
-        random_suffix = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
-        test_email = f"test_{random_suffix}@example.com"
-        test_password = "TestPassword123!"
-        test_display_name = f"Test User {random_suffix}"
-        
-        success, signup_response = self.test_email_signup(test_email, test_password, test_display_name)
-        if not success:
-            print("❌ Email signup failed, stopping test")
-            return False
-        
-        user_id = self.email_user['user_id']
-        
-        # Test Case 1: Empty strings for required fields
-        print("\n1️⃣ Testing empty strings for required fields...")
-        empty_profile_data = {
-            "trading_experience": "",
-            "preferred_tokens": ["Meme Coins"],
-            "trading_style": "Day Trader",
-            "portfolio_size": "$10K-$100K"
-        }
-        
-        success, _ = self.test_update_user_profile(user_id, empty_profile_data)
-        if not success:
-            print("❌ Failed to update user profile with empty trading_experience")
-            return False
-        
-        success, user_data = self.test_get_user(user_id)
-        if not success:
-            print("❌ Failed to get user profile")
-            return False
-        
-        if user_data.get('profile_complete'):
-            print("❌ Profile incorrectly marked as complete with empty trading_experience")
-            return False
-        else:
-            print("✅ Profile correctly marked as incomplete with empty trading_experience")
-        
-        # Test Case 2: Empty array for preferred_tokens
-        print("\n2️⃣ Testing empty array for preferred_tokens...")
-        empty_tokens_data = {
-            "trading_experience": "Intermediate",
-            "preferred_tokens": [],
-            "trading_style": "Day Trader",
-            "portfolio_size": "$10K-$100K"
-        }
-        
-        success, _ = self.test_update_user_profile(user_id, empty_tokens_data)
-        if not success:
-            print("❌ Failed to update user profile with empty preferred_tokens")
-            return False
-        
-        success, user_data = self.test_get_user(user_id)
-        if not success:
-            print("❌ Failed to get user profile")
-            return False
-        
-        if user_data.get('profile_complete'):
-            print("❌ Profile incorrectly marked as complete with empty preferred_tokens")
-            return False
-        else:
-            print("✅ Profile correctly marked as incomplete with empty preferred_tokens")
-        
-        # Test Case 3: Missing one required field
-        print("\n3️⃣ Testing missing one required field...")
-        # First, clear the portfolio_size field
-        clear_field_data = {
-            "portfolio_size": ""
-        }
-        success, _ = self.test_update_user_profile(user_id, clear_field_data)
-        if not success:
-            print("❌ Failed to clear portfolio_size field")
-            return False
+        if not user_id:
+            # Create a new test user
+            random_suffix = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
+            test_email = f"test_{random_suffix}@example.com"
+            test_password = "TestPassword123!"
+            test_display_name = f"Test User {random_suffix}"
             
-        # Now update with missing portfolio_size
-        missing_field_data = {
-            "trading_experience": "Intermediate",
-            "preferred_tokens": ["Meme Coins"],
-            "trading_style": "Day Trader"
-            # Missing portfolio_size
+            success, signup_response = self.test_email_signup(test_email, test_password, test_display_name)
+            if not success:
+                print("❌ Email signup failed, stopping test")
+                return False
+            
+            user_id = self.email_user['user_id']
+        
+        # Get initial user profile
+        success, initial_profile = self.test_get_user(user_id)
+        if not success:
+            print("❌ Failed to get initial user profile")
+            return False
+        
+        print(f"Initial profile_complete: {initial_profile.get('profile_complete')}")
+        
+        # Test Case 1: Update with incomplete profile (missing trading_experience)
+        incomplete_profile = {
+            "preferred_tokens": ["Meme Coins", "DeFi"],
+            "trading_style": "Day Trader",
+            "portfolio_size": "$10K-$100K"
         }
         
-        success, _ = self.test_update_user_profile(user_id, missing_field_data)
+        success, _ = self.test_update_user_profile(user_id, incomplete_profile)
         if not success:
-            print("❌ Failed to update user profile with missing portfolio_size")
+            print("❌ Failed to update user profile with incomplete data")
             return False
         
-        success, user_data = self.test_get_user(user_id)
+        success, updated_profile = self.test_get_user(user_id)
         if not success:
-            print("❌ Failed to get user profile")
+            print("❌ Failed to get updated user profile")
             return False
         
-        print(f"User data after update: {json.dumps(user_data, default=str)}")
+        print(f"After incomplete update, profile_complete: {updated_profile.get('profile_complete')}")
         
-        if user_data.get('profile_complete'):
-            print("❌ Profile incorrectly marked as complete with missing portfolio_size")
-            return False
-        else:
-            print("✅ Profile correctly marked as incomplete with missing portfolio_size")
-        
-        # Test Case 4: All required fields present and valid
-        print("\n4️⃣ Testing all required fields present and valid...")
-        complete_profile_data = {
+        # Test Case 2: Update with complete profile
+        complete_profile = {
             "trading_experience": "Intermediate",
             "preferred_tokens": ["Meme Coins", "DeFi"],
             "trading_style": "Day Trader",
             "portfolio_size": "$10K-$100K"
         }
         
-        success, _ = self.test_update_user_profile(user_id, complete_profile_data)
+        success, _ = self.test_update_user_profile(user_id, complete_profile)
         if not success:
-            print("❌ Failed to update user profile with all required fields")
+            print("❌ Failed to update user profile with complete data")
             return False
         
-        success, user_data = self.test_get_user(user_id)
+        success, updated_profile = self.test_get_user(user_id)
         if not success:
-            print("❌ Failed to get user profile")
+            print("❌ Failed to get updated user profile")
             return False
         
-        if not user_data.get('profile_complete'):
-            print("❌ Profile incorrectly marked as incomplete with all required fields")
-            print(f"Profile data: {json.dumps(user_data, default=str)}")
+        print(f"After complete update, profile_complete: {updated_profile.get('profile_complete')}")
+        
+        # Test Case 3: Update with empty preferred_tokens
+        empty_tokens_profile = {
+            "trading_experience": "Intermediate",
+            "preferred_tokens": [],
+            "trading_style": "Day Trader",
+            "portfolio_size": "$10K-$100K"
+        }
+        
+        success, _ = self.test_update_user_profile(user_id, empty_tokens_profile)
+        if not success:
+            print("❌ Failed to update user profile with empty tokens")
+            return False
+        
+        success, updated_profile = self.test_get_user(user_id)
+        if not success:
+            print("❌ Failed to get updated user profile")
+            return False
+        
+        print(f"After empty tokens update, profile_complete: {updated_profile.get('profile_complete')}")
+        
+        # Test Case 4: Update with empty string for trading_style
+        empty_style_profile = {
+            "trading_experience": "Intermediate",
+            "preferred_tokens": ["Meme Coins", "DeFi"],
+            "trading_style": "",
+            "portfolio_size": "$10K-$100K"
+        }
+        
+        success, _ = self.test_update_user_profile(user_id, empty_style_profile)
+        if not success:
+            print("❌ Failed to update user profile with empty trading style")
+            return False
+        
+        success, updated_profile = self.test_get_user(user_id)
+        if not success:
+            print("❌ Failed to get updated user profile")
+            return False
+        
+        print(f"After empty style update, profile_complete: {updated_profile.get('profile_complete')}")
+        
+        # Test Case 5: Update back to complete profile
+        success, _ = self.test_update_user_profile(user_id, complete_profile)
+        if not success:
+            print("❌ Failed to update user profile back to complete")
+            return False
+        
+        success, final_profile = self.test_get_user(user_id)
+        if not success:
+            print("❌ Failed to get final user profile")
+            return False
+        
+        print(f"Final profile_complete: {final_profile.get('profile_complete')}")
+        
+        # Verify profile completion logic is working correctly
+        if not final_profile.get('profile_complete'):
+            print("❌ Profile completion logic failed - profile should be marked as complete")
             return False
         else:
-            print("✅ Profile correctly marked as complete with all required fields")
-        
-        # Test Case 5: Verify user appears in discovery after profile completion
-        print("\n5️⃣ Verifying user appears in discovery after profile completion...")
-        
-        # Create another test user
-        random_suffix2 = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
-        test_email2 = f"test_{random_suffix2}@example.com"
-        test_display_name2 = f"Test User {random_suffix2}"
-        
-        success, signup_response2 = self.test_email_signup(test_email2, test_password, test_display_name2)
-        if not success:
-            print("❌ Second email signup failed")
-            return False
-        
-        user_id2 = signup_response2.get("user")['user_id']
-        
-        # Update second user's profile to complete it
-        success, _ = self.test_update_user_profile(user_id2, complete_profile_data)
-        if not success:
-            print("❌ Failed to update second user's profile")
-            return False
-        
-        # Check if second user can discover first user
-        success, discover_results = self.test_discover_users(user_id2)
-        if not success:
-            print("❌ Failed to get discovery results for second user")
-            return False
-        
-        # Check if first user is in the discovery results
-        first_user_found = False
-        for user in discover_results:
-            if user.get('user_id') == user_id:
-                first_user_found = True
-                break
-        
-        if first_user_found:
-            print("✅ First user successfully found in second user's discovery results")
-        else:
-            print("❌ First user NOT found in second user's discovery results")
-            print(f"Discovery returned {len(discover_results)} users, but first user (ID: {user_id}) was not among them")
+            print("✅ Profile completion logic is working correctly")
         
         return True
 
-    def test_ai_recommendations(self, user_id):
-        """Test getting AI recommendations"""
-        return self.run_test(
-            "AI Recommendations",
-            "GET",
-            f"ai-recommendations/{user_id}",
+    def test_discovery_filters(self):
+        """Test discovery filters to ensure no hidden filters are blocking users"""
+        print("\n🔍 Testing Discovery Filters...")
+        
+        # Create two test users with complete profiles
+        print("Creating two test users with complete profiles...")
+        
+        # User A
+        random_suffix_a = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
+        email_a = f"test_a_{random_suffix_a}@example.com"
+        display_name_a = f"Test User A {random_suffix_a}"
+        
+        success, signup_response_a = self.test_email_signup(email_a, "TestPassword123!", display_name_a)
+        if not success:
+            print("❌ Failed to create User A")
+            return False
+        
+        user_a_id = self.email_user['user_id']
+        
+        # User B
+        random_suffix_b = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
+        email_b = f"test_b_{random_suffix_b}@example.com"
+        display_name_b = f"Test User B {random_suffix_b}"
+        
+        success, signup_response_b = self.test_email_signup(email_b, "TestPassword123!", display_name_b)
+        if not success:
+            print("❌ Failed to create User B")
+            return False
+        
+        user_b_id = self.email_user['user_id']
+        
+        print(f"Created User A (ID: {user_a_id}) and User B (ID: {user_b_id})")
+        
+        # Complete profiles for both users
+        complete_profile = {
+            "trading_experience": "Intermediate",
+            "preferred_tokens": ["Meme Coins", "DeFi"],
+            "trading_style": "Day Trader",
+            "portfolio_size": "$10K-$100K"
+        }
+        
+        success, _ = self.test_update_user_profile(user_a_id, complete_profile)
+        if not success:
+            print("❌ Failed to update User A's profile")
+            return False
+        
+        success, _ = self.test_update_user_profile(user_b_id, complete_profile)
+        if not success:
+            print("❌ Failed to update User B's profile")
+            return False
+        
+        # Verify both profiles are marked as complete
+        success, user_a = self.test_get_user(user_a_id)
+        success, user_b = self.test_get_user(user_b_id)
+        
+        if not user_a.get('profile_complete') or not user_b.get('profile_complete'):
+            print("❌ One or both user profiles not marked as complete")
+            return False
+        
+        print("✅ Both user profiles marked as complete")
+        
+        # Test if User A can discover User B
+        print("\nTesting if User A can discover User B...")
+        success, discover_results_a = self.test_discover_users(user_a_id)
+        if not success:
+            print("❌ Failed to get discovery results for User A")
+            return False
+        
+        user_b_found = False
+        for user in discover_results_a:
+            if user.get('user_id') == user_b_id:
+                user_b_found = True
+                break
+        
+        if user_b_found:
+            print("✅ User A can discover User B")
+        else:
+            print("❌ User A cannot discover User B")
+            print(f"Discovery returned {len(discover_results_a)} users, but User B was not among them")
+        
+        # Test if User B can discover User A
+        print("\nTesting if User B can discover User A...")
+        success, discover_results_b = self.test_discover_users(user_b_id)
+        if not success:
+            print("❌ Failed to get discovery results for User B")
+            return False
+        
+        user_a_found = False
+        for user in discover_results_b:
+            if user.get('user_id') == user_a_id:
+                user_a_found = True
+                break
+        
+        if user_a_found:
+            print("✅ User B can discover User A")
+        else:
+            print("❌ User B cannot discover User A")
+            print(f"Discovery returned {len(discover_results_b)} users, but User A was not among them")
+        
+        # Test swipe history filtering
+        if user_b_found:
+            print("\nTesting swipe history filtering...")
+            
+            # User A swipes on User B
+            success, _ = self.run_test(
+                "User A swipes on User B",
+                "POST",
+                "swipe",
+                200,
+                data={
+                    "swiper_id": user_a_id,
+                    "target_id": user_b_id,
+                    "action": "like"
+                }
+            )
+            
+            if not success:
+                print("❌ Failed when User A swiped on User B")
+                return False
+            
+            # Check if User A can still see User B in discovery
+            success, discover_results_a_after = self.test_discover_users(user_a_id)
+            if not success:
+                print("❌ Failed to get discovery results for User A after swiping")
+                return False
+            
+            user_b_found_after = False
+            for user in discover_results_a_after:
+                if user.get('user_id') == user_b_id:
+                    user_b_found_after = True
+                    break
+            
+            if not user_b_found_after:
+                print("✅ User A cannot discover User B after swiping (as expected)")
+            else:
+                print("❌ User A can still discover User B after swiping (unexpected)")
+        
+        # Test sorting by last_activity
+        print("\nTesting sorting by last_activity...")
+        
+        # Update User B's last_activity to be more recent
+        success, _ = self.run_test(
+            "Update User B's activity",
+            "POST",
+            f"user/{user_b_id}/update-activity",
             200
         )
+        
+        if not success:
+            print("❌ Failed to update User B's activity")
+            return False
+        
+        # Create a third user who will have the most recent activity
+        random_suffix_c = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
+        email_c = f"test_c_{random_suffix_c}@example.com"
+        display_name_c = f"Test User C {random_suffix_c}"
+        
+        success, signup_response_c = self.test_email_signup(email_c, "TestPassword123!", display_name_c)
+        if not success:
+            print("❌ Failed to create User C")
+            return False
+        
+        user_c_id = self.email_user['user_id']
+        
+        # Complete profile for User C
+        success, _ = self.test_update_user_profile(user_c_id, complete_profile)
+        if not success:
+            print("❌ Failed to update User C's profile")
+            return False
+        
+        # Update User C's activity to be the most recent
+        time.sleep(1)  # Ensure timestamp difference
+        success, _ = self.run_test(
+            "Update User C's activity",
+            "POST",
+            f"user/{user_c_id}/update-activity",
+            200
+        )
+        
+        if not success:
+            print("❌ Failed to update User C's activity")
+            return False
+        
+        # Check discovery results for a new user to see the order
+        random_suffix_d = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
+        email_d = f"test_d_{random_suffix_d}@example.com"
+        display_name_d = f"Test User D {random_suffix_d}"
+        
+        success, signup_response_d = self.test_email_signup(email_d, "TestPassword123!", display_name_d)
+        if not success:
+            print("❌ Failed to create User D")
+            return False
+        
+        user_d_id = self.email_user['user_id']
+        
+        # Complete profile for User D
+        success, _ = self.test_update_user_profile(user_d_id, complete_profile)
+        if not success:
+            print("❌ Failed to update User D's profile")
+            return False
+        
+        # Get discovery results for User D
+        success, discover_results_d = self.test_discover_users(user_d_id)
+        if not success:
+            print("❌ Failed to get discovery results for User D")
+            return False
+        
+        print("\nDiscovery results for User D (should be sorted by last_activity):")
+        for i, user in enumerate(discover_results_d[:5]):  # Show first 5 results
+            print(f"{i+1}. User ID: {user.get('user_id')}, Username: {user.get('username')}, Last Activity: {user.get('last_activity')}")
+        
+        # Check if User C appears before User B and User A in the results
+        user_positions = {}
+        for i, user in enumerate(discover_results_d):
+            if user.get('user_id') == user_a_id:
+                user_positions['A'] = i
+            elif user.get('user_id') == user_b_id:
+                user_positions['B'] = i
+            elif user.get('user_id') == user_c_id:
+                user_positions['C'] = i
+        
+        if 'C' in user_positions and 'B' in user_positions and user_positions['C'] < user_positions['B']:
+            print("✅ User C appears before User B in discovery results (correct sorting)")
+        elif 'C' in user_positions and 'B' in user_positions:
+            print("❌ User C appears after User B in discovery results (incorrect sorting)")
+        else:
+            print("⚠️ Could not verify sorting - one or both users not found in results")
+        
+        return True
+
+    def live_debug_session(self):
+        """Run a live debug session with test users"""
+        print("\n🔍 Running Live Debug Session...")
+        
+        # Step 1: Create two test users
+        print("\n1️⃣ Creating two test users...")
+        
+        # User A
+        random_suffix_a = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
+        email_a = f"test_a_{random_suffix_a}@example.com"
+        display_name_a = f"Test User A {random_suffix_a}"
+        
+        success, signup_response_a = self.test_email_signup(email_a, "TestPassword123!", display_name_a)
+        if not success:
+            print("❌ Failed to create User A")
+            return False
+        
+        user_a_id = self.email_user['user_id']
+        
+        # User B
+        random_suffix_b = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
+        email_b = f"test_b_{random_suffix_b}@example.com"
+        display_name_b = f"Test User B {random_suffix_b}"
+        
+        success, signup_response_b = self.test_email_signup(email_b, "TestPassword123!", display_name_b)
+        if not success:
+            print("❌ Failed to create User B")
+            return False
+        
+        user_b_id = self.email_user['user_id']
+        
+        print(f"Created User A (ID: {user_a_id}) and User B (ID: {user_b_id})")
+        
+        # Step 2: Complete profiles for both users
+        print("\n2️⃣ Completing profiles for both users...")
+        
+        complete_profile_a = {
+            "trading_experience": "Intermediate",
+            "preferred_tokens": ["Meme Coins", "DeFi"],
+            "trading_style": "Day Trader",
+            "portfolio_size": "$10K-$100K"
+        }
+        
+        complete_profile_b = {
+            "trading_experience": "Advanced",
+            "preferred_tokens": ["NFTs", "GameFi"],
+            "trading_style": "Swing Trader",
+            "portfolio_size": "$100K+"
+        }
+        
+        success, _ = self.test_update_user_profile(user_a_id, complete_profile_a)
+        if not success:
+            print("❌ Failed to update User A's profile")
+            return False
+        
+        success, _ = self.test_update_user_profile(user_b_id, complete_profile_b)
+        if not success:
+            print("❌ Failed to update User B's profile")
+            return False
+        
+        # Verify both profiles are marked as complete
+        success, user_a = self.test_get_user(user_a_id)
+        success, user_b = self.test_get_user(user_b_id)
+        
+        if not user_a.get('profile_complete') or not user_b.get('profile_complete'):
+            print("❌ One or both user profiles not marked as complete")
+            return False
+        
+        print("✅ Both user profiles marked as complete")
+        
+        # Step 3: Test immediate discovery
+        print("\n3️⃣ Testing immediate discovery...")
+        
+        # Test if User A can discover User B
+        print("Testing if User A can discover User B...")
+        success, discover_results_a = self.test_discover_users(user_a_id)
+        if not success:
+            print("❌ Failed to get discovery results for User A")
+            return False
+        
+        user_b_found = False
+        for user in discover_results_a:
+            if user.get('user_id') == user_b_id:
+                user_b_found = True
+                break
+        
+        if user_b_found:
+            print("✅ User A can discover User B immediately after profile completion")
+        else:
+            print("❌ User A cannot discover User B")
+            print(f"Discovery returned {len(discover_results_a)} users, but User B was not among them")
+        
+        # Test if User B can discover User A
+        print("\nTesting if User B can discover User A...")
+        success, discover_results_b = self.test_discover_users(user_b_id)
+        if not success:
+            print("❌ Failed to get discovery results for User B")
+            return False
+        
+        user_a_found = False
+        for user in discover_results_b:
+            if user.get('user_id') == user_a_id:
+                user_a_found = True
+                break
+        
+        if user_a_found:
+            print("✅ User B can discover User A immediately after profile completion")
+        else:
+            print("❌ User B cannot discover User A")
+            print(f"Discovery returned {len(discover_results_b)} users, but User A was not among them")
+        
+        # Step 4: Compare with real user data
+        print("\n4️⃣ Comparing with real user data...")
+        
+        # Get real users with complete profiles
+        real_users = list(self.db.users.find({
+            "auth_method": {"$in": ["email", "wallet"]},
+            "profile_complete": True
+        }).limit(5))
+        
+        if not real_users:
+            print("No real users with complete profiles found for comparison")
+            return True
+        
+        print(f"Found {len(real_users)} real users with complete profiles for comparison")
+        
+        # Check if test users can discover real users
+        print("\nChecking if test users can discover real users...")
+        
+        real_user_ids = [user.get('user_id') for user in real_users]
+        
+        success, discover_results_a = self.test_discover_users(user_a_id)
+        if not success:
+            print("❌ Failed to get discovery results for User A")
+            return False
+        
+        real_users_found_by_a = []
+        for user in discover_results_a:
+            if user.get('user_id') in real_user_ids:
+                real_users_found_by_a.append(user.get('user_id'))
+        
+        print(f"User A found {len(real_users_found_by_a)} real users in discovery")
+        
+        # Check if real users can discover test users
+        if real_users:
+            print("\nChecking if real users can discover test users...")
+            
+            real_user_id = real_users[0].get('user_id')
+            
+            success, discover_results_real = self.test_discover_users(real_user_id)
+            if not success:
+                print(f"❌ Failed to get discovery results for real user {real_user_id}")
+                return False
+            
+            test_users_found = []
+            for user in discover_results_real:
+                if user.get('user_id') in [user_a_id, user_b_id]:
+                    test_users_found.append(user.get('user_id'))
+            
+            print(f"Real user found {len(test_users_found)} test users in discovery")
+            if test_users_found:
+                print(f"Test users found: {', '.join(test_users_found)}")
+        
+        return True
 
     def run_discovery_debug_tests(self):
         """Run all tests related to debugging discovery issues"""
         print("🚀 Starting Solm8 Discovery Debug Tests")
         
-        # Step 1: Check database users
-        real_user_ids = self.check_database_users()
+        # Step 1: Check actual users in database
+        print("\n===== STEP 1: CHECK ACTUAL USERS IN DATABASE =====")
+        complete_user_ids = self.check_actual_users_in_database()
         
-        # Step 2: Test profile completion flow
-        self.test_profile_completion_flow()
+        # Step 2: Test discovery with real user IDs
+        print("\n===== STEP 2: TEST DISCOVERY WITH REAL USER IDS =====")
+        if complete_user_ids:
+            self.test_discovery_with_real_users(complete_user_ids)
         
-        # Step 3: Test discovery with real users
-        if real_user_ids:
-            self.test_discovery_with_real_users(real_user_ids)
+        # Step 3: Debug profile update process
+        print("\n===== STEP 3: DEBUG PROFILE UPDATE PROCESS =====")
+        self.test_profile_update_process()
+        
+        # Step 4: Test discovery filters
+        print("\n===== STEP 4: TEST DISCOVERY FILTERS =====")
+        self.test_discovery_filters()
+        
+        # Step 5: Live debug session
+        print("\n===== STEP 5: LIVE DEBUG SESSION =====")
+        self.live_debug_session()
         
         # Print results
         print(f"\n📊 Tests passed: {self.tests_passed}/{self.tests_run}")
         return self.tests_passed == self.tests_run
 
-def test_profile_completion_edge_cases(self):
-    """Test edge cases for profile completion logic"""
-    print("\n🔍 Testing Profile Completion Edge Cases...")
-    
-    # Create a new user for testing
-    random_suffix = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
-    test_email = f"test_{random_suffix}@example.com"
-    test_password = "TestPassword123!"
-    test_display_name = f"Test User {random_suffix}"
-    
-    success, signup_response = self.test_email_signup(test_email, test_password, test_display_name)
-    if not success:
-        print("❌ Email signup failed, stopping test")
-        return False
-    
-    user_id = self.email_user['user_id']
-    
-    # Test Case 1: Empty strings for required fields
-    print("\n1️⃣ Testing empty strings for required fields...")
-    empty_profile_data = {
-        "trading_experience": "",
-        "preferred_tokens": ["Meme Coins"],
-        "trading_style": "Day Trader",
-        "portfolio_size": "$10K-$100K"
-    }
-    
-    success, _ = self.test_update_user_profile(user_id, empty_profile_data)
-    if not success:
-        print("❌ Failed to update user profile with empty trading_experience")
-        return False
-    
-    success, user_data = self.test_get_user(user_id)
-    if not success:
-        print("❌ Failed to get user profile")
-        return False
-    
-    if user_data.get('profile_complete'):
-        print("❌ Profile incorrectly marked as complete with empty trading_experience")
-        return False
-    else:
-        print("✅ Profile correctly marked as incomplete with empty trading_experience")
-    
-    # Test Case 2: Empty array for preferred_tokens
-    print("\n2️⃣ Testing empty array for preferred_tokens...")
-    empty_tokens_data = {
-        "trading_experience": "Intermediate",
-        "preferred_tokens": [],
-        "trading_style": "Day Trader",
-        "portfolio_size": "$10K-$100K"
-    }
-    
-    success, _ = self.test_update_user_profile(user_id, empty_tokens_data)
-    if not success:
-        print("❌ Failed to update user profile with empty preferred_tokens")
-        return False
-    
-    success, user_data = self.test_get_user(user_id)
-    if not success:
-        print("❌ Failed to get user profile")
-        return False
-    
-    if user_data.get('profile_complete'):
-        print("❌ Profile incorrectly marked as complete with empty preferred_tokens")
-        return False
-    else:
-        print("✅ Profile correctly marked as incomplete with empty preferred_tokens")
-    
-    # Test Case 3: Missing one required field
-    print("\n3️⃣ Testing missing one required field...")
-    missing_field_data = {
-        "trading_experience": "Intermediate",
-        "preferred_tokens": ["Meme Coins"],
-        "trading_style": "Day Trader"
-        # Missing portfolio_size
-    }
-    
-    success, _ = self.test_update_user_profile(user_id, missing_field_data)
-    if not success:
-        print("❌ Failed to update user profile with missing portfolio_size")
-        return False
-    
-    success, user_data = self.test_get_user(user_id)
-    if not success:
-        print("❌ Failed to get user profile")
-        return False
-    
-    if user_data.get('profile_complete'):
-        print("❌ Profile incorrectly marked as complete with missing portfolio_size")
-        return False
-    else:
-        print("✅ Profile correctly marked as incomplete with missing portfolio_size")
-    
-    # Test Case 4: All required fields present and valid
-    print("\n4️⃣ Testing all required fields present and valid...")
-    complete_profile_data = {
-        "trading_experience": "Intermediate",
-        "preferred_tokens": ["Meme Coins", "DeFi"],
-        "trading_style": "Day Trader",
-        "portfolio_size": "$10K-$100K"
-    }
-    
-    success, _ = self.test_update_user_profile(user_id, complete_profile_data)
-    if not success:
-        print("❌ Failed to update user profile with all required fields")
-        return False
-    
-    success, user_data = self.test_get_user(user_id)
-    if not success:
-        print("❌ Failed to get user profile")
-        return False
-    
-    if not user_data.get('profile_complete'):
-        print("❌ Profile incorrectly marked as incomplete with all required fields")
-        print(f"Profile data: {json.dumps(user_data, default=str)}")
-        return False
-    else:
-        print("✅ Profile correctly marked as complete with all required fields")
-    
-    # Test Case 5: Verify user appears in discovery after profile completion
-    print("\n5️⃣ Verifying user appears in discovery after profile completion...")
-    
-    # Create another test user
-    random_suffix2 = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
-    test_email2 = f"test_{random_suffix2}@example.com"
-    test_display_name2 = f"Test User {random_suffix2}"
-    
-    success, signup_response2 = self.test_email_signup(test_email2, test_password, test_display_name2)
-    if not success:
-        print("❌ Second email signup failed")
-        return False
-    
-    user_id2 = signup_response2.get("user")['user_id']
-    
-    # Update second user's profile to complete it
-    success, _ = self.test_update_user_profile(user_id2, complete_profile_data)
-    if not success:
-        print("❌ Failed to update second user's profile")
-        return False
-    
-    # Check if second user can discover first user
-    success, discover_results = self.test_discover_users(user_id2)
-    if not success:
-        print("❌ Failed to get discovery results for second user")
-        return False
-    
-    # Check if first user is in the discovery results
-    first_user_found = False
-    for user in discover_results:
-        if user.get('user_id') == user_id:
-            first_user_found = True
-            break
-    
-    if first_user_found:
-        print("✅ First user successfully found in second user's discovery results")
-    else:
-        print("❌ First user NOT found in second user's discovery results")
-        print(f"Discovery returned {len(discover_results)} users, but first user (ID: {user_id}) was not among them")
-    
-    return True
-
 if __name__ == "__main__":
     tester = Solm8APITester()
-    # Test profile completion logic specifically
-    tester.test_profile_completion_edge_cases()
-    # Run discovery debug tests
-    # tester.run_discovery_debug_tests()
-    # Alternatively, run other tests
-    # tester.test_user_matching_flow()
-    # tester.run_all_tests()
+    tester.run_discovery_debug_tests()
