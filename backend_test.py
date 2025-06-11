@@ -1394,6 +1394,16 @@ class Solm8APITester:
         
         # Test Case 3: Missing one required field
         print("\n3️⃣ Testing missing one required field...")
+        # First, clear the portfolio_size field
+        clear_field_data = {
+            "portfolio_size": ""
+        }
+        success, _ = self.test_update_user_profile(user_id, clear_field_data)
+        if not success:
+            print("❌ Failed to clear portfolio_size field")
+            return False
+            
+        # Now update with missing portfolio_size
         missing_field_data = {
             "trading_experience": "Intermediate",
             "preferred_tokens": ["Meme Coins"],
