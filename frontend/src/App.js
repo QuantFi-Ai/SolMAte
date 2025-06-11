@@ -406,7 +406,7 @@ function AppContent() {
       const response = await fetch(`${API_BASE_URL}/api/discover/${currentUser.user_id}`);
       if (response.ok) {
         const data = await response.json();
-        setDiscoveryCards(filterCardsByStatus(data.potential_matches || []));
+        setDiscoveryCards(filterCardsByStatus(data || []));
       }
     } catch (error) {
       console.error('Error fetching discovery cards:', error);
