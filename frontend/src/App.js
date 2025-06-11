@@ -1799,7 +1799,7 @@ function AppContent() {
       {/* Profile Manager Modal */}
       {showProfileManager && (
         <ProfileManager 
-          user={currentUser} 
+          currentUser={currentUser} 
           onClose={() => setShowProfileManager(false)} 
         />
       )}
