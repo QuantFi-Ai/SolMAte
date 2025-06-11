@@ -195,6 +195,14 @@ const ProfileManager = ({ currentUser, onClose }) => {
         </div>
       );
     }
+    // Add safety check for currentUser
+    if (!currentUser) {
+      return (
+        <div className="text-center py-8">
+          <p className="text-gray-600">Loading profile...</p>
+        </div>
+      );
+    }
 
     return (
       <div className="space-y-6">
