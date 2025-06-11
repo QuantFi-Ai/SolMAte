@@ -1349,6 +1349,13 @@ function AppContent() {
             >
               📱 Share Profile
             </button>
+            <button
+              onClick={refreshDiscovery}
+              className="px-4 py-2 rounded-lg font-medium text-gray-600 hover:text-black transition-all"
+              title="Refresh to see new profiles"
+            >
+              🔄 Refresh
+            </button>
           </div>
           <div className="flex items-center space-x-3">
             {/* Status Toggle */}
@@ -1380,6 +1387,14 @@ function AppContent() {
                 className="w-8 h-8 rounded-full border-2 border-gray-300 group-hover:border-gray-400 transition-all"
               />
               <span className="text-black font-medium group-hover:text-gray-700">{currentUser?.display_name}</span>
+            </button>
+            
+            <button
+              onClick={handleLogout}
+              className="px-3 py-1 rounded-lg font-medium text-red-600 hover:bg-red-50 transition-all"
+              title="Log out"
+            >
+              🚪 Logout
             </button>
           </div>
         </div>
