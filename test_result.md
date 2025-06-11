@@ -101,6 +101,7 @@ test_plan:
   current_focus:
     - "Authentication Session Validation"
     - "Discovery API Format"
+    - "User Matching System"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
