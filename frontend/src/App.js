@@ -666,6 +666,26 @@ function AppContent() {
 
   // Redirect to login if not authenticated
   if (!currentUser && currentView !== 'login') {
+    // Check for stored user session first
+    const storedUser = localStorage.getItem('solm8_user');
+    if (storedUser) {
+      try {
+        const userData = JSON.parse(storedUser);
+        setCurrentUser(userData);
+        
+        // Update user activity
+        fetch(`${API_BASE_URL}/api/user/${userData.user_id}/update-activity`, {
+          method: 'POST'
+        }).catch(err => console.error('Failed to update activity:', err));
+        
+        // Don't redirect to login if we have a session
+        return null;
+      } catch (error) {
+        console.error('Error parsing stored user:', error);
+        localStorage.removeItem('solm8_user');
+      }
+    }
+    
     setCurrentView('login');
     return null;
   }
