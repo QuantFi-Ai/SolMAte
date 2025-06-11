@@ -1510,11 +1510,11 @@ async def discover_users(user_id: str, limit: int = 10):
     swiped_user_ids = [doc["target_id"] for doc in swipes_collection.find({"swiper_id": user_id})]
     swiped_user_ids.append(user_id)  # Exclude self
     
-    # Find users not swiped on yet with complete profiles
+    # Find users not swiped on yet with complete profiles, sorted by recent activity
     potential_matches = list(users_collection.find({
         "user_id": {"$nin": swiped_user_ids},
         "profile_complete": True
-    }).limit(limit))
+    }).sort("last_activity", -1).limit(limit))
     
     # Remove MongoDB _id fields
     for user in potential_matches:
