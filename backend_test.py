@@ -1324,6 +1324,166 @@ class Solm8APITester:
             print(f"User: {result['username']}, Profile Complete: {result['profile_complete']}, Discovery: {result['discover_count']}, AI Recommendations: {result['ai_recommendations_count']}")
         
         return results
+        
+    def test_profile_completion_edge_cases(self):
+        """Test edge cases for profile completion logic"""
+        print("\n🔍 Testing Profile Completion Edge Cases...")
+        
+        # Create a new user for testing
+        random_suffix = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
+        test_email = f"test_{random_suffix}@example.com"
+        test_password = "TestPassword123!"
+        test_display_name = f"Test User {random_suffix}"
+        
+        success, signup_response = self.test_email_signup(test_email, test_password, test_display_name)
+        if not success:
+            print("❌ Email signup failed, stopping test")
+            return False
+        
+        user_id = self.email_user['user_id']
+        
+        # Test Case 1: Empty strings for required fields
+        print("\n1️⃣ Testing empty strings for required fields...")
+        empty_profile_data = {
+            "trading_experience": "",
+            "preferred_tokens": ["Meme Coins"],
+            "trading_style": "Day Trader",
+            "portfolio_size": "$10K-$100K"
+        }
+        
+        success, _ = self.test_update_user_profile(user_id, empty_profile_data)
+        if not success:
+            print("❌ Failed to update user profile with empty trading_experience")
+            return False
+        
+        success, user_data = self.test_get_user(user_id)
+        if not success:
+            print("❌ Failed to get user profile")
+            return False
+        
+        if user_data.get('profile_complete'):
+            print("❌ Profile incorrectly marked as complete with empty trading_experience")
+            return False
+        else:
+            print("✅ Profile correctly marked as incomplete with empty trading_experience")
+        
+        # Test Case 2: Empty array for preferred_tokens
+        print("\n2️⃣ Testing empty array for preferred_tokens...")
+        empty_tokens_data = {
+            "trading_experience": "Intermediate",
+            "preferred_tokens": [],
+            "trading_style": "Day Trader",
+            "portfolio_size": "$10K-$100K"
+        }
+        
+        success, _ = self.test_update_user_profile(user_id, empty_tokens_data)
+        if not success:
+            print("❌ Failed to update user profile with empty preferred_tokens")
+            return False
+        
+        success, user_data = self.test_get_user(user_id)
+        if not success:
+            print("❌ Failed to get user profile")
+            return False
+        
+        if user_data.get('profile_complete'):
+            print("❌ Profile incorrectly marked as complete with empty preferred_tokens")
+            return False
+        else:
+            print("✅ Profile correctly marked as incomplete with empty preferred_tokens")
+        
+        # Test Case 3: Missing one required field
+        print("\n3️⃣ Testing missing one required field...")
+        missing_field_data = {
+            "trading_experience": "Intermediate",
+            "preferred_tokens": ["Meme Coins"],
+            "trading_style": "Day Trader"
+            # Missing portfolio_size
+        }
+        
+        success, _ = self.test_update_user_profile(user_id, missing_field_data)
+        if not success:
+            print("❌ Failed to update user profile with missing portfolio_size")
+            return False
+        
+        success, user_data = self.test_get_user(user_id)
+        if not success:
+            print("❌ Failed to get user profile")
+            return False
+        
+        if user_data.get('profile_complete'):
+            print("❌ Profile incorrectly marked as complete with missing portfolio_size")
+            return False
+        else:
+            print("✅ Profile correctly marked as incomplete with missing portfolio_size")
+        
+        # Test Case 4: All required fields present and valid
+        print("\n4️⃣ Testing all required fields present and valid...")
+        complete_profile_data = {
+            "trading_experience": "Intermediate",
+            "preferred_tokens": ["Meme Coins", "DeFi"],
+            "trading_style": "Day Trader",
+            "portfolio_size": "$10K-$100K"
+        }
+        
+        success, _ = self.test_update_user_profile(user_id, complete_profile_data)
+        if not success:
+            print("❌ Failed to update user profile with all required fields")
+            return False
+        
+        success, user_data = self.test_get_user(user_id)
+        if not success:
+            print("❌ Failed to get user profile")
+            return False
+        
+        if not user_data.get('profile_complete'):
+            print("❌ Profile incorrectly marked as incomplete with all required fields")
+            print(f"Profile data: {json.dumps(user_data, default=str)}")
+            return False
+        else:
+            print("✅ Profile correctly marked as complete with all required fields")
+        
+        # Test Case 5: Verify user appears in discovery after profile completion
+        print("\n5️⃣ Verifying user appears in discovery after profile completion...")
+        
+        # Create another test user
+        random_suffix2 = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
+        test_email2 = f"test_{random_suffix2}@example.com"
+        test_display_name2 = f"Test User {random_suffix2}"
+        
+        success, signup_response2 = self.test_email_signup(test_email2, test_password, test_display_name2)
+        if not success:
+            print("❌ Second email signup failed")
+            return False
+        
+        user_id2 = signup_response2.get("user")['user_id']
+        
+        # Update second user's profile to complete it
+        success, _ = self.test_update_user_profile(user_id2, complete_profile_data)
+        if not success:
+            print("❌ Failed to update second user's profile")
+            return False
+        
+        # Check if second user can discover first user
+        success, discover_results = self.test_discover_users(user_id2)
+        if not success:
+            print("❌ Failed to get discovery results for second user")
+            return False
+        
+        # Check if first user is in the discovery results
+        first_user_found = False
+        for user in discover_results:
+            if user.get('user_id') == user_id:
+                first_user_found = True
+                break
+        
+        if first_user_found:
+            print("✅ First user successfully found in second user's discovery results")
+        else:
+            print("❌ First user NOT found in second user's discovery results")
+            print(f"Discovery returned {len(discover_results)} users, but first user (ID: {user_id}) was not among them")
+        
+        return True
 
     def test_ai_recommendations(self, user_id):
         """Test getting AI recommendations"""
