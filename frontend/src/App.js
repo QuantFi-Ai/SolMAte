@@ -430,6 +430,8 @@ function AppContent() {
       setCurrentUser(demoUser);
       // Save user session to localStorage
       localStorage.setItem('solm8_user', JSON.stringify(demoUser));
+      // Save user session to localStorage
+      localStorage.setItem('solm8_user', JSON.stringify(demoUser));
       setProfileForm({
         display_name: demoUser.display_name || '',
         bio: demoUser.bio || '',
