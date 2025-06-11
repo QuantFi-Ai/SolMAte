@@ -28,13 +28,16 @@ backend:
       - working: true
         agent: "testing"
         comment: "✅ TESTED: Discovery system sorting fix is working correctly. Successfully verified: 1) Created multiple test users with staggered activity times, 2) Confirmed users are sorted by last_activity in descending order (newest first) in both discovery endpoints, 3) Verified newly created users appear in discovery results, 4) Confirmed users can discover each other in both 'Browse Traders' and 'AI Recommended' modes."
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Conducted in-depth investigation of discovery issues. Found: 1) Both discovery endpoints are working correctly, 2) Users with complete profiles are visible to each other, 3) Profile completion logic is working as expected, 4) Real users (email/wallet) can see each other in discovery, 5) Newly created users appear in discovery results immediately after profile completion, 6) No hidden filters blocking discovery were found."
 
 frontend:
 
 metadata:
   created_by: "testing_agent"
   version: "1.0"
-  test_sequence: 1
+  test_sequence: 2
   run_ui: false
 
 test_plan:
@@ -47,3 +50,5 @@ test_plan:
 agent_communication:
   - agent: "testing"
     message: "Successfully verified the discovery system sorting fix. Both discovery endpoints now correctly sort users by last_activity in descending order, ensuring that recently active users appear first. New users are now visible in discovery results, and users can discover each other in both 'Browse Traders' and 'AI Recommended' modes."
+  - agent: "testing"
+    message: "Completed in-depth investigation of discovery issues. The backend discovery system is working correctly. Database analysis shows 331 total users (8 email, 3 wallet, 0 twitter, 52 demo, 268 with no auth_method). 306 users have complete profiles. All users with complete profiles have the required fields (trading_experience, preferred_tokens, trading_style, portfolio_size). Created new email users and verified they can discover each other immediately after profile completion. Both regular discovery and AI recommendations are returning results correctly. The sorting by last_activity is working as expected. No technical issues were found with the discovery system."
