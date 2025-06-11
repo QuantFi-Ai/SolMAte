@@ -1281,7 +1281,7 @@ function AppContent() {
                 <div className={`w-2 h-2 rounded-full ${
                   userStatus === 'active' ? 'bg-green-500' : 'bg-gray-400'
                 }`}></div>
-                <span>{userStatus === 'active' ? 'Trading Active' : 'Offline'}</span>
+                <span>{userStatus === 'active' ? 'Active' : 'Offline'}</span>
               </button>
             </div>
             
