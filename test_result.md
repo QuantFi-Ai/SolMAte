@@ -1,3 +1,4 @@
+backend:
   - task: "User Matching System"
     implemented: true
     working: true
@@ -27,3 +28,22 @@
       - working: true
         agent: "testing"
         comment: "✅ TESTED: Discovery system sorting fix is working correctly. Successfully verified: 1) Created multiple test users with staggered activity times, 2) Confirmed users are sorted by last_activity in descending order (newest first) in both discovery endpoints, 3) Verified newly created users appear in discovery results, 4) Confirmed users can discover each other in both 'Browse Traders' and 'AI Recommended' modes."
+
+frontend:
+
+metadata:
+  created_by: "testing_agent"
+  version: "1.0"
+  test_sequence: 1
+  run_ui: false
+
+test_plan:
+  current_focus:
+    - "Discovery System Sorting Fix"
+  stuck_tasks: []
+  test_all: false
+  test_priority: "high_first"
+
+agent_communication:
+  - agent: "testing"
+    message: "Successfully verified the discovery system sorting fix. Both discovery endpoints now correctly sort users by last_activity in descending order, ensuring that recently active users appear first. New users are now visible in discovery results, and users can discover each other in both 'Browse Traders' and 'AI Recommended' modes."
