@@ -1,7 +1,7 @@
 backend:
   - task: "User Matching System"
     implemented: true
-    working: true
+    working: false
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
@@ -13,6 +13,9 @@ backend:
       - working: true
         agent: "testing"
         comment: "✅ TESTED: Complete user matching flow working correctly. Successfully tested: 1) Creating two users, 2) User A likes User B, 3) User B likes User A back creating a match, 4) Match appears in both users' match lists with correct data structure, 5) Users can send and receive messages in the match."
+      - working: false
+        agent: "testing"
+        comment: "❌ TESTED: Found issues with the matching system. 1) Discovered demo users in the database (1 with auth_method='demo' and 2 suspicious usernames like crypto_whale_2024 and sol_degen_pro), 2) Found duplicate swipes in the swipes collection (5 instances where the same user swiped on the same target multiple times), 3) The basic matching functionality works correctly when tested with new users (bilateral matching, message sending), but the presence of demo users and duplicate swipes may be causing inconsistencies in the production environment."
 
   - task: "Discovery System Sorting Fix"
     implemented: true
