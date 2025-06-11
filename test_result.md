@@ -31,6 +31,9 @@ backend:
       - working: true
         agent: "testing"
         comment: "✅ TESTED: Conducted in-depth investigation of discovery issues. Found: 1) Both discovery endpoints are working correctly, 2) Users with complete profiles are visible to each other, 3) Profile completion logic is working as expected, 4) Real users (email/wallet) can see each other in discovery, 5) Newly created users appear in discovery results immediately after profile completion, 6) No hidden filters blocking discovery were found."
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Performed comprehensive discovery debug with real user data. Database analysis shows 338 total users (15 email, 3 wallet, 0 twitter, 52 demo, 268 with no auth_method). 313 users have complete profiles. Tested discovery with real user IDs and confirmed all users with complete profiles can see each other in discovery. Verified sorting by last_activity is working correctly, with most recently active users appearing first. Created new test users and confirmed they can discover each other immediately after profile completion."
       
   - task: "Profile Completion Logic"
     implemented: true
@@ -46,6 +49,9 @@ backend:
       - working: true
         agent: "testing"
         comment: "✅ TESTED: Profile completion logic is working correctly. Verified: 1) The profile_complete flag is set to true only when all required fields are present (trading_experience, preferred_tokens, trading_style, portfolio_size), 2) Empty strings and empty arrays are correctly handled as incomplete, 3) Users with complete profiles appear in discovery results immediately, 4) Database check shows no users with inconsistent profile_complete flags, 5) All users with complete profiles have the required fields filled."
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Thoroughly tested profile update process and verified profile completion logic is working correctly. Confirmed that: 1) Empty strings for required fields correctly result in profile_complete=false, 2) Empty arrays for preferred_tokens correctly result in profile_complete=false, 3) When all required fields are present and valid, profile_complete is set to true, 4) Users with complete profiles can immediately discover each other, 5) Real users with complete profiles can discover newly created test users and vice versa."
 
 frontend:
 
