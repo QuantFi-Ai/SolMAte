@@ -428,6 +428,8 @@ function AppContent() {
       console.log('Demo user created:', demoUser); // Debug log
       
       setCurrentUser(demoUser);
+      // Save user session to localStorage
+      localStorage.setItem('solm8_user', JSON.stringify(demoUser));
       setProfileForm({
         display_name: demoUser.display_name || '',
         bio: demoUser.bio || '',
