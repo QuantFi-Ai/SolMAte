@@ -316,6 +316,9 @@ function AppContent() {
       // Save user session to localStorage
       localStorage.setItem('solm8_user', JSON.stringify(data.user));
       
+      // Save user session to localStorage
+      localStorage.setItem('solm8_user', JSON.stringify(data.user));
+      
     } catch (error) {
       console.error('Signup error:', error);
       alert(error.message || 'Signup failed. Please try again.');
