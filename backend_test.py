@@ -826,6 +826,358 @@ class Solm8APITester:
         print(f"\n📊 Tests passed: {self.tests_passed}/{self.tests_run}")
         return self.tests_passed == self.tests_run
 
+    def test_session_validation(self):
+        """Test session validation by creating a user and verifying the session persists"""
+        print("\n🔍 Testing Session Validation...")
+        
+        # Step 1: Create a new test user
+        random_suffix = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
+        test_email = f"test_session_{random_suffix}@example.com"
+        test_password = "TestPassword123!"
+        test_display_name = f"Test Session User {random_suffix}"
+        
+        success, signup_response = self.test_email_signup(test_email, test_password, test_display_name)
+        if not success:
+            print("❌ Email signup failed, stopping test")
+            return False
+        
+        user_id = self.email_user['user_id']
+        print(f"Created test user with ID: {user_id}")
+        
+        # Step 2: Verify user exists via /api/user/{user_id} endpoint
+        success, user_data = self.test_get_user(user_id)
+        if not success:
+            print("❌ Failed to get user data - session validation failed")
+            return False
+        
+        print(f"✅ Successfully retrieved user data for ID: {user_id}")
+        print(f"Username: {user_data.get('username')}")
+        print(f"Email: {user_data.get('email')}")
+        
+        # Step 3: Simulate a page refresh by making another request to get user data
+        print("\nSimulating page refresh...")
+        success, refreshed_user_data = self.test_get_user(user_id)
+        if not success:
+            print("❌ Failed to get user data after simulated refresh - session validation failed")
+            return False
+        
+        print(f"✅ Successfully retrieved user data after simulated refresh")
+        
+        # Step 4: Verify the data is consistent
+        if user_data.get('user_id') == refreshed_user_data.get('user_id') and \
+           user_data.get('email') == refreshed_user_data.get('email'):
+            print("✅ User session data is consistent after refresh")
+        else:
+            print("❌ User session data is inconsistent after refresh")
+            return False
+        
+        # Step 5: Test updating user activity
+        success, _ = self.run_test(
+            "Update User Activity",
+            "POST",
+            f"user/{user_id}/update-activity",
+            200
+        )
+        
+        if not success:
+            print("❌ Failed to update user activity")
+            return False
+        
+        print("✅ Successfully updated user activity")
+        
+        # Step 6: Verify user data again after activity update
+        success, updated_user_data = self.test_get_user(user_id)
+        if not success:
+            print("❌ Failed to get user data after activity update")
+            return False
+        
+        print("✅ Successfully retrieved user data after activity update")
+        
+        return True
+
+    def test_discovery_api_format(self):
+        """Test that the discovery API returns the correct format (not nested in potential_matches)"""
+        print("\n🔍 Testing Discovery API Format...")
+        
+        # Step 1: Create a new test user
+        random_suffix = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
+        test_email = f"test_disc_{random_suffix}@example.com"
+        test_password = "TestPassword123!"
+        test_display_name = f"Test Discovery User {random_suffix}"
+        
+        success, signup_response = self.test_email_signup(test_email, test_password, test_display_name)
+        if not success:
+            print("❌ Email signup failed, stopping test")
+            return False
+        
+        user_id = self.email_user['user_id']
+        print(f"Created test user with ID: {user_id}")
+        
+        # Step 2: Complete the user profile
+        complete_profile = {
+            "trading_experience": "Intermediate",
+            "preferred_tokens": ["Meme Coins", "DeFi"],
+            "trading_style": "Day Trader",
+            "portfolio_size": "$10K-$100K"
+        }
+        
+        success, _ = self.test_update_user_profile(user_id, complete_profile)
+        if not success:
+            print("❌ Failed to update user profile")
+            return False
+        
+        # Step 3: Test the discover endpoint
+        success, discover_results = self.test_discover_users(user_id)
+        if not success:
+            print("❌ Failed to get discovery results")
+            return False
+        
+        # Step 4: Verify the format of the response
+        if isinstance(discover_results, list):
+            print(f"✅ Discovery API returns an array format with {len(discover_results)} items")
+            
+            # Check the first item if available
+            if discover_results and len(discover_results) > 0:
+                first_item = discover_results[0]
+                print(f"Sample discovery result: User ID: {first_item.get('user_id')}, Username: {first_item.get('username')}")
+        else:
+            print("❌ Discovery API does not return an array format")
+            print(f"Returned type: {type(discover_results)}")
+            return False
+        
+        # Step 5: Test the AI recommendations endpoint
+        success, ai_results = self.test_ai_recommendations(user_id)
+        if not success:
+            print("❌ Failed to get AI recommendations")
+            return False
+        
+        # Step 6: Verify the format of the AI recommendations response
+        if isinstance(ai_results, list):
+            print(f"✅ AI Recommendations API returns an array format with {len(ai_results)} items")
+            
+            # Check the first item if available
+            if ai_results and len(ai_results) > 0:
+                first_item = ai_results[0]
+                print(f"Sample AI recommendation: User ID: {first_item.get('user_id')}, Username: {first_item.get('username')}")
+                print(f"Compatibility: {first_item.get('ai_compatibility', {}).get('compatibility_percentage')}%")
+        else:
+            print("❌ AI Recommendations API does not return an array format")
+            print(f"Returned type: {type(ai_results)}")
+            return False
+        
+        return True
+
+    def test_profile_completion_and_discovery(self):
+        """Test that users with complete profiles are marked correctly and appear in discovery"""
+        print("\n🔍 Testing Profile Completion and Discovery...")
+        
+        # Step 1: Create two test users
+        random_suffix_a = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
+        email_a = f"test_prof_a_{random_suffix_a}@example.com"
+        display_name_a = f"Test Profile User A {random_suffix_a}"
+        
+        success, signup_response_a = self.test_email_signup(email_a, "TestPassword123!", display_name_a)
+        if not success:
+            print("❌ Failed to create User A")
+            return False
+        
+        user_a_id = self.email_user['user_id']
+        
+        random_suffix_b = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
+        email_b = f"test_prof_b_{random_suffix_b}@example.com"
+        display_name_b = f"Test Profile User B {random_suffix_b}"
+        
+        success, signup_response_b = self.test_email_signup(email_b, "TestPassword123!", display_name_b)
+        if not success:
+            print("❌ Failed to create User B")
+            return False
+        
+        user_b_id = self.email_user['user_id']
+        
+        print(f"Created User A (ID: {user_a_id}) and User B (ID: {user_b_id})")
+        
+        # Step 2: Verify both users have profile_complete = false initially
+        success, user_a_initial = self.test_get_user(user_a_id)
+        success, user_b_initial = self.test_get_user(user_b_id)
+        
+        if user_a_initial.get('profile_complete') or user_b_initial.get('profile_complete'):
+            print("❌ One or both users have profile_complete = true initially (unexpected)")
+            return False
+        
+        print("✅ Both users have profile_complete = false initially (as expected)")
+        
+        # Step 3: Update User A with incomplete profile
+        incomplete_profile = {
+            "trading_experience": "Intermediate",
+            "preferred_tokens": ["Meme Coins"],
+            # Missing trading_style
+            "portfolio_size": "$10K-$100K"
+        }
+        
+        success, _ = self.test_update_user_profile(user_a_id, incomplete_profile)
+        if not success:
+            print("❌ Failed to update User A with incomplete profile")
+            return False
+        
+        # Step 4: Verify User A still has profile_complete = false
+        success, user_a_updated = self.test_get_user(user_a_id)
+        if user_a_updated.get('profile_complete'):
+            print("❌ User A has profile_complete = true with incomplete profile (unexpected)")
+            return False
+        
+        print("✅ User A has profile_complete = false with incomplete profile (as expected)")
+        
+        # Step 5: Update User A with complete profile
+        complete_profile_a = {
+            "trading_experience": "Intermediate",
+            "preferred_tokens": ["Meme Coins", "DeFi"],
+            "trading_style": "Day Trader",
+            "portfolio_size": "$10K-$100K"
+        }
+        
+        success, _ = self.test_update_user_profile(user_a_id, complete_profile_a)
+        if not success:
+            print("❌ Failed to update User A with complete profile")
+            return False
+        
+        # Step 6: Verify User A now has profile_complete = true
+        success, user_a_complete = self.test_get_user(user_a_id)
+        if not user_a_complete.get('profile_complete'):
+            print("❌ User A has profile_complete = false with complete profile (unexpected)")
+            return False
+        
+        print("✅ User A has profile_complete = true with complete profile (as expected)")
+        
+        # Step 7: Update User B with complete profile
+        complete_profile_b = {
+            "trading_experience": "Advanced",
+            "preferred_tokens": ["NFTs", "GameFi"],
+            "trading_style": "Swing Trader",
+            "portfolio_size": "$100K+"
+        }
+        
+        success, _ = self.test_update_user_profile(user_b_id, complete_profile_b)
+        if not success:
+            print("❌ Failed to update User B with complete profile")
+            return False
+        
+        # Step 8: Verify User B now has profile_complete = true
+        success, user_b_complete = self.test_get_user(user_b_id)
+        if not user_b_complete.get('profile_complete'):
+            print("❌ User B has profile_complete = false with complete profile (unexpected)")
+            return False
+        
+        print("✅ User B has profile_complete = true with complete profile (as expected)")
+        
+        # Step 9: Test if User A can discover User B
+        print("\nTesting if User A can discover User B...")
+        success, discover_results_a = self.test_discover_users(user_a_id)
+        if not success:
+            print("❌ Failed to get discovery results for User A")
+            return False
+        
+        user_b_found = False
+        for user in discover_results_a:
+            if user.get('user_id') == user_b_id:
+                user_b_found = True
+                break
+        
+        if user_b_found:
+            print("✅ User A can discover User B (as expected)")
+        else:
+            print("❌ User A cannot discover User B (unexpected)")
+            print(f"Discovery returned {len(discover_results_a)} users, but User B was not among them")
+            return False
+        
+        # Step 10: Test if User B can discover User A
+        print("\nTesting if User B can discover User A...")
+        success, discover_results_b = self.test_discover_users(user_b_id)
+        if not success:
+            print("❌ Failed to get discovery results for User B")
+            return False
+        
+        user_a_found = False
+        for user in discover_results_b:
+            if user.get('user_id') == user_a_id:
+                user_a_found = True
+                break
+        
+        if user_a_found:
+            print("✅ User B can discover User A (as expected)")
+        else:
+            print("❌ User B cannot discover User A (unexpected)")
+            print(f"Discovery returned {len(discover_results_b)} users, but User A was not among them")
+            return False
+        
+        # Step 11: Update User A with incomplete profile (empty preferred_tokens)
+        incomplete_profile_2 = {
+            "trading_experience": "Intermediate",
+            "preferred_tokens": [],
+            "trading_style": "Day Trader",
+            "portfolio_size": "$10K-$100K"
+        }
+        
+        success, _ = self.test_update_user_profile(user_a_id, incomplete_profile_2)
+        if not success:
+            print("❌ Failed to update User A with incomplete profile (empty tokens)")
+            return False
+        
+        # Step 12: Verify User A now has profile_complete = false
+        success, user_a_incomplete = self.test_get_user(user_a_id)
+        if user_a_incomplete.get('profile_complete'):
+            print("❌ User A has profile_complete = true with empty tokens (unexpected)")
+            return False
+        
+        print("✅ User A has profile_complete = false with empty tokens (as expected)")
+        
+        # Step 13: Test if User B can still discover User A (should not be able to)
+        print("\nTesting if User B can discover User A with incomplete profile...")
+        success, discover_results_b_2 = self.test_discover_users(user_b_id)
+        if not success:
+            print("❌ Failed to get discovery results for User B")
+            return False
+        
+        user_a_found_2 = False
+        for user in discover_results_b_2:
+            if user.get('user_id') == user_a_id:
+                user_a_found_2 = True
+                break
+        
+        if not user_a_found_2:
+            print("✅ User B cannot discover User A with incomplete profile (as expected)")
+        else:
+            print("❌ User B can discover User A with incomplete profile (unexpected)")
+            return False
+        
+        return True
+
+    def run_auth_discovery_tests(self):
+        """Run all tests related to authentication and discovery issues"""
+        print("🚀 Starting Solm8 Authentication and Discovery Tests")
+        
+        # Step 1: Test session validation
+        print("\n===== STEP 1: TEST SESSION VALIDATION =====")
+        session_valid = self.test_session_validation()
+        
+        # Step 2: Test discovery API format
+        print("\n===== STEP 2: TEST DISCOVERY API FORMAT =====")
+        discovery_format_valid = self.test_discovery_api_format()
+        
+        # Step 3: Test profile completion and discovery
+        print("\n===== STEP 3: TEST PROFILE COMPLETION AND DISCOVERY =====")
+        profile_completion_valid = self.test_profile_completion_and_discovery()
+        
+        # Print results
+        print("\n📊 Test Results Summary:")
+        print(f"Session Validation: {'✅ PASSED' if session_valid else '❌ FAILED'}")
+        print(f"Discovery API Format: {'✅ PASSED' if discovery_format_valid else '❌ FAILED'}")
+        print(f"Profile Completion and Discovery: {'✅ PASSED' if profile_completion_valid else '❌ FAILED'}")
+        
+        overall_success = session_valid and discovery_format_valid and profile_completion_valid
+        print(f"\nOverall Test Result: {'✅ PASSED' if overall_success else '❌ FAILED'}")
+        
+        return overall_success
+
 if __name__ == "__main__":
     tester = Solm8APITester()
-    tester.run_discovery_debug_tests()
+    tester.run_auth_discovery_tests()
