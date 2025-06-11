@@ -33,9 +33,11 @@ const ProfileManager = ({ currentUser, onClose }) => {
   ];
 
   useEffect(() => {
-    fetchTradingHighlights();
-    fetchSocialLinks();
-  }, []);
+    if (currentUser) {
+      fetchTradingHighlights();
+      fetchSocialLinks();
+    }
+  }, [currentUser]);
 
   const fetchTradingHighlights = async () => {
     try {
@@ -171,7 +173,7 @@ const ProfileManager = ({ currentUser, onClose }) => {
   };
 
   const getPublicProfileLink = () => {
-    return `${window.location.origin}/profile/${currentUser.username}`;
+    return `${window.location.origin}/profile/${currentUser?.username || ''}`;
   };
 
   const copyProfileLink = () => {
@@ -187,15 +189,6 @@ const ProfileManager = ({ currentUser, onClose }) => {
 
   // Profile Preview Component (similar to PublicProfile but editable)
   const ProfilePreview = () => {
-    if (!currentUser) {
-      return (
-        <div className="text-center py-8">
-          <p className="text-gray-600">Loading profile...</p>
-        </div>
-      );
-    }
-
-    // Add safety check for currentUser
     if (!currentUser) {
       return (
         <div className="text-center py-8">
@@ -248,133 +241,134 @@ const ProfileManager = ({ currentUser, onClose }) => {
           </div>
         </div>
 
-      {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-white p-4 rounded-xl border border-gray-200">
-          <h4 className="font-semibold text-gray-800 mb-2">Trading Profile</h4>
-          <div className="space-y-2 text-sm">
-            {currentUser.portfolio_size && (
-              <p><span className="text-gray-500">Portfolio:</span> {currentUser.portfolio_size}</p>
-            )}
-            {currentUser.risk_tolerance && (
-              <p><span className="text-gray-500">Risk:</span> {currentUser.risk_tolerance}</p>
-            )}
+        {/* Quick Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="bg-white p-4 rounded-xl border border-gray-200">
+            <h4 className="font-semibold text-gray-800 mb-2">Trading Profile</h4>
+            <div className="space-y-2 text-sm">
+              {currentUser.portfolio_size && (
+                <p><span className="text-gray-500">Portfolio:</span> {currentUser.portfolio_size}</p>
+              )}
+              {currentUser.risk_tolerance && (
+                <p><span className="text-gray-500">Risk:</span> {currentUser.risk_tolerance}</p>
+              )}
+            </div>
+          </div>
+
+          <div className="bg-white p-4 rounded-xl border border-gray-200">
+            <h4 className="font-semibold text-gray-800 mb-2">Platforms</h4>
+            <div className="space-y-2 text-sm">
+              {currentUser.preferred_trading_platform && (
+                <p><span className="text-gray-500">Trading:</span> {currentUser.preferred_trading_platform}</p>
+              )}
+              {socialLinks.twitter && (
+                <p><span className="text-gray-500">Twitter:</span> Connected</p>
+              )}
+            </div>
+          </div>
+
+          <div className="bg-white p-4 rounded-xl border border-gray-200">
+            <h4 className="font-semibold text-gray-800 mb-2">Activity</h4>
+            <div className="space-y-2 text-sm">
+              <p><span className="text-gray-500">Highlights:</span> {tradingHighlights.length}</p>
+              <p><span className="text-gray-500">Social Links:</span> {Object.values(socialLinks).filter(link => link).length}</p>
+            </div>
           </div>
         </div>
 
-        <div className="bg-white p-4 rounded-xl border border-gray-200">
-          <h4 className="font-semibold text-gray-800 mb-2">Platforms</h4>
-          <div className="space-y-2 text-sm">
-            {currentUser.preferred_trading_platform && (
-              <p><span className="text-gray-500">Trading:</span> {currentUser.preferred_trading_platform}</p>
-            )}
-            {socialLinks.twitter && (
-              <p><span className="text-gray-500">Twitter:</span> Connected</p>
-            )}
+        {/* Social Links */}
+        {Object.values(socialLinks).some(link => link) && (
+          <div className="bg-white rounded-xl p-6 border border-gray-200">
+            <h3 className="text-lg font-semibold text-black mb-4">Connect With Me</h3>
+            <div className="flex flex-wrap gap-3">
+              {socialLinks.twitter && (
+                <a href={socialLinks.twitter} target="_blank" rel="noopener noreferrer" 
+                   className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-all">
+                  🐦 Twitter
+                </a>
+              )}
+              {socialLinks.discord && (
+                <a href={socialLinks.discord} target="_blank" rel="noopener noreferrer"
+                   className="bg-indigo-500 text-white px-4 py-2 rounded-lg hover:bg-indigo-600 transition-all">
+                  💬 Discord
+                </a>
+              )}
+              {socialLinks.telegram && (
+                <a href={socialLinks.telegram} target="_blank" rel="noopener noreferrer"
+                   className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-all">
+                  📱 Telegram
+                </a>
+              )}
+              {socialLinks.website && (
+                <a href={socialLinks.website} target="_blank" rel="noopener noreferrer"
+                   className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-all">
+                  🌐 Website
+                </a>
+              )}
+            </div>
           </div>
-        </div>
+        )}
 
-        <div className="bg-white p-4 rounded-xl border border-gray-200">
-          <h4 className="font-semibold text-gray-800 mb-2">Activity</h4>
-          <div className="space-y-2 text-sm">
-            <p><span className="text-gray-500">Highlights:</span> {tradingHighlights.length}</p>
-            <p><span className="text-gray-500">Social Links:</span> {Object.values(socialLinks).filter(link => link).length}</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Social Links */}
-      {Object.values(socialLinks).some(link => link) && (
-        <div className="bg-white rounded-xl p-6 border border-gray-200">
-          <h3 className="text-lg font-semibold text-black mb-4">Connect With Me</h3>
-          <div className="flex flex-wrap gap-3">
-            {socialLinks.twitter && (
-              <a href={socialLinks.twitter} target="_blank" rel="noopener noreferrer" 
-                 className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-all">
-                🐦 Twitter
-              </a>
-            )}
-            {socialLinks.discord && (
-              <a href={socialLinks.discord} target="_blank" rel="noopener noreferrer"
-                 className="bg-indigo-500 text-white px-4 py-2 rounded-lg hover:bg-indigo-600 transition-all">
-                💬 Discord
-              </a>
-            )}
-            {socialLinks.telegram && (
-              <a href={socialLinks.telegram} target="_blank" rel="noopener noreferrer"
-                 className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-all">
-                📱 Telegram
-              </a>
-            )}
-            {socialLinks.website && (
-              <a href={socialLinks.website} target="_blank" rel="noopener noreferrer"
-                 className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-all">
-                🌐 Website
-              </a>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Trading Highlights */}
-      {tradingHighlights.length > 0 && (
-        <div className="bg-white rounded-xl p-6 border border-gray-200">
-          <h3 className="text-lg font-semibold text-black mb-4">Trading Highlights</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {tradingHighlights.map(highlight => (
-              <div key={highlight.highlight_id} className="border border-gray-200 rounded-lg p-4">
-                {highlight.image_data && (
-                  <img
-                    src={`data:image/jpeg;base64,${highlight.image_data}`}
-                    alt={highlight.title}
-                    className="w-full h-32 object-cover rounded-lg mb-3"
-                  />
-                )}
-                <h4 className="font-semibold text-black mb-2">{highlight.title}</h4>
-                {highlight.description && (
-                  <p className="text-gray-700 text-sm mb-3">{highlight.description}</p>
-                )}
-                <div className="flex flex-wrap gap-2">
-                  {highlight.profit_loss && (
-                    <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">
-                      💰 {highlight.profit_loss}
-                    </span>
+        {/* Trading Highlights */}
+        {tradingHighlights.length > 0 && (
+          <div className="bg-white rounded-xl p-6 border border-gray-200">
+            <h3 className="text-lg font-semibold text-black mb-4">Trading Highlights</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {tradingHighlights.map(highlight => (
+                <div key={highlight.highlight_id} className="border border-gray-200 rounded-lg p-4">
+                  {highlight.image_data && (
+                    <img
+                      src={`data:image/jpeg;base64,${highlight.image_data}`}
+                      alt={highlight.title}
+                      className="w-full h-32 object-cover rounded-lg mb-3"
+                    />
                   )}
-                  {highlight.percentage_gain && (
-                    <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">
-                      📈 {highlight.percentage_gain}
-                    </span>
+                  <h4 className="font-semibold text-black mb-2">{highlight.title}</h4>
+                  {highlight.description && (
+                    <p className="text-gray-700 text-sm mb-3">{highlight.description}</p>
                   )}
+                  <div className="flex flex-wrap gap-2">
+                    {highlight.profit_loss && (
+                      <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">
+                        💰 {highlight.profit_loss}
+                      </span>
+                    )}
+                    {highlight.percentage_gain && (
+                      <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">
+                        📈 {highlight.percentage_gain}
+                      </span>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Empty States */}
-      {tradingHighlights.length === 0 && !Object.values(socialLinks).some(link => link) && (
-        <div className="bg-gray-50 rounded-xl p-8 text-center">
-          <h3 className="text-lg font-semibold text-gray-800 mb-2">Complete Your Profile</h3>
-          <p className="text-gray-600 mb-4">Add trading highlights and social links to make your profile stand out!</p>
-          <div className="space-x-4">
-            <button
-              onClick={() => setActiveTab('highlights')}
-              className="bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-all"
-            >
-              Add Trading Highlights
-            </button>
-            <button
-              onClick={() => setActiveTab('social')}
-              className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-all"
-            >
-              Add Social Links
-            </button>
+        {/* Empty States */}
+        {tradingHighlights.length === 0 && !Object.values(socialLinks).some(link => link) && (
+          <div className="bg-gray-50 rounded-xl p-8 text-center">
+            <h3 className="text-lg font-semibold text-gray-800 mb-2">Complete Your Profile</h3>
+            <p className="text-gray-600 mb-4">Add trading highlights and social links to make your profile stand out!</p>
+            <div className="space-x-4">
+              <button
+                onClick={() => setActiveTab('highlights')}
+                className="bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-all"
+              >
+                Add Trading Highlights
+              </button>
+              <button
+                onClick={() => setActiveTab('social')}
+                className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-all"
+              >
+                Add Social Links
+              </button>
+            </div>
           </div>
-        </div>
-      )}
-    </div>
-  );
+        )}
+      </div>
+    );
+  };
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 overflow-y-auto">
@@ -758,7 +752,7 @@ const ProfileManager = ({ currentUser, onClose }) => {
                   <div className="text-sm text-gray-600">Social Links</div>
                 </div>
                 <div className="bg-white p-4 rounded-xl border border-gray-200 text-center">
-                  <div className="text-2xl font-bold text-black">{currentUser.profile_complete ? '✅' : '⚠️'}</div>
+                  <div className="text-2xl font-bold text-black">{currentUser?.profile_complete ? '✅' : '⚠️'}</div>
                   <div className="text-sm text-gray-600">Profile Status</div>
                 </div>
               </div>
