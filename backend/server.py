@@ -1476,11 +1476,11 @@ async def get_ai_recommendations(user_id: str, limit: int = 10):
     swiped_user_ids = [doc["target_id"] for doc in swipes_collection.find({"swiper_id": user_id})]
     swiped_user_ids.append(user_id)  # Exclude self
     
-    # Find all potential matches with complete profiles
+    # Find all potential matches with complete profiles, sorted by recent activity
     potential_matches = list(users_collection.find({
         "user_id": {"$nin": swiped_user_ids},
         "profile_complete": True
-    }))
+    }).sort("last_activity", -1))
     
     # Calculate AI compatibility scores for each potential match
     scored_matches = []
