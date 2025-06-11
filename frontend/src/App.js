@@ -116,8 +116,35 @@ function AppContent() {
   });
   const [authLoading, setAuthLoading] = useState(false);
 
-  // Handle auth callback on page load
+  // Handle auth callback and session restoration on page load
   useEffect(() => {
+    // First, check for stored user session
+    const storedUser = localStorage.getItem('solm8_user');
+    if (storedUser && !currentUser) {
+      try {
+        const userData = JSON.parse(storedUser);
+        console.log('Restoring user session:', userData);
+        setCurrentUser(userData);
+        
+        // Update user activity
+        fetch(`${API_BASE_URL}/api/user/${userData.user_id}/update-activity`, {
+          method: 'POST'
+        }).catch(err => console.error('Failed to update activity:', err));
+        
+        // Set appropriate view based on profile completion
+        if (!userData.profile_complete) {
+          setCurrentView('profile-setup');
+        } else {
+          setCurrentView('discover');
+        }
+        return; // Don't process URL params if we restored session
+      } catch (error) {
+        console.error('Error parsing stored user:', error);
+        localStorage.removeItem('solm8_user');
+      }
+    }
+
+    // Then check for auth callback URL params
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('auth_success') === 'true') {
       const userId = urlParams.get('user_id');
