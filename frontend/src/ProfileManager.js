@@ -186,49 +186,59 @@ const ProfileManager = ({ currentUser, onClose }) => {
   };
 
   // Profile Preview Component (similar to PublicProfile but editable)
-  const ProfilePreview = () => (
-    <div className="space-y-6">
-      {/* Profile Header */}
-      <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-2xl p-8">
-        <div className="flex flex-col md:flex-row items-center md:items-start space-y-6 md:space-y-0 md:space-x-8">
-          <img
-            src={currentUser.avatar_url}
-            alt={currentUser.display_name}
-            className="w-24 h-24 rounded-full border-4 border-white shadow-lg"
-          />
-          
-          <div className="flex-1 text-center md:text-left">
-            <h1 className="text-2xl font-bold text-black mb-2">{currentUser.display_name}</h1>
-            <p className="text-lg text-gray-600 mb-4">@{currentUser.username}</p>
+  const ProfilePreview = () => {
+    // Add safety check for currentUser
+    if (!currentUser) {
+      return (
+        <div className="text-center py-8">
+          <p className="text-gray-600">Loading profile...</p>
+        </div>
+      );
+    }
+
+    return (
+      <div className="space-y-6">
+        {/* Profile Header */}
+        <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-2xl p-8">
+          <div className="flex flex-col md:flex-row items-center md:items-start space-y-6 md:space-y-0 md:space-x-8">
+            <img
+              src={currentUser.avatar_url}
+              alt={currentUser.display_name}
+              className="w-24 h-24 rounded-full border-4 border-white shadow-lg"
+            />
             
-            {currentUser.bio && (
-              <p className="text-gray-700 mb-4">{currentUser.bio}</p>
-            )}
-            
-            <div className="flex flex-wrap justify-center md:justify-start gap-2 mb-4">
-              {currentUser.trading_experience && (
-                <span className="bg-black text-white px-3 py-1 rounded-full text-sm font-medium">
-                  {currentUser.trading_experience}
-                </span>
+            <div className="flex-1 text-center md:text-left">
+              <h1 className="text-2xl font-bold text-black mb-2">{currentUser.display_name}</h1>
+              <p className="text-lg text-gray-600 mb-4">@{currentUser.username}</p>
+              
+              {currentUser.bio && (
+                <p className="text-gray-700 mb-4">{currentUser.bio}</p>
               )}
-              {currentUser.years_trading > 0 && (
-                <span className="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm">
-                  {currentUser.years_trading} years trading
-                </span>
-              )}
-              {currentUser.trading_style && (
-                <span className="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm">
-                  {currentUser.trading_style}
-                </span>
+              
+              <div className="flex flex-wrap justify-center md:justify-start gap-2 mb-4">
+                {currentUser.trading_experience && (
+                  <span className="bg-black text-white px-3 py-1 rounded-full text-sm font-medium">
+                    {currentUser.trading_experience}
+                  </span>
+                )}
+                {currentUser.years_trading > 0 && (
+                  <span className="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm">
+                    {currentUser.years_trading} years trading
+                  </span>
+                )}
+                {currentUser.trading_style && (
+                  <span className="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm">
+                    {currentUser.trading_style}
+                  </span>
+                )}
+              </div>
+              
+              {currentUser.location && (
+                <p className="text-gray-600 mb-2">📍 {currentUser.location}</p>
               )}
             </div>
-            
-            {currentUser.location && (
-              <p className="text-gray-600 mb-2">📍 {currentUser.location}</p>
-            )}
           </div>
         </div>
-      </div>
 
       {/* Quick Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
