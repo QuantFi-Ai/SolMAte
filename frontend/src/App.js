@@ -351,6 +351,9 @@ function AppContent() {
       setCurrentUser(data.user);
       setEmailForm({ email: '', password: '', display_name: '' });
       
+      // Save user session to localStorage
+      localStorage.setItem('solm8_user', JSON.stringify(data.user));
+      
       // Check if profile is complete
       if (!data.user.profile_complete) {
         setCurrentView('profile-setup');
