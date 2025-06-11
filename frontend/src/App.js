@@ -412,10 +412,6 @@ function AppContent() {
     }
   };
 
-  const handleTwitterLogin = () => {
-    window.location.href = `${API_BASE_URL}/api/login/twitter`;
-  };
-
   const handleDemoLogin = async () => {
     try {
       const response = await fetch(`${API_BASE_URL}/api/create-demo-user`, {
