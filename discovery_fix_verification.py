@@ -6,7 +6,7 @@ from datetime import datetime
 from pprint import pprint
 
 # Base URL from frontend .env
-BASE_URL = "https://abc11984-1ed0-4743-b061-3045e146cf6a.preview.emergentagent.com"
+BASE_URL = "https://ad8c686b-31d6-433d-aa09-b025124c7c61.preview.emergentagent.com"
 
 def print_separator():
     print("\n" + "="*80 + "\n")
