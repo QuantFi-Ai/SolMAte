@@ -178,9 +178,9 @@ function AppContent() {
             } else {
               setCurrentView('discover');
               console.log('🔄 Session restored, fetching data...');
-              fetchDiscoveryCards();
-              fetchAiRecommendations();
-              fetchMatches();
+              fetchDiscoveryCards(validatedUser);
+              fetchAiRecommendations(validatedUser);
+              fetchMatches(validatedUser);
             }
           } else {
             // Invalid session, go to login
