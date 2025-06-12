@@ -149,6 +149,10 @@ function AppContent() {
   const [showReferralDashboard, setShowReferralDashboard] = useState(false);
   const [showSupportModal, setShowSupportModal] = useState(false);
 
+  // Support and Referral modals
+  const [showReferralDashboard, setShowReferralDashboard] = useState(false);
+  const [showSupportModal, setShowSupportModal] = useState(false);
+
   // Profile popup modal state
   const [showProfilePopup, setShowProfilePopup] = useState(false);
   const [selectedProfileUser, setSelectedProfileUser] = useState(null);
