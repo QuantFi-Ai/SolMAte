@@ -972,6 +972,28 @@ function AppContent() {
                   </motion.div>
                 )}
                 
+                {authMode === 'signup' && referralInfo && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    className="bg-green-50 border border-green-200 rounded-lg p-3"
+                  >
+                    <div className="flex items-center space-x-2">
+                      <img
+                        src={referralInfo.referrer.avatar_url}
+                        alt={referralInfo.referrer.display_name}
+                        className="w-8 h-8 rounded-full"
+                      />
+                      <div>
+                        <p className="text-sm font-medium text-green-800">
+                          Referred by {referralInfo.referrer.display_name}
+                        </p>
+                        <p className="text-xs text-green-600">You'll both get special bonuses!</p>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+                
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
                   <motion.input
