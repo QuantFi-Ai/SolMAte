@@ -1859,6 +1859,93 @@ function AppContent() {
         </div>
       )}
 
+      {/* Messages View */}
+      {currentView === 'messages' && (
+        <div className="max-w-4xl mx-auto pt-8 px-4">
+          <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-200">
+            <h2 className="text-2xl font-bold text-black mb-6">Messages</h2>
+            
+            {matchesWithMessages.length === 0 ? (
+              <div className="text-center py-12">
+                <div className="text-6xl mb-4">💬</div>
+                <h3 className="text-xl font-bold text-black mb-2">No Conversations Yet</h3>
+                <p className="text-gray-600 mb-4">Start matching to begin conversations!</p>
+                <button
+                  onClick={() => setCurrentView('discover')}
+                  className="bg-black hover:bg-gray-800 text-white font-medium py-2 px-4 rounded-lg transition-all"
+                >
+                  Find Traders
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {matchesWithMessages.map((match) => (
+                  <div key={match.match_id} className="border border-gray-200 rounded-xl p-4 hover:shadow-md transition-all cursor-pointer"
+                       onClick={() => {
+                         setSelectedMatch(match);
+                         fetchMessages(match.match_id);
+                         setCurrentView('chat');
+                       }}>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-4">
+                        <div className="relative">
+                          <img
+                            src={match.other_user.avatar_url}
+                            alt="Profile"
+                            className="w-12 h-12 rounded-full object-cover"
+                          />
+                          {match.other_user.user_status === 'active' && (
+                            <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-white rounded-full"></div>
+                          )}
+                        </div>
+                        
+                        <div className="flex-1">
+                          <div className="flex items-center space-x-2 mb-1">
+                            <h3 className="font-semibold text-black">{match.other_user.display_name}</h3>
+                            {match.other_user.trading_experience && (
+                              <span className="bg-gray-100 text-gray-600 px-2 py-1 rounded-full text-xs">
+                                {match.other_user.trading_experience}
+                              </span>
+                            )}
+                          </div>
+                          
+                          {match.latest_message.content ? (
+                            <div className="flex items-center space-x-2">
+                              <p className="text-sm text-gray-600 truncate max-w-xs">
+                                {match.latest_message.sender_id === currentUser?.user_id ? 'You: ' : ''}
+                                {match.latest_message.content}
+                              </p>
+                              {match.latest_message.timestamp && (
+                                <span className="text-xs text-gray-400 whitespace-nowrap">
+                                  {new Date(match.latest_message.timestamp).toLocaleDateString()}
+                                </span>
+                              )}
+                            </div>
+                          ) : (
+                            <p className="text-sm text-gray-400">Start a conversation...</p>
+                          )}
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center space-x-3">
+                        {match.unread_count > 0 && (
+                          <span className="bg-red-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center font-medium">
+                            {match.unread_count}
+                          </span>
+                        )}
+                        <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Chat View */}
       {currentView === 'chat' && selectedMatch && (
         <div className="max-w-2xl mx-auto pt-8 px-4">
