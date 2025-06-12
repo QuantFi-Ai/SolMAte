@@ -446,9 +446,10 @@ function AppContent() {
     alert('Wallet authentication coming soon! Please use email/password for now.');
   };
 
-  const fetchDiscoveryCards = async () => {
+  const fetchDiscoveryCards = async (user = currentUser) => {
+    if (!user) return;
     try {
-      const response = await fetch(`${API_BASE_URL}/api/discover/${currentUser.user_id}`);
+      const response = await fetch(`${API_BASE_URL}/api/discover/${user.user_id}`);
       if (response.ok) {
         const data = await response.json();
         setDiscoveryCards(filterCardsByStatus(data || []));
@@ -458,9 +459,10 @@ function AppContent() {
     }
   };
 
-  const fetchAiRecommendations = async () => {
+  const fetchAiRecommendations = async (user = currentUser) => {
+    if (!user) return;
     try {
-      const response = await fetch(`${API_BASE_URL}/api/ai-recommendations/${currentUser.user_id}`);
+      const response = await fetch(`${API_BASE_URL}/api/ai-recommendations/${user.user_id}`);
       if (response.ok) {
         const data = await response.json();
         setAiRecommendations(filterCardsByStatus(data || []));
@@ -470,10 +472,11 @@ function AppContent() {
     }
   };
 
-  const fetchMatches = async () => {
+  const fetchMatches = async (user = currentUser) => {
+    if (!user) return;
     try {
-      console.log('🔍 Fetching matches for user:', currentUser.user_id);
-      const response = await fetch(`${API_BASE_URL}/api/matches/${currentUser.user_id}`);
+      console.log('🔍 Fetching matches for user:', user.user_id);
+      const response = await fetch(`${API_BASE_URL}/api/matches/${user.user_id}`);
       console.log('📡 Matches response status:', response.status);
       const matchesData = await response.json();
       console.log('📊 Matches data received:', matchesData);
