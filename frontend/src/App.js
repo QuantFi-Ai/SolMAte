@@ -182,6 +182,7 @@ function AppContent() {
               fetchDiscoveryCards(validatedUser);
               fetchAiRecommendations(validatedUser);
               fetchMatches(validatedUser);
+              fetchMatchesWithMessages(validatedUser);
             }
           } else {
             // Invalid session, go to login
