@@ -30,6 +30,7 @@ profile_images_collection = db.profile_images
 trading_highlights_collection = db.trading_highlights
 social_links_collection = db.social_links
 token_launch_profiles_collection = db.token_launch_profiles
+referrals_collection = db.referrals
 
 # Authentication utilities
 def hash_password(password: str) -> str:
