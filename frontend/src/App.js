@@ -1612,7 +1612,11 @@ function AppContent() {
           </div>
 
           {getCurrentIndex() < getCurrentCards().length ? (
-            <div className="bg-white rounded-2xl overflow-hidden shadow-lg border border-gray-200">
+            <SwipeableCard
+              onSwipeLeft={() => handleSwipe('pass', discoveryMode === 'ai')}
+              onSwipeRight={() => handleSwipe('like', discoveryMode === 'ai')}
+              className="bg-white rounded-2xl overflow-hidden shadow-lg border border-gray-200"
+            >
               {/* AI Compatibility Banner */}
               {discoveryMode === 'ai' && getCurrentCard()?.ai_compatibility && (
                 <div className="bg-gradient-to-r from-blue-500 to-green-600 text-white p-4">
