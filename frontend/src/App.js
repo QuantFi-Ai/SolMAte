@@ -1936,7 +1936,9 @@ function AppContent() {
               <img
                 src={selectedMatch.other_user.avatar_url}
                 alt="Match"
-                className="w-10 h-10 rounded-full object-cover"
+                className="w-10 h-10 rounded-full object-cover cursor-pointer hover:opacity-80 transition-all"
+                onClick={() => showUserProfile(selectedMatch.other_user)}
+                title="Click to view full profile"
               />
               <div>
                 <h3 className="font-semibold text-black">{selectedMatch.other_user.display_name}</h3>
