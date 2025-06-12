@@ -545,6 +545,7 @@ function AppContent() {
   };
 
   const showUserProfile = (user, context = 'matches') => {
+    console.log('🔍 showUserProfile called with context:', context);
     setSelectedProfileUser(user);
     setProfilePopupContext(context);
     setShowProfilePopup(true);
