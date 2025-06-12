@@ -2185,6 +2185,169 @@ function AppContent() {
           </div>
         </div>
       )}
+
+      {/* Profile Popup Modal */}
+      {showProfilePopup && selectedProfileUser && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 overflow-y-auto">
+          <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[95vh] overflow-y-auto">
+            {/* Header */}
+            <div className="p-6 border-b border-gray-200 flex items-center justify-between sticky top-0 bg-white z-10">
+              <h2 className="text-2xl font-bold text-black">Trader Profile</h2>
+              <button
+                onClick={() => setShowProfilePopup(false)}
+                className="text-gray-500 hover:text-black transition-all"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="p-6 space-y-6">
+              {/* Profile Header */}
+              <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-2xl p-6">
+                <div className="flex flex-col md:flex-row items-center md:items-start space-y-4 md:space-y-0 md:space-x-6">
+                  <img
+                    src={selectedProfileUser.avatar_url}
+                    alt={selectedProfileUser.display_name}
+                    className="w-20 h-20 rounded-full border-4 border-white shadow-lg"
+                  />
+                  
+                  <div className="flex-1 text-center md:text-left">
+                    <h1 className="text-2xl font-bold text-black mb-2">{selectedProfileUser.display_name}</h1>
+                    {selectedProfileUser.show_twitter && selectedProfileUser.twitter_username && (
+                      <p className="text-blue-600 mb-2">🐦 @{selectedProfileUser.twitter_username}</p>
+                    )}
+                    {selectedProfileUser.location && (
+                      <p className="text-gray-600 mb-2">📍 {selectedProfileUser.location}</p>
+                    )}
+                    
+                    <div className="flex flex-wrap justify-center md:justify-start gap-2">
+                      <span className="bg-black text-white px-3 py-1 rounded-full text-sm font-medium">
+                        {selectedProfileUser.trading_experience}
+                      </span>
+                      <span className="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm">
+                        {selectedProfileUser.years_trading} years trading
+                      </span>
+                      <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
+                        {selectedProfileUser.portfolio_size}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Bio */}
+              {selectedProfileUser.bio && (
+                <div>
+                  <h3 className="text-lg font-semibold text-black mb-3">About</h3>
+                  <p className="text-gray-700 leading-relaxed">{selectedProfileUser.bio}</p>
+                </div>
+              )}
+
+              {/* Trading Info */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <h4 className="font-semibold text-gray-800 mb-3">Trading Style</h4>
+                  <div className="space-y-2 text-sm">
+                    <p><span className="text-gray-500">Style:</span> {selectedProfileUser.trading_style}</p>
+                    <p><span className="text-gray-500">Risk Tolerance:</span> {selectedProfileUser.risk_tolerance}</p>
+                    <p><span className="text-gray-500">Trading Hours:</span> {selectedProfileUser.trading_hours}</p>
+                    <p><span className="text-gray-500">Communication:</span> {selectedProfileUser.communication_style}</p>
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="font-semibold text-gray-800 mb-3">Platforms</h4>
+                  <div className="space-y-2 text-sm">
+                    {selectedProfileUser.preferred_trading_platform && (
+                      <p><span className="text-gray-500">Trading Platform:</span> {selectedProfileUser.preferred_trading_platform}</p>
+                    )}
+                    {selectedProfileUser.preferred_communication_platform && (
+                      <p><span className="text-gray-500">Communication Platform:</span> {selectedProfileUser.preferred_communication_platform}</p>
+                    )}
+                    {selectedProfileUser.favorite_project && (
+                      <p><span className="text-gray-500">Favorite Project:</span> {selectedProfileUser.favorite_project}</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Preferred Tokens */}
+              {selectedProfileUser.preferred_tokens && selectedProfileUser.preferred_tokens.length > 0 && (
+                <div>
+                  <h4 className="font-semibold text-gray-800 mb-3">Preferred Token Categories</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {selectedProfileUser.preferred_tokens.map((token, idx) => (
+                      <span key={idx} className="bg-purple-100 text-purple-800 px-3 py-2 rounded-lg text-sm font-medium">
+                        {token}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Looking For */}
+              {selectedProfileUser.looking_for && selectedProfileUser.looking_for.length > 0 && (
+                <div>
+                  <h4 className="font-semibold text-gray-800 mb-3">Looking For</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {selectedProfileUser.looking_for.map((item, idx) => (
+                      <span key={idx} className="bg-orange-100 text-orange-800 px-3 py-2 rounded-lg text-sm font-medium">
+                        {item}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Trading Stories */}
+              {(selectedProfileUser.best_trade || selectedProfileUser.worst_trade) && (
+                <div className="space-y-4">
+                  <h4 className="font-semibold text-gray-800">Trading Stories</h4>
+                  
+                  {selectedProfileUser.best_trade && (
+                    <div>
+                      <h5 className="text-green-600 font-medium mb-2">💰 Best Trade</h5>
+                      <p className="text-sm text-gray-700 bg-green-50 p-3 rounded-lg">{selectedProfileUser.best_trade}</p>
+                    </div>
+                  )}
+                  
+                  {selectedProfileUser.worst_trade && (
+                    <div>
+                      <h5 className="text-red-600 font-medium mb-2">📉 Learning Experience</h5>
+                      <p className="text-sm text-gray-700 bg-red-50 p-3 rounded-lg">{selectedProfileUser.worst_trade}</p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Action Buttons */}
+              <div className="flex space-x-4 pt-4 border-t border-gray-200">
+                <button
+                  onClick={() => {
+                    setShowProfilePopup(false);
+                    // Find the match for this user and open chat
+                    const match = matches.find(m => m.other_user.user_id === selectedProfileUser.user_id);
+                    if (match) {
+                      setSelectedMatch(match);
+                      fetchMessages(match.match_id);
+                      setCurrentView('chat');
+                    }
+                  }}
+                  className="flex-1 bg-black hover:bg-gray-800 text-white font-medium py-3 px-6 rounded-lg transition-all"
+                >
+                  💬 Start Chat
+                </button>
+                <button
+                  onClick={() => setShowProfilePopup(false)}
+                  className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-3 px-6 rounded-lg transition-all"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
