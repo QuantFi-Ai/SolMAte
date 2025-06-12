@@ -684,6 +684,18 @@ async def email_signup(signup_data: EmailSignup):
         if existing_user:
             raise HTTPException(status_code=400, detail="Email already registered")
         
+        # Validate referral code if provided
+        referral_valid = False
+        if signup_data.referral_code:
+            referral = referrals_collection.find_one({
+                "referral_code": signup_data.referral_code,
+                "status": "pending"
+            })
+            if referral:
+                referral_valid = True
+            else:
+                raise HTTPException(status_code=400, detail="Invalid referral code")
+        
         # Hash password
         hashed_password = hash_password(signup_data.password)
         
@@ -701,11 +713,20 @@ async def email_signup(signup_data: EmailSignup):
         # Insert user
         users_collection.insert_one(user_data)
         
+        # Process referral if valid
+        if referral_valid and signup_data.referral_code:
+            process_referral_signup(user_data["user_id"], signup_data.referral_code)
+        
         # Remove sensitive data before returning
         user_data.pop('_id', None)
         user_data.pop('password_hash', None)
         
-        return {"message": "Account created successfully", "user": user_data}
+        response_data = {"message": "Account created successfully", "user": user_data}
+        if referral_valid:
+            response_data["referral_applied"] = True
+            response_data["message"] = "Account created successfully with referral bonus!"
+        
+        return response_data
         
     except HTTPException:
         raise
