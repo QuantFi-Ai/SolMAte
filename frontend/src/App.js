@@ -167,12 +167,6 @@ function AppContent() {
   const showToastNotification = (message, type = 'info') => {
     setToastMessage(message);
     setToastType(type);
-    setShowToast(true);
-  };
-
-  // Typing indicator simulation
-  const simulateTyping = (duration = 2000) => {
-    setIsTyping(true);
     setTimeout(() => setIsTyping(false), duration);
   };
 
