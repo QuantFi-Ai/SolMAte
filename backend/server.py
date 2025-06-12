@@ -1221,6 +1221,128 @@ async def get_token_launchers():
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to get token launchers: {str(e)}")
 
+# Referral System Endpoints
+
+@app.post("/api/referrals/generate/{user_id}")
+async def generate_user_referral_code(user_id: str):
+    """Generate a referral code for a user"""
+    try:
+        # Check if user exists
+        user = users_collection.find_one({"user_id": user_id})
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        # Check if user already has an active referral code
+        existing_referral = referrals_collection.find_one({
+            "referrer_user_id": user_id,
+            "status": "pending"
+        })
+        
+        if existing_referral:
+            return {
+                "referral_code": existing_referral["referral_code"],
+                "created_at": existing_referral["created_at"],
+                "message": "Existing referral code returned"
+            }
+        
+        # Generate new referral code
+        referral_code = generate_referral_code(user_id)
+        referral_data = create_referral_entry(user_id, referral_code)
+        
+        # Remove MongoDB _id
+        referral_data.pop('_id', None)
+        
+        return {
+            "referral_code": referral_code,
+            "created_at": referral_data["created_at"],
+            "message": "New referral code generated successfully"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to generate referral code: {str(e)}")
+
+@app.get("/api/referrals/stats/{user_id}")
+async def get_referral_stats(user_id: str):
+    """Get referral statistics for a user"""
+    try:
+        # Check if user exists
+        user = users_collection.find_one({"user_id": user_id})
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        # Get user's referral code
+        user_referral = referrals_collection.find_one({
+            "referrer_user_id": user_id,
+            "status": "pending"
+        })
+        
+        # Get completed referrals (people who signed up using their code)
+        completed_referrals = list(referrals_collection.find({
+            "referrer_user_id": user_id,
+            "status": "completed"
+        }))
+        
+        # Get details of referred users
+        referred_users = []
+        for referral in completed_referrals:
+            if referral.get("referred_user_id"):
+                referred_user = users_collection.find_one({"user_id": referral["referred_user_id"]})
+                if referred_user:
+                    referred_users.append({
+                        "user_id": referred_user["user_id"],
+                        "username": referred_user["username"],
+                        "display_name": referred_user["display_name"],
+                        "avatar_url": referred_user["avatar_url"],
+                        "joined_at": referral["used_at"],
+                        "profile_complete": referred_user.get("profile_complete", False)
+                    })
+        
+        return {
+            "referral_code": user_referral["referral_code"] if user_referral else None,
+            "total_referrals": len(completed_referrals),
+            "successful_signups": len([r for r in referred_users if r["profile_complete"]]),
+            "pending_signups": len([r for r in referred_users if not r["profile_complete"]]),
+            "referred_users": referred_users,
+            "referral_link": f"https://8134b81b-ad13-497e-ba8a-ecdf0793b0b4.preview.emergentagent.com/?ref={user_referral['referral_code']}" if user_referral else None
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get referral stats: {str(e)}")
+
+@app.get("/api/referrals/validate/{referral_code}")
+async def validate_referral_code(referral_code: str):
+    """Validate a referral code"""
+    try:
+        referral = referrals_collection.find_one({
+            "referral_code": referral_code,
+            "status": "pending"
+        })
+        
+        if not referral:
+            return {"valid": False, "message": "Invalid or expired referral code"}
+        
+        # Get referrer user info
+        referrer = users_collection.find_one({"user_id": referral["referrer_user_id"]})
+        if not referrer:
+            return {"valid": False, "message": "Referrer user not found"}
+        
+        return {
+            "valid": True,
+            "referrer": {
+                "display_name": referrer["display_name"],
+                "username": referrer["username"],
+                "avatar_url": referrer["avatar_url"]
+            },
+            "message": f"Valid referral code from {referrer['display_name']}"
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to validate referral code: {str(e)}")
+
 @app.get("/api/health")
 async def health_check():
     return {"status": "healthy", "service": "Solm8 API"}
