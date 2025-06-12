@@ -1852,22 +1852,29 @@ function AppContent() {
             ) : (
               <div className="space-y-4">
                 {matchesWithMessages.map((match) => (
-                  <div key={match.match_id} className="border border-gray-200 rounded-xl p-4 hover:shadow-md transition-all cursor-pointer"
-                       onClick={() => openChatAndMarkRead(match)}>
+                  <div key={match.match_id} className="border border-gray-200 rounded-xl p-4 hover:shadow-md transition-all">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-4">
                         <div className="relative">
                           <img
                             src={match.other_user.avatar_url}
                             alt="Profile"
-                            className="w-12 h-12 rounded-full object-cover"
+                            className="w-12 h-12 rounded-full object-cover cursor-pointer hover:opacity-80 transition-all"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              showUserProfile(match.other_user);
+                            }}
+                            title="Click to view full profile"
                           />
                           {match.other_user.user_status === 'active' && (
                             <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-white rounded-full"></div>
                           )}
                         </div>
                         
-                        <div className="flex-1">
+                        <div 
+                          className="flex-1 cursor-pointer"
+                          onClick={() => openChatAndMarkRead(match)}
+                        >
                           <div className="flex items-center space-x-2 mb-1">
                             <h3 className="font-semibold text-black">{match.other_user.display_name}</h3>
                             {match.other_user.trading_experience && (
