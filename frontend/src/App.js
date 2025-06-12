@@ -1440,7 +1440,7 @@ function AppContent() {
               whileTap={{ scale: 0.95 }}
               onClick={() => setCurrentView('discover')}
               className={`nav-tab px-4 py-2 rounded-lg font-medium transition-all ${
-                currentView === 'discover' ? 'active bg-black text-white' : 'text-gray-600 hover:text-black'
+                currentView === 'discover' ? 'active text-black' : 'text-gray-600 hover:text-black'
               }`}
             >
               Discover
@@ -1450,7 +1450,7 @@ function AppContent() {
               whileTap={{ scale: 0.95 }}
               onClick={() => setCurrentView('matches')}
               className={`nav-tab px-4 py-2 rounded-lg font-medium transition-all relative ${
-                currentView === 'matches' ? 'active bg-black text-white' : 'text-gray-600 hover:text-black'
+                currentView === 'matches' ? 'active text-black' : 'text-gray-600 hover:text-black'
               }`}
             >
               Matches ({matches.length})
@@ -1463,7 +1463,7 @@ function AppContent() {
                 fetchMatchesWithMessages();
               }}
               className={`nav-tab px-4 py-2 rounded-lg font-medium transition-all relative ${
-                currentView === 'messages' ? 'active bg-black text-white' : 'text-gray-600 hover:text-black'
+                currentView === 'messages' ? 'active text-black' : 'text-gray-600 hover:text-black'
               }`}
             >
               Messages
