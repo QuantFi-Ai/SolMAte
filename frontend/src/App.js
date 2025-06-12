@@ -1832,11 +1832,7 @@ function AppContent() {
               <div className="space-y-4">
                 {matchesWithMessages.map((match) => (
                   <div key={match.match_id} className="border border-gray-200 rounded-xl p-4 hover:shadow-md transition-all cursor-pointer"
-                       onClick={() => {
-                         setSelectedMatch(match);
-                         fetchMessages(match.match_id);
-                         setCurrentView('chat');
-                       }}>
+                       onClick={() => openChatAndMarkRead(match)}>
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-4">
                         <div className="relative">
