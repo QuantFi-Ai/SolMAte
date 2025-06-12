@@ -1787,24 +1787,16 @@ function AppContent() {
                       )}
                     </div>
                     
-                    <div className="flex space-x-2">
-                      <button
-                        onClick={() => showUserProfile(match.other_user)}
-                        className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2 px-4 rounded-lg transition-all"
-                      >
-                        👤 View Profile
-                      </button>
-                      <button
-                        onClick={() => {
-                          setSelectedMatch(match);
-                          fetchMessages(match.match_id);
-                          setCurrentView('chat');
-                        }}
-                        className="flex-1 bg-black hover:bg-gray-800 text-white font-medium py-2 px-4 rounded-lg transition-all"
-                      >
-                        💬 Chat
-                      </button>
-                    </div>
+                    <button
+                      onClick={() => {
+                        setSelectedMatch(match);
+                        fetchMessages(match.match_id);
+                        setCurrentView('chat');
+                      }}
+                      className="w-full bg-black hover:bg-gray-800 text-white font-medium py-2 px-4 rounded-lg transition-all"
+                    >
+                      💬 Chat
+                    </button>
                   </div>
                 ))}
               </div>
