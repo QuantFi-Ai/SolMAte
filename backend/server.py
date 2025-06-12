@@ -1431,6 +1431,65 @@ async def get_user_matches(user_id: str):
     
     return enriched_matches
 
+@app.get("/api/matches-with-messages/{user_id}")
+async def get_matches_with_messages(user_id: str):
+    """Get user's matches with latest message info and unread counts"""
+    try:
+        # Get user's matches
+        matches = list(matches_collection.find({
+            "$or": [{"user1_id": user_id}, {"user2_id": user_id}]
+        }).sort("created_at", -1))
+        
+        result = []
+        for match in matches:
+            # Determine the other user
+            other_user_id = match["user2_id"] if match["user1_id"] == user_id else match["user1_id"]
+            other_user = users_collection.find_one({"user_id": other_user_id})
+            
+            if not other_user:
+                continue
+                
+            # Remove sensitive data from other_user
+            other_user.pop('_id', None)
+            other_user.pop('password_hash', None)
+            
+            # Get latest message for this match
+            latest_message = messages_collection.find_one(
+                {"match_id": match["match_id"]},
+                sort=[("timestamp", -1)]
+            )
+            
+            # Get unread message count (messages after user's last read time)
+            # For now, we'll use a simple approach - count messages from the other user that are newer than 1 hour ago
+            # In a real app, you'd track last_read_at per match per user
+            one_hour_ago = datetime.utcnow() - timedelta(hours=1)
+            unread_count = messages_collection.count_documents({
+                "match_id": match["match_id"],
+                "sender_id": other_user_id,
+                "timestamp": {"$gte": one_hour_ago}
+            })
+            
+            match_data = {
+                "match_id": match["match_id"],
+                "user1_id": match["user1_id"],
+                "user2_id": match["user2_id"],
+                "created_at": match["created_at"],
+                "last_message_at": match.get("last_message_at", match["created_at"]),
+                "other_user": other_user,
+                "latest_message": {
+                    "content": latest_message.get("content", "") if latest_message else "",
+                    "timestamp": latest_message.get("timestamp") if latest_message else None,
+                    "sender_id": latest_message.get("sender_id") if latest_message else None
+                },
+                "unread_count": unread_count
+            }
+            result.append(match_data)
+        
+        return result
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to fetch matches: {str(e)}")
+
 @app.get("/api/messages/{match_id}")
 async def get_match_messages(match_id: str, limit: int = 50):
     """Get messages for a specific match"""
