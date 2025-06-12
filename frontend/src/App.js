@@ -1645,6 +1645,17 @@ function AppContent() {
                     </div>
                   )}
 
+                  {/* Best Trade Preview */}
+                  {getCurrentCard()?.best_trade && (
+                    <div>
+                      <span className="text-sm font-medium text-green-600 block mb-1">💰 Best Trade:</span>
+                      <p className="text-xs text-gray-600 bg-green-50 p-2 rounded line-clamp-2">
+                        {getCurrentCard()?.best_trade.substring(0, 120)}
+                        {getCurrentCard()?.best_trade.length > 120 ? '...' : ''}
+                      </p>
+                    </div>
+                  )}
+
                   {/* Trading Stories */}
                   {(getCurrentCard()?.best_trade || getCurrentCard()?.worst_trade) && (
                     <div className="space-y-2">
