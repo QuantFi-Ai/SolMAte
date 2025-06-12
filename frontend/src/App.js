@@ -144,6 +144,24 @@ function AppContent() {
   const [toastType, setToastType] = useState('info');
   const [isTyping, setIsTyping] = useState(false);
 
+  // Profile popup modal state
+  const [showProfilePopup, setShowProfilePopup] = useState(false);
+  const [selectedProfileUser, setSelectedProfileUser] = useState(null);
+  const [profilePopupContext, setProfilePopupContext] = useState(''); // 'discover', 'matches', 'messages', 'chat'
+
+  // Toast notification helper
+  const showToastNotification = (message, type = 'info') => {
+    setToastMessage(message);
+    setToastType(type);
+    setShowToast(true);
+  };
+
+  // Typing indicator simulation
+  const simulateTyping = (duration = 2000) => {
+    setIsTyping(true);
+    setTimeout(() => setIsTyping(false), duration);
+  };
+
   // Validate session with backend
   const validateSession = async (userData) => {
     try {
