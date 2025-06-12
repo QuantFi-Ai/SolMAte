@@ -1526,7 +1526,7 @@ function AppContent() {
                   src={getCurrentCard()?.avatar_url}
                   alt="Profile"
                   className="w-full h-96 object-cover cursor-pointer hover:opacity-95 transition-all"
-                  onClick={() => showUserProfile(getCurrentCard())}
+                  onClick={() => showUserProfile(getCurrentCard(), 'discover')}
                   title="Click to view full profile"
                 />
                 {/* Status Indicator */}
