@@ -1635,7 +1635,7 @@ function AppContent() {
                             <div className="flex items-center space-x-2">
                               {discoveryMode === 'ai' && getCurrentCard().ai_compatibility && (
                                 <div className="bg-purple-100 text-purple-800 px-2 py-1 rounded-full text-xs font-medium">
-                                  {getCurrentCard().ai_compatibility}% Match
+                                  {getCurrentCard().ai_compatibility.compatibility_percentage}% Match
                                 </div>
                               )}
                               {getCurrentCard().user_status === 'active' && (
