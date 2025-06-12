@@ -1838,7 +1838,7 @@ function AppContent() {
                             className="w-12 h-12 rounded-full object-cover cursor-pointer hover:opacity-80 transition-all"
                             onClick={(e) => {
                               e.stopPropagation();
-                              showUserProfile(match.other_user);
+                              showUserProfile(match.other_user, 'messages');
                             }}
                             title="Click to view full profile"
                           />
