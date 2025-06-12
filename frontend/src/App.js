@@ -2074,7 +2074,20 @@ function AppContent() {
         onClose={() => setShowMatchModal(false)}
         user={getCurrentCard()}
       />
-      
+
+      {/* Referral Dashboard Modal */}
+      <ReferralDashboard
+        isOpen={showReferralDashboard}
+        onClose={() => setShowReferralDashboard(false)}
+        currentUser={currentUser}
+      />
+
+      {/* Support Modal */}
+      <SupportModal
+        isOpen={showSupportModal}
+        onClose={() => setShowSupportModal(false)}
+      />
+
       {/* Toast Notification */}
       <ToastNotification
         message={toastMessage}
