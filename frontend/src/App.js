@@ -183,8 +183,6 @@ function AppContent() {
               fetchAiRecommendations(validatedUser);
               fetchMatches(validatedUser);
               fetchMatchesWithMessages(validatedUser);
-              fetchMatchesWithMessages(validatedUser);
-              fetchMatchesWithMessages(validatedUser);
             }
           } else {
             // Invalid session, go to login
