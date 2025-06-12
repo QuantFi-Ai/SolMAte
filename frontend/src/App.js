@@ -2142,7 +2142,6 @@ function AppContent() {
               )}
 
               {/* Action Buttons */}
-              {/* Action Buttons */}
               <div className="flex space-x-4 pt-4 border-t border-gray-200">
                 {profilePopupContext === 'discover' ? (
                   // Discover context - Show Like/Pass buttons
