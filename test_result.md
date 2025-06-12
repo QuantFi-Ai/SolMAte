@@ -195,7 +195,7 @@ frontend:
         agent: "testing"
         comment: "✅ TESTED: Support system is working correctly. Successfully verified: 1) Support option appears in the profile dropdown menu, 2) Clicking Support opens the support modal with proper animation, 3) The support form includes topic selection, email field, and message area, 4) Form validation works correctly for required fields, 5) Submitting the form shows a success message, 6) The modal automatically closes after successful submission."
 
-  - task: "Referral System"
+  - task: "Referral Link"
     implemented: true
     working: true
     file: "/app/frontend/src/ReferralComponents.js"
@@ -205,10 +205,10 @@ frontend:
     status_history:
       - working: "NA"
         agent: "testing"
-        comment: "Testing the new Referral system feature to verify functionality and user experience."
+        comment: "Testing the referral link functionality to verify that users can sign up using a referral code."
       - working: true
         agent: "testing"
-        comment: "✅ TESTED: Referral system is working correctly. Successfully verified: 1) Refer Friends option appears in the profile dropdown menu, 2) Clicking Refer Friends opens the referral dashboard with proper animation, 3) Generate Referral Code button works and creates a unique referral link, 4) The referral link is displayed correctly with the proper format (?ref=XXXXX), 5) Referral statistics are displayed (Total Referrals, Active Users, Pending Setup), 6) The How Referrals Work section explains the process clearly with numbered steps."
+        comment: "✅ TESTED: Referral link functionality is working correctly. Successfully verified: 1) Navigating to the app with a referral code parameter (?ref=XXXXX) shows the referral information on the signup page, 2) The referral information displays the referrer's name and profile picture, 3) Users can successfully sign up using the referral link, 4) The referral relationship is properly established in the system. The only minor issue is that the referral information is only visible after switching to the Sign Up tab, not on the initial Sign In view."
 
 metadata:
   created_by: "testing_agent"
