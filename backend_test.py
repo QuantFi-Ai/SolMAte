@@ -1151,6 +1151,285 @@ class Solm8APITester:
         
         return True
 
+    def test_referral_code_generation(self, user_id=None):
+        """Test generating a referral code for a user"""
+        if not user_id:
+            # Create a new test user if user_id not provided
+            random_suffix = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
+            test_email = f"test_ref_{random_suffix}@example.com"
+            test_password = "TestPassword123!"
+            test_display_name = f"Test Referral User {random_suffix}"
+            
+            success, signup_response = self.test_email_signup(test_email, test_password, test_display_name)
+            if not success:
+                print("❌ Email signup failed, stopping test")
+                return False, None
+            
+            user_id = self.email_user['user_id']
+            print(f"Created test user with ID: {user_id}")
+        
+        print(f"\n🔍 Testing Referral Code Generation for user ID: {user_id}")
+        
+        success, response = self.run_test(
+            "Generate Referral Code",
+            "POST",
+            f"referrals/generate/{user_id}",
+            200
+        )
+        
+        if success:
+            print(f"✅ Successfully generated referral code: {response.get('referral_code')}")
+            print(f"Created at: {response.get('created_at')}")
+            print(f"Message: {response.get('message')}")
+        
+        return success, response
+    
+    def test_referral_code_validation(self, referral_code):
+        """Test validating a referral code"""
+        print(f"\n🔍 Testing Referral Code Validation for code: {referral_code}")
+        
+        success, response = self.run_test(
+            "Validate Referral Code",
+            "GET",
+            f"referrals/validate/{referral_code}",
+            200
+        )
+        
+        if success:
+            if response.get('valid'):
+                print(f"✅ Referral code is valid")
+                print(f"Referrer: {response.get('referrer', {}).get('display_name')}")
+            else:
+                print(f"❌ Referral code is invalid: {response.get('message')}")
+        
+        return success, response
+    
+    def test_referral_stats(self, user_id):
+        """Test getting referral statistics for a user"""
+        print(f"\n🔍 Testing Referral Statistics for user ID: {user_id}")
+        
+        success, response = self.run_test(
+            "Get Referral Stats",
+            "GET",
+            f"referrals/stats/{user_id}",
+            200
+        )
+        
+        if success:
+            print(f"✅ Successfully retrieved referral statistics")
+            print(f"Referral code: {response.get('referral_code')}")
+            print(f"Total referrals: {response.get('total_referrals')}")
+            print(f"Successful signups: {response.get('successful_signups')}")
+            print(f"Pending signups: {response.get('pending_signups')}")
+            print(f"Referral link: {response.get('referral_link')}")
+            
+            if response.get('referred_users'):
+                print(f"Referred users: {len(response.get('referred_users'))}")
+                for i, user in enumerate(response.get('referred_users')):
+                    print(f"  {i+1}. {user.get('display_name')} (Profile complete: {user.get('profile_complete')})")
+        
+        return success, response
+    
+    def test_signup_with_referral(self, referral_code):
+        """Test signing up with a referral code"""
+        print(f"\n🔍 Testing Signup with Referral Code: {referral_code}")
+        
+        # Generate random user data
+        random_suffix = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
+        test_email = f"test_referred_{random_suffix}@example.com"
+        test_password = "TestPassword123!"
+        test_display_name = f"Referred User {random_suffix}"
+        
+        data = {
+            "email": test_email,
+            "password": test_password,
+            "display_name": test_display_name,
+            "referral_code": referral_code
+        }
+        
+        success, response = self.run_test(
+            "Email Signup with Referral",
+            "POST",
+            "auth/email/signup",
+            200,
+            data=data
+        )
+        
+        if success:
+            self.email_user = response.get("user")
+            print(f"✅ Successfully created user with referral code")
+            print(f"User ID: {self.email_user.get('user_id')}")
+            print(f"Username: {self.email_user.get('username')}")
+            print(f"Referral applied: {response.get('referral_applied', False)}")
+            print(f"Message: {response.get('message')}")
+        
+        return success, response
+    
+    def test_invalid_referral_signup(self):
+        """Test signing up with an invalid referral code"""
+        print(f"\n🔍 Testing Signup with Invalid Referral Code")
+        
+        # Generate random user data
+        random_suffix = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
+        test_email = f"test_invalid_ref_{random_suffix}@example.com"
+        test_password = "TestPassword123!"
+        test_display_name = f"Invalid Ref User {random_suffix}"
+        
+        # Generate an invalid referral code
+        invalid_code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
+        
+        data = {
+            "email": test_email,
+            "password": test_password,
+            "display_name": test_display_name,
+            "referral_code": invalid_code
+        }
+        
+        # We expect this to fail with a 400 status code
+        success, response = self.run_test(
+            "Email Signup with Invalid Referral",
+            "POST",
+            "auth/email/signup",
+            400,
+            data=data
+        )
+        
+        if success:
+            print(f"✅ Correctly rejected invalid referral code")
+        
+        return success, response
+    
+    def test_referral_flow(self):
+        """Test the complete referral flow from generation to signup"""
+        print("\n🔍 Testing Complete Referral Flow")
+        
+        # Step 1: Create a referrer user
+        random_suffix = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
+        referrer_email = f"referrer_{random_suffix}@example.com"
+        referrer_password = "TestPassword123!"
+        referrer_display_name = f"Referrer {random_suffix}"
+        
+        success, signup_response = self.test_email_signup(referrer_email, referrer_password, referrer_display_name)
+        if not success:
+            print("❌ Failed to create referrer user")
+            return False
+        
+        referrer_id = self.email_user['user_id']
+        print(f"Created referrer user with ID: {referrer_id}")
+        
+        # Step 2: Generate a referral code for the referrer
+        success, gen_response = self.test_referral_code_generation(referrer_id)
+        if not success:
+            print("❌ Failed to generate referral code")
+            return False
+        
+        referral_code = gen_response.get('referral_code')
+        print(f"Generated referral code: {referral_code}")
+        
+        # Step 3: Validate the referral code
+        success, validate_response = self.test_referral_code_validation(referral_code)
+        if not success or not validate_response.get('valid'):
+            print("❌ Failed to validate referral code")
+            return False
+        
+        print(f"Validated referral code successfully")
+        
+        # Step 4: Sign up a new user with the referral code
+        success, signup_response = self.test_signup_with_referral(referral_code)
+        if not success:
+            print("❌ Failed to sign up with referral code")
+            return False
+        
+        referred_id = self.email_user['user_id']
+        print(f"Created referred user with ID: {referred_id}")
+        
+        # Step 5: Check referral stats for the referrer
+        success, stats_response = self.test_referral_stats(referrer_id)
+        if not success:
+            print("❌ Failed to get referral stats")
+            return False
+        
+        # Verify that the referral was recorded
+        if stats_response.get('total_referrals') > 0:
+            print(f"✅ Referral was successfully recorded")
+            
+            # Check if the referred user is in the list
+            referred_users = stats_response.get('referred_users', [])
+            referred_user_found = False
+            for user in referred_users:
+                if user.get('user_id') == referred_id:
+                    referred_user_found = True
+                    break
+            
+            if referred_user_found:
+                print(f"✅ Referred user appears in referrer's stats")
+            else:
+                print(f"❌ Referred user not found in referrer's stats")
+                return False
+        else:
+            print(f"❌ Referral was not recorded in stats")
+            return False
+        
+        # Step 6: Try to generate another referral code for the same user
+        # This should return the existing code
+        success, gen_response2 = self.test_referral_code_generation(referrer_id)
+        if not success:
+            print("❌ Failed to retrieve existing referral code")
+            return False
+        
+        if gen_response2.get('referral_code') == referral_code:
+            print(f"✅ Successfully retrieved existing referral code")
+        else:
+            print(f"❌ Generated a different referral code instead of returning the existing one")
+            return False
+        
+        # Step 7: Try to sign up with an invalid referral code
+        success, invalid_response = self.test_invalid_referral_signup()
+        if not success:
+            print("❌ Test for invalid referral code failed")
+            return False
+        
+        print(f"✅ Complete referral flow tested successfully")
+        return True
+    
+    def test_database_referrals(self):
+        """Check the referrals collection in the database"""
+        print("\n🔍 Checking Referrals in Database...")
+        
+        # Get all referrals
+        referrals = list(self.db.referrals.find())
+        total_referrals = len(referrals)
+        
+        # Count referrals by status
+        status_counts = {}
+        for referral in referrals:
+            status = referral.get('status', 'unknown')
+            status_counts[status] = status_counts.get(status, 0) + 1
+        
+        print(f"Total referrals in database: {total_referrals}")
+        print(f"Referrals by status: {status_counts}")
+        
+        # Count completed referrals
+        completed_referrals = sum(1 for referral in referrals if referral.get('status') == 'completed')
+        
+        print(f"Completed referrals: {completed_referrals}")
+        
+        # Show some sample referrals
+        if referrals:
+            print("\nSample referrals:")
+            for i, referral in enumerate(referrals[:5]):  # Show first 5 referrals
+                print(f"{i+1}. Referral ID: {referral.get('referral_id')}")
+                print(f"   Referrer User ID: {referral.get('referrer_user_id')}")
+                print(f"   Referral Code: {referral.get('referral_code')}")
+                print(f"   Status: {referral.get('status')}")
+                print(f"   Created At: {referral.get('created_at')}")
+                if referral.get('referred_user_id'):
+                    print(f"   Referred User ID: {referral.get('referred_user_id')}")
+                    print(f"   Used At: {referral.get('used_at')}")
+                print()
+        
+        return referrals
+    
     def run_auth_discovery_tests(self):
         """Run all tests related to authentication and discovery issues"""
         print("🚀 Starting Solm8 Authentication and Discovery Tests")
@@ -1177,7 +1456,59 @@ class Solm8APITester:
         print(f"\nOverall Test Result: {'✅ PASSED' if overall_success else '❌ FAILED'}")
         
         return overall_success
+    
+    def run_referral_tests(self):
+        """Run all tests related to the referral system"""
+        print("🚀 Starting Solm8 Referral System Tests")
+        
+        # Step 1: Test referral code generation
+        print("\n===== STEP 1: TEST REFERRAL CODE GENERATION =====")
+        success, gen_response = self.test_referral_code_generation()
+        if not success:
+            print("❌ Referral code generation test failed")
+            return False
+        
+        referral_code = gen_response.get('referral_code')
+        user_id = self.email_user['user_id']
+        
+        # Step 2: Test referral code validation
+        print("\n===== STEP 2: TEST REFERRAL CODE VALIDATION =====")
+        success, _ = self.test_referral_code_validation(referral_code)
+        if not success:
+            print("❌ Referral code validation test failed")
+            return False
+        
+        # Step 3: Test referral stats
+        print("\n===== STEP 3: TEST REFERRAL STATS =====")
+        success, _ = self.test_referral_stats(user_id)
+        if not success:
+            print("❌ Referral stats test failed")
+            return False
+        
+        # Step 4: Test signup with referral
+        print("\n===== STEP 4: TEST SIGNUP WITH REFERRAL =====")
+        success, _ = self.test_signup_with_referral(referral_code)
+        if not success:
+            print("❌ Signup with referral test failed")
+            return False
+        
+        # Step 5: Test complete referral flow
+        print("\n===== STEP 5: TEST COMPLETE REFERRAL FLOW =====")
+        success = self.test_referral_flow()
+        if not success:
+            print("❌ Complete referral flow test failed")
+            return False
+        
+        # Step 6: Check database referrals
+        print("\n===== STEP 6: CHECK DATABASE REFERRALS =====")
+        self.test_database_referrals()
+        
+        print("\n📊 Referral System Tests Summary:")
+        print("✅ All referral system tests passed successfully")
+        
+        return True
 
 if __name__ == "__main__":
     tester = Solm8APITester()
-    tester.run_auth_discovery_tests()
+    # tester.run_auth_discovery_tests()
+    tester.run_referral_tests()
