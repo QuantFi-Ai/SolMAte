@@ -198,6 +198,91 @@ class TokenLaunchProfile(BaseModel):
     project_type: str = ""  # "Meme Coin", "Utility Token", "DeFi Protocol", "GameFi", "NFT Project", "Other"
     looking_for_help_with: List[str] = []  # ["Technical Development", "Marketing", "Community Building", "Funding", "Legal/Compliance"]
 
+class ReferralCode(BaseModel):
+    user_id: str
+
+class ReferralStats(BaseModel):
+    user_id: str
+
+# Referral utility functions
+def generate_referral_code(user_id: str) -> str:
+    """Generate a unique referral code for a user"""
+    # Create a unique code based on user ID and random string
+    import hashlib
+    import time
+    
+    # Get user data to create a more personalized code
+    user = users_collection.find_one({"user_id": user_id})
+    if user:
+        username = user.get('username', '')
+        # Create code: first 3 letters of username + 4 random chars
+        if len(username) >= 3:
+            prefix = username[:3].upper()
+        else:
+            prefix = 'SOL'
+        
+        # Add timestamp-based suffix to ensure uniqueness
+        timestamp = str(int(time.time()))[-4:]
+        referral_code = f"{prefix}{timestamp}"
+        
+        # Ensure it's unique
+        while referrals_collection.find_one({"referral_code": referral_code}):
+            timestamp = str(int(time.time() * 1000))[-4:]
+            referral_code = f"{prefix}{timestamp}"
+        
+        return referral_code
+    else:
+        # Fallback random code
+        return f"SOL{secrets.token_hex(4)[:6].upper()}"
+
+def create_referral_entry(user_id: str, referral_code: str) -> dict:
+    """Create a referral entry in the database"""
+    referral_data = {
+        "referral_id": str(uuid.uuid4()),
+        "referrer_user_id": user_id,
+        "referral_code": referral_code,
+        "referred_user_id": None,
+        "created_at": datetime.utcnow(),
+        "used_at": None,
+        "status": "pending",  # "pending", "completed"
+        "bonus_awarded": False
+    }
+    
+    referrals_collection.insert_one(referral_data)
+    return referral_data
+
+def process_referral_signup(referred_user_id: str, referral_code: str) -> bool:
+    """Process a referral when someone signs up with a referral code"""
+    try:
+        # Find the referral entry
+        referral = referrals_collection.find_one({
+            "referral_code": referral_code,
+            "status": "pending"
+        })
+        
+        if not referral:
+            return False
+        
+        # Update the referral with the new user
+        referrals_collection.update_one(
+            {"referral_id": referral["referral_id"]},
+            {
+                "$set": {
+                    "referred_user_id": referred_user_id,
+                    "used_at": datetime.utcnow(),
+                    "status": "completed"
+                }
+            }
+        )
+        
+        # You could add bonus logic here (e.g., reward points, premium features, etc.)
+        # award_referral_bonus(referral["referrer_user_id"], referred_user_id)
+        
+        return True
+    except Exception as e:
+        print(f"Error processing referral: {e}")
+        return False
+
 # New Authentication Models
 class EmailSignup(BaseModel):
     email: EmailStr
