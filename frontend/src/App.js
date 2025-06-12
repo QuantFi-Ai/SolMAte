@@ -539,22 +539,6 @@ function AppContent() {
     await markMessagesAsRead(match.match_id);
   };
 
-  const markMessagesAsRead = async (matchId) => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/messages/${matchId}/mark-read`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ user_id: currentUser.user_id })
-      });
-      
-      if (response.ok) {
-        // Refresh matches with messages to update unread counts
-        fetchMatchesWithMessages();
-      }
-    } catch (error) {
-      console.error('Error marking messages as read:', error);
-    }
-  };
 
   const openChatAndMarkRead = async (match) => {
     setSelectedMatch(match);
