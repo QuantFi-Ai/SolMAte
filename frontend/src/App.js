@@ -178,16 +178,6 @@ function AppContent() {
             } else {
               setCurrentView('discover');
               // Fetch data when restoring session
-              // Fetch data when restoring session
-              fetchDiscoveryCards();
-              fetchAiRecommendations();
-              fetchMatches();
-              fetchDiscoveryCards();
-              fetchAiRecommendations();
-              fetchMatches();
-              fetchDiscoveryCards();
-              fetchAiRecommendations();
-              fetchMatches();
             }
           } else {
             // Invalid session, go to login
