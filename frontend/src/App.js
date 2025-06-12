@@ -846,17 +846,44 @@ function AppContent() {
   // Login View
   if (currentView === 'login') {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center p-4">
-        <div className="max-w-md w-full bg-white border border-gray-200 rounded-2xl p-8 shadow-lg">
-          <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold text-black mb-2">Solm8</h1>
-            <p className="text-gray-600">Connect with like-minded Solana traders</p>
-          </div>
+      <AnimatedPage className="min-h-screen bg-white flex items-center justify-center p-4">
+        <AnimatedCard className="max-w-md w-full p-8" hover={false}>
+          <motion.div 
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+            className="text-center mb-8"
+          >
+            <motion.h1 
+              className="text-4xl font-bold text-black mb-2"
+              animate={{ 
+                textShadow: ["0 0 0 rgba(0,0,0,0.1)", "0 2px 4px rgba(0,0,0,0.2)", "0 0 0 rgba(0,0,0,0.1)"]
+              }}
+              transition={{ duration: 2, repeat: Infinity }}
+            >
+              Solm8
+            </motion.h1>
+            <motion.p 
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="text-gray-600"
+            >
+              Connect with like-minded Solana traders
+            </motion.p>
+          </motion.div>
           
           <div className="space-y-6">
             {/* Authentication Mode Toggle */}
-            <div className="flex bg-gray-100 rounded-xl p-1 mb-6">
-              <button
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              className="flex bg-gray-100 rounded-xl p-1 mb-6"
+            >
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
                 onClick={() => setAuthMode('signin')}
                 className={`flex-1 py-2 px-4 rounded-lg font-medium transition-all ${
                   authMode === 'signin' 
@@ -865,8 +892,10 @@ function AppContent() {
                 }`}
               >
                 Sign In
-              </button>
-              <button
+              </motion.button>
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
                 onClick={() => setAuthMode('signup')}
                 className={`flex-1 py-2 px-4 rounded-lg font-medium transition-all ${
                   authMode === 'signup' 
@@ -875,33 +904,45 @@ function AppContent() {
                 }`}
               >
                 Sign Up
-              </button>
-            </div>
+              </motion.button>
+            </motion.div>
 
             {/* Email/Password Forms */}
             {(authMode === 'signin' || authMode === 'signup') && (
-              <form onSubmit={authMode === 'signup' ? handleEmailSignup : handleEmailLogin} className="space-y-4">
+              <motion.form 
+                initial={{ opacity: 0, x: authMode === 'signin' ? -20 : 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.3 }}
+                onSubmit={authMode === 'signup' ? handleEmailSignup : handleEmailLogin} 
+                className="space-y-4"
+              >
                 {authMode === 'signup' && (
-                  <div>
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    transition={{ duration: 0.3 }}
+                  >
                     <label className="block text-sm font-medium text-gray-700 mb-2">Display Name</label>
-                    <input
+                    <motion.input
+                      whileFocus={{ scale: 1.02, y: -2 }}
                       type="text"
                       value={emailForm.display_name}
                       onChange={(e) => setEmailForm(prev => ({ ...prev, display_name: e.target.value }))}
-                      className="w-full border border-gray-300 rounded-xl px-4 py-3 text-black focus:ring-2 focus:ring-black focus:border-transparent"
+                      className="w-full border border-gray-300 rounded-xl px-4 py-3 text-black focus:ring-2 focus:ring-black focus:border-transparent transition-all duration-300"
                       placeholder="Your trading name"
                       required
                     />
-                  </div>
+                  </motion.div>
                 )}
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
-                  <input
+                  <motion.input
+                    whileFocus={{ scale: 1.02, y: -2 }}
                     type="email"
                     value={emailForm.email}
                     onChange={(e) => setEmailForm(prev => ({ ...prev, email: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-xl px-4 py-3 text-black focus:ring-2 focus:ring-black focus:border-transparent"
+                    className="w-full border border-gray-300 rounded-xl px-4 py-3 text-black focus:ring-2 focus:ring-black focus:border-transparent transition-all duration-300"
                     placeholder="trader@example.com"
                     required
                   />
@@ -909,28 +950,36 @@ function AppContent() {
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
-                  <input
+                  <motion.input
+                    whileFocus={{ scale: 1.02, y: -2 }}
                     type="password"
                     value={emailForm.password}
                     onChange={(e) => setEmailForm(prev => ({ ...prev, password: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-xl px-4 py-3 text-black focus:ring-2 focus:ring-black focus:border-transparent"
+                    className="w-full border border-gray-300 rounded-xl px-4 py-3 text-black focus:ring-2 focus:ring-black focus:border-transparent transition-all duration-300"
                     placeholder="••••••••"
                     required
                   />
                 </div>
                 
-                <button
+                <AnimatedButton
                   type="submit"
                   disabled={authLoading}
-                  className="w-full bg-black hover:bg-gray-800 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 disabled:opacity-50"
+                  className="w-full"
                 >
-                  {authLoading ? 'Please wait...' : (authMode === 'signup' ? 'Create Account' : 'Sign In')}
-                </button>
-              </form>
+                  {authLoading ? (
+                    <div className="flex items-center justify-center space-x-2">
+                      <LoadingDots />
+                      <span>Please wait...</span>
+                    </div>
+                  ) : (
+                    authMode === 'signup' ? 'Create Account' : 'Sign In'
+                  )}
+                </AnimatedButton>
+              </motion.form>
             )}
           </div>
-        </div>
-      </div>
+        </AnimatedCard>
+      </AnimatedPage>
     );
   }
 
