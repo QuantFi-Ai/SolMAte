@@ -1676,26 +1676,6 @@ function AppContent() {
                     </div>
                   )}
 
-                  {/* Trading Stories */}
-                  {(getCurrentCard()?.best_trade || getCurrentCard()?.worst_trade) && (
-                    <div className="space-y-2">
-                      {getCurrentCard()?.best_trade && (
-                        <div>
-                          <span className="text-sm font-medium text-green-600 block mb-1">💰 Best Trade:</span>
-                          <p className="text-xs text-gray-600 bg-green-50 p-2 rounded">{getCurrentCard()?.best_trade}</p>
-                        </div>
-                      )}
-                      
-                      {getCurrentCard()?.worst_trade && (
-                        <div>
-                          <span className="text-sm font-medium text-red-600 block mb-1">📉 Learning Experience:</span>
-                          <p className="text-xs text-gray-600 bg-red-50 p-2 rounded">{getCurrentCard()?.worst_trade}</p>
-                        </div>
-                      )}
-                    </div>
-                  )}
-
-                  {getCurrentCard()?.favorite_project && (
                     <div>
                       <span className="text-sm font-medium text-gray-500 block mb-1">❤️ Favorite Project:</span>
                       <p className="text-xs text-gray-600 bg-gray-50 p-2 rounded">{getCurrentCard()?.favorite_project}</p>
