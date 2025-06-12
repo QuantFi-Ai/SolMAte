@@ -2142,28 +2142,58 @@ function AppContent() {
               )}
 
               {/* Action Buttons */}
+              {/* Action Buttons */}
               <div className="flex space-x-4 pt-4 border-t border-gray-200">
-                <button
-                  onClick={() => {
-                    setShowProfilePopup(false);
-                    // Find the match for this user and open chat
-                    const match = matches.find(m => m.other_user.user_id === selectedProfileUser.user_id);
-                    if (match) {
-                      setSelectedMatch(match);
-                      fetchMessages(match.match_id);
-                      setCurrentView('chat');
-                    }
-                  }}
-                  className="flex-1 bg-black hover:bg-gray-800 text-white font-medium py-3 px-6 rounded-lg transition-all"
-                >
-                  💬 Start Chat
-                </button>
-                <button
-                  onClick={() => setShowProfilePopup(false)}
-                  className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-3 px-6 rounded-lg transition-all"
-                >
-                  Close
-                </button>
+                {profilePopupContext === 'discover' ? (
+                  // Discover context - Show Like/Pass buttons
+                  <>
+                    <button
+                      onClick={() => {
+                        handleSwipe('pass', discoveryMode === 'ai');
+                        setShowProfilePopup(false);
+                      }}
+                      className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-600 font-medium py-3 px-6 rounded-lg transition-all flex items-center justify-center space-x-2"
+                    >
+                      <span>👎</span>
+                      <span>Pass</span>
+                    </button>
+                    <button
+                      onClick={() => {
+                        handleSwipe('like', discoveryMode === 'ai');
+                        setShowProfilePopup(false);
+                      }}
+                      className="flex-1 bg-black hover:bg-gray-800 text-white font-medium py-3 px-6 rounded-lg transition-all flex items-center justify-center space-x-2"
+                    >
+                      <span>👍</span>
+                      <span>Like</span>
+                    </button>
+                  </>
+                ) : (
+                  // Matches/Messages/Chat context - Show Chat button
+                  <>
+                    <button
+                      onClick={() => {
+                        setShowProfilePopup(false);
+                        // Find the match for this user and open chat
+                        const match = matches.find(m => m.other_user.user_id === selectedProfileUser.user_id);
+                        if (match) {
+                          setSelectedMatch(match);
+                          fetchMessages(match.match_id);
+                          setCurrentView('chat');
+                        }
+                      }}
+                      className="flex-1 bg-black hover:bg-gray-800 text-white font-medium py-3 px-6 rounded-lg transition-all"
+                    >
+                      💬 Start Chat
+                    </button>
+                    <button
+                      onClick={() => setShowProfilePopup(false)}
+                      className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-3 px-6 rounded-lg transition-all"
+                    >
+                      Close
+                    </button>
+                  </>
+                )}
               </div>
             </div>
           </div>
