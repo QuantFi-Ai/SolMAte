@@ -132,9 +132,11 @@ function AppContent() {
   const [emailForm, setEmailForm] = useState({
     email: '',
     password: '',
-    display_name: ''
+    display_name: '',
+    referral_code: ''
   });
   const [authLoading, setAuthLoading] = useState(false);
+  const [referralInfo, setReferralInfo] = useState(null);
 
   // Profile dropdown state
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
