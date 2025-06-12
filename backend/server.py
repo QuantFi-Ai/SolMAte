@@ -1459,15 +1459,26 @@ async def get_matches_with_messages(user_id: str):
                 sort=[("timestamp", -1)]
             )
             
-            # Get unread message count (messages after user's last read time)
-            # For now, we'll use a simple approach - count messages from the other user that are newer than 1 hour ago
-            # In a real app, you'd track last_read_at per match per user
-            one_hour_ago = datetime.utcnow() - timedelta(hours=1)
-            unread_count = messages_collection.count_documents({
-                "match_id": match["match_id"],
-                "sender_id": other_user_id,
-                "timestamp": {"$gte": one_hour_ago}
+            # Get unread message count based on actual read status
+            read_status_collection = db.read_status
+            read_status = read_status_collection.find_one({
+                "user_id": user_id,
+                "match_id": match["match_id"]
             })
+            
+            if read_status and read_status.get("last_read_at"):
+                # Count messages from other user after last read time
+                unread_count = messages_collection.count_documents({
+                    "match_id": match["match_id"],
+                    "sender_id": other_user_id,
+                    "timestamp": {"$gt": read_status["last_read_at"]}
+                })
+            else:
+                # If no read status exists, count all messages from other user
+                unread_count = messages_collection.count_documents({
+                    "match_id": match["match_id"],
+                    "sender_id": other_user_id
+                })
             
             match_data = {
                 "match_id": match["match_id"],
