@@ -162,14 +162,6 @@ function AppContent() {
     setTimeout(() => setIsTyping(false), duration);
   };
 
-
-  // Toast notification helper
-  const showToastNotification = (message, type = 'info') => {
-    setToastMessage(message);
-    setToastType(type);
-    setTimeout(() => setIsTyping(false), duration);
-  };
-
   // Validate session with backend
   const validateSession = async (userData) => {
     try {
@@ -1538,12 +1530,12 @@ function AppContent() {
                     className="flex items-center space-x-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-all"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
                     </svg>
-                    <span>Share Profile</span>
+                    <span>Profile Settings</span>
                   </button>
                   
-                  <div className="border-t border-gray-100 my-1"></div>
+                  <hr className="my-1 border-gray-200" />
                   
                   <button
                     onClick={handleLogout}
@@ -1559,944 +1551,660 @@ function AppContent() {
             </div>
           </div>
         </div>
-      </nav>
+      </motion.nav>
 
-      {/* Discover View */}
-      {currentView === 'discover' && (
-        <div className="max-w-md mx-auto pt-8 px-4">
-          {/* Discovery Mode Toggle */}
-          <div className="flex bg-gray-100 rounded-xl p-1 mb-6">
-            <button
-              onClick={() => setDiscoveryMode('browse')}
-              className={`flex-1 py-2 px-4 rounded-lg font-medium transition-all ${
-                discoveryMode === 'browse' 
-                  ? 'bg-white text-black shadow-sm' 
-                  : 'text-gray-600 hover:text-black'
-              }`}
-            >
-              Browse Traders
-            </button>
-            <button
-              onClick={() => setDiscoveryMode('ai')}
-              className={`flex-1 py-2 px-4 rounded-lg font-medium transition-all ${
-                discoveryMode === 'ai' 
-                  ? 'bg-white text-black shadow-sm' 
-                  : 'text-gray-600 hover:text-black'
-              }`}
-            >
-              🤖 AI Matches
-            </button>
-          </div>
-
-          {/* Active Users Filter */}
-          <div className="flex items-center justify-between mb-6 p-3 bg-white rounded-lg border border-gray-200">
-            <div className="flex items-center space-x-2">
-              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-              <span className="text-sm font-medium text-gray-700">Show only active traders</span>
-            </div>
-            <button
-              onClick={() => {
-                setShowOnlyActive(!showOnlyActive);
-                // Refresh cards with new filter
-                if (discoveryMode === 'browse') {
-                  fetchDiscoveryCards();
-                } else {
-                  fetchAiRecommendations();
-                }
-              }}
-              className={`w-12 h-6 rounded-full transition-all duration-200 focus:outline-none ${
-                showOnlyActive ? 'bg-green-500' : 'bg-gray-300'
-              }`}
-            >
-              <div className={`w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-200 ${
-                showOnlyActive ? 'translate-x-6' : 'translate-x-0.5'
-              }`}></div>
-            </button>
-          </div>
-
-          {getCurrentIndex() < getCurrentCards().length ? (
-            <SwipeableCard
-              onSwipeLeft={() => handleSwipe('pass', discoveryMode === 'ai')}
-              onSwipeRight={() => handleSwipe('like', discoveryMode === 'ai')}
-              className="bg-white rounded-2xl overflow-hidden shadow-lg border border-gray-200"
-            >
-              {/* AI Compatibility Banner */}
-              {discoveryMode === 'ai' && getCurrentCard()?.ai_compatibility && (
-                <div className="bg-gradient-to-r from-blue-500 to-green-600 text-white p-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium">Match Score</span>
-                    <span className="text-2xl font-bold">
-                      {getCurrentCard().ai_compatibility.compatibility_percentage}%
-                    </span>
+      {/* Main Content */}
+      <div className="max-w-6xl mx-auto p-4">
+        <AnimatePresence mode="wait">
+          {/* Discover View */}
+          {currentView === 'discover' && (
+            <AnimatedPage key="discover">
+              <div className="mb-6">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-2xl font-bold text-black">Discover Traders</h2>
+                  <div className="flex items-center space-x-4">
+                    {/* Discovery Mode Toggle */}
+                    <div className="flex bg-gray-100 rounded-xl p-1">
+                      <motion.button
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={() => setDiscoveryMode('browse')}
+                        className={`py-2 px-4 rounded-lg font-medium transition-all ${
+                          discoveryMode === 'browse' 
+                            ? 'bg-white text-black shadow-sm' 
+                            : 'text-gray-600 hover:text-black'
+                        }`}
+                      >
+                        Browse Traders
+                      </motion.button>
+                      <motion.button
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={() => setDiscoveryMode('ai')}
+                        className={`py-2 px-4 rounded-lg font-medium transition-all ${
+                          discoveryMode === 'ai' 
+                            ? 'bg-white text-black shadow-sm' 
+                            : 'text-gray-600 hover:text-black'
+                        }`}
+                      >
+                        AI Recommended
+                      </motion.button>
+                    </div>
+                    
+                    {/* Active Filter Toggle */}
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id="show_only_active"
+                        checked={showOnlyActive}
+                        onChange={(e) => {
+                          setShowOnlyActive(e.target.checked);
+                          // Re-filter cards
+                          setDiscoveryCards(prev => filterCardsByStatus(prev));
+                          setAiRecommendations(prev => filterCardsByStatus(prev));
+                        }}
+                        className="w-4 h-4 text-black bg-gray-100 border-gray-300 rounded focus:ring-black focus:ring-2"
+                      />
+                      <label htmlFor="show_only_active" className="text-sm font-medium text-gray-700">
+                        Show only active traders
+                      </label>
+                    </div>
                   </div>
-                  <div className="space-y-1">
-                    {getCurrentCard().ai_compatibility.recommendations.map((rec, idx) => (
-                      <p key={idx} className="text-xs text-blue-100">{rec}</p>
-                    ))}
+                </div>
+              </div>
+              
+              {/* Discovery Cards */}
+              <div className="grid grid-cols-1 gap-6">
+                {getCurrentCards().length > 0 && getCurrentIndex() < getCurrentCards().length ? (
+                  <SwipeableCard
+                    onSwipeLeft={() => handleSwipe('pass', discoveryMode === 'ai')}
+                    onSwipeRight={() => handleSwipe('like', discoveryMode === 'ai')}
+                    className="max-w-2xl mx-auto w-full"
+                  >
+                    <AnimatedCard className="p-6" hover={false}>
+                      <div className="flex items-start space-x-4">
+                        <AnimatedProfilePicture
+                          src={getCurrentCard().avatar_url}
+                          alt={getCurrentCard().display_name}
+                          size="w-20 h-20"
+                          className={getCurrentCard().user_status === 'active' ? 'status-online' : ''}
+                        />
+                        <div className="flex-1">
+                          <div className="flex items-center justify-between">
+                            <h3 className="text-xl font-bold text-black">{getCurrentCard().display_name}</h3>
+                            <div className="flex items-center space-x-2">
+                              {discoveryMode === 'ai' && getCurrentCard().ai_compatibility && (
+                                <div className="bg-purple-100 text-purple-800 px-2 py-1 rounded-full text-xs font-medium">
+                                  {getCurrentCard().ai_compatibility}% Match
+                                </div>
+                              )}
+                              {getCurrentCard().user_status === 'active' && (
+                                <div className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium flex items-center">
+                                  <div className="w-2 h-2 bg-green-500 rounded-full mr-1"></div>
+                                  Active
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                          
+                          <div className="mt-1 text-sm text-gray-500">
+                            {getCurrentCard().location && (
+                              <div className="flex items-center space-x-1">
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                                <span>{getCurrentCard().location}</span>
+                              </div>
+                            )}
+                          </div>
+                          
+                          {getCurrentCard().bio && (
+                            <p className="mt-3 text-gray-700">{getCurrentCard().bio}</p>
+                          )}
+                          
+                          <div className="mt-4 grid grid-cols-2 gap-3">
+                            {getCurrentCard().trading_experience && (
+                              <div className="bg-gray-50 p-2 rounded-lg">
+                                <span className="text-xs text-gray-500">Experience</span>
+                                <p className="font-medium">{getCurrentCard().trading_experience}</p>
+                              </div>
+                            )}
+                            
+                            {getCurrentCard().trading_style && (
+                              <div className="bg-gray-50 p-2 rounded-lg">
+                                <span className="text-xs text-gray-500">Style</span>
+                                <p className="font-medium">{getCurrentCard().trading_style}</p>
+                              </div>
+                            )}
+                            
+                            {getCurrentCard().preferred_tokens && getCurrentCard().preferred_tokens.length > 0 && (
+                              <div className="bg-gray-50 p-2 rounded-lg col-span-2">
+                                <span className="text-xs text-gray-500">Preferred Tokens</span>
+                                <div className="flex flex-wrap gap-1 mt-1">
+                                  {getCurrentCard().preferred_tokens.map(token => (
+                                    <span key={token} className="bg-gray-200 text-gray-800 px-2 py-0.5 rounded text-xs">
+                                      {token}
+                                    </span>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                          
+                          <div className="mt-6 flex justify-between">
+                            <motion.button
+                              whileHover={{ scale: 1.05 }}
+                              whileTap={{ scale: 0.95 }}
+                              onClick={() => handleSwipe('pass', discoveryMode === 'ai')}
+                              className="bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-2 px-4 rounded-lg transition-all"
+                            >
+                              Pass
+                            </motion.button>
+                            
+                            <motion.button
+                              whileHover={{ scale: 1.05 }}
+                              whileTap={{ scale: 0.95 }}
+                              onClick={() => handleSwipe('like', discoveryMode === 'ai')}
+                              className="bg-black hover:bg-gray-800 text-white font-medium py-2 px-4 rounded-lg transition-all"
+                            >
+                              Like
+                            </motion.button>
+                          </div>
+                        </div>
+                      </div>
+                    </AnimatedCard>
+                  </SwipeableCard>
+                ) : (
+                  <div className="text-center py-12">
+                    <h3 className="text-xl font-medium text-gray-700 mb-2">
+                      {getCurrentCards().length === 0 ? 'Loading traders...' : 'No more traders to discover'}
+                    </h3>
+                    {getCurrentCards().length === 0 ? (
+                      <div className="flex justify-center">
+                        <LoadingDots size="lg" />
+                      </div>
+                    ) : (
+                      <p className="text-gray-500">
+                        Check back later for more traders to connect with!
+                      </p>
+                    )}
                   </div>
+                )}
+              </div>
+            </AnimatedPage>
+          )}
+          
+          {/* Matches View */}
+          {currentView === 'matches' && (
+            <AnimatedPage key="matches">
+              <div className="mb-6">
+                <h2 className="text-2xl font-bold text-black">Your Matches</h2>
+                <p className="text-gray-600">Traders who liked you back</p>
+              </div>
+              
+              {matches.length > 0 ? (
+                <StaggeredList className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {matches.map(match => (
+                    <AnimatedCard 
+                      key={match.match_id} 
+                      className="p-4"
+                      onClick={() => showUserProfile(match.user, 'matches')}
+                    >
+                      <div className="flex items-center space-x-3">
+                        <AnimatedProfilePicture
+                          src={match.user.avatar_url}
+                          alt={match.user.display_name}
+                          className={match.user.user_status === 'active' ? 'status-online' : ''}
+                        />
+                        <div>
+                          <h3 className="font-semibold text-black">{match.user.display_name}</h3>
+                          <p className="text-sm text-gray-600">{match.user.trading_style || 'Trader'}</p>
+                        </div>
+                      </div>
+                      
+                      <div className="mt-4 flex justify-between">
+                        <motion.button
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            openChatAndMarkRead(match);
+                          }}
+                          className="bg-black hover:bg-gray-800 text-white text-sm font-medium py-1.5 px-3 rounded-lg transition-all"
+                        >
+                          Message
+                        </motion.button>
+                        
+                        <div className="text-xs text-gray-500 flex items-center">
+                          Matched {new Date(match.created_at).toLocaleDateString()}
+                        </div>
+                      </div>
+                    </AnimatedCard>
+                  ))}
+                </StaggeredList>
+              ) : (
+                <div className="text-center py-12 bg-white rounded-2xl shadow-sm border border-gray-200">
+                  <h3 className="text-xl font-medium text-gray-700 mb-2">No matches yet</h3>
+                  <p className="text-gray-500 mb-6">
+                    Like more traders to increase your chances of matching!
+                  </p>
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => setCurrentView('discover')}
+                    className="bg-black hover:bg-gray-800 text-white font-medium py-2 px-6 rounded-xl transition-all"
+                  >
+                    Discover Traders
+                  </motion.button>
                 </div>
               )}
-
-              <div className="relative">
-                <img
-                  src={getCurrentCard()?.avatar_url}
-                  alt="Profile"
-                  className="w-full h-96 object-cover cursor-pointer hover:opacity-95 transition-all"
-                  onClick={() => showUserProfile(getCurrentCard(), 'discover')}
-                  title="Click to view full profile"
-                />
-                {/* Status Indicator */}
-                {getCurrentCard()?.user_status === 'active' && (
-                  <div className="absolute top-4 right-4 flex items-center space-x-1 bg-green-500 text-white px-2 py-1 rounded-full text-xs font-medium">
-                    <div className="w-2 h-2 bg-white rounded-full"></div>
-                    <span>Trading Now</span>
-                  </div>
-                )}
-                {getCurrentCard()?.timezone && (
-                  <div className="absolute top-4 left-4 bg-black/70 text-white px-2 py-1 rounded text-xs">
-                    🌍 {getCurrentCard().timezone.replace('_', ' ')}
-                  </div>
-                )}
-                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6">
-                  <h3 className="text-2xl font-bold text-white">
-                    {getCurrentCard()?.display_name}
-                  </h3>
-                  <div className="flex items-center space-x-2 mt-1">
-                    {getCurrentCard()?.show_twitter && getCurrentCard()?.twitter_username && (
-                      <p className="text-blue-300 text-sm">
-                        🐦 @{getCurrentCard()?.twitter_username}
-                      </p>
-                    )}
-                    {getCurrentCard()?.location && (
-                      <p className="text-white/90 text-sm">📍 {getCurrentCard()?.location}</p>
-                    )}
-                  </div>
-                </div>
-              </div>
-              
-              <div className="p-6 space-y-4">
-                <p className="text-gray-700">{getCurrentCard()?.bio}</p>
-                
-                <div className="space-y-3">
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="flex items-center space-x-2">
-                      <span className="text-sm font-medium text-gray-500">Experience:</span>
-                      <span className="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs">
-                        {getCurrentCard()?.trading_experience}
-                      </span>
-                    </div>
-                    
-                    <div className="flex items-center space-x-2">
-                      <span className="text-sm font-medium text-gray-500">Years:</span>
-                      <span className="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs">
-                        {getCurrentCard()?.years_trading}
-                      </span>
-                    </div>
-                  </div>
-                  
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="flex items-center space-x-2">
-                      <span className="text-sm font-medium text-gray-500">Style:</span>
-                      <span className="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs">
-                        {getCurrentCard()?.trading_style}
-                      </span>
-                    </div>
-                    
-                    <div className="flex items-center space-x-2">
-                      <span className="text-sm font-medium text-gray-500">Portfolio:</span>
-                      <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">
-                        💰 {getCurrentCard()?.portfolio_size}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="flex items-center space-x-2">
-                      <span className="text-sm font-medium text-gray-500">Risk:</span>
-                      <span className="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs">
-                        {getCurrentCard()?.risk_tolerance}
-                      </span>
-                    </div>
-                    
-                    <div className="flex items-center space-x-2">
-                      <span className="text-sm font-medium text-gray-500">Hours:</span>
-                      <span className="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs">
-                        🕐 {getCurrentCard()?.trading_hours}
-                      </span>
-                    </div>
-                    
-                  </div>
-
-                  {/* Communication Preferences */}
-                  {(getCurrentCard()?.preferred_communication_platform || getCurrentCard()?.preferred_trading_platform) && (
-                    <div className="space-y-2">
-                      {getCurrentCard()?.preferred_communication_platform && (
-                        <div className="flex items-center space-x-2">
-                          <span className="text-sm font-medium text-gray-500">Prefers:</span>
-                          <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">
-                            📱 {getCurrentCard()?.preferred_communication_platform}
-                          </span>
-                        </div>
-                      )}
-                      
-                      {getCurrentCard()?.preferred_trading_platform && (
-                        <div className="flex items-center space-x-2">
-                          <span className="text-sm font-medium text-gray-500">Trades on:</span>
-                          <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">
-                            ⚡ {getCurrentCard()?.preferred_trading_platform}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                  
-                  <div>
-                    <span className="text-sm font-medium text-gray-500 block mb-2">Preferred Tokens:</span>
-                    <div className="flex flex-wrap gap-1">
-                      {getCurrentCard()?.preferred_tokens?.map((token, idx) => (
-                        <span key={idx} className="bg-purple-100 text-purple-800 px-2 py-1 rounded-full text-xs">
-                          {token}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-
-                  {getCurrentCard()?.looking_for && getCurrentCard()?.looking_for?.length > 0 && (
-                    <div>
-                      <span className="text-sm font-medium text-gray-500 block mb-2">Looking For:</span>
-                      <div className="flex flex-wrap gap-1">
-                        {getCurrentCard()?.looking_for?.map((item, idx) => (
-                          <span key={idx} className="bg-orange-100 text-orange-800 px-2 py-1 rounded-full text-xs">
-                            {item}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Best Trade Preview */}
-                  {getCurrentCard()?.best_trade && (
-                    <div>
-                      <span className="text-sm font-medium text-green-600 block mb-1">💰 Best Trade:</span>
-                      <p className="text-xs text-gray-600 bg-green-50 p-2 rounded line-clamp-2">
-                        {getCurrentCard()?.best_trade.substring(0, 120)}
-                        {getCurrentCard()?.best_trade.length > 120 ? '...' : ''}
-                      </p>
-                    </div>
-                  )}
-
-                  {/* Best Trade Preview */}
-                  {getCurrentCard()?.best_trade && (
-                    <div>
-                      <span className="text-sm font-medium text-green-600 block mb-1">💰 Best Trade:</span>
-                      <p className="text-xs text-gray-600 bg-green-50 p-2 rounded line-clamp-2">
-                        {getCurrentCard()?.best_trade.substring(0, 120)}
-                        {getCurrentCard()?.best_trade.length > 120 ? '...' : ''}
-                      </p>
-                    </div>
-                  )}
-
-                    <div>
-                      <span className="text-sm font-medium text-gray-500 block mb-1">❤️ Favorite Project:</span>
-                      <p className="text-xs text-gray-600 bg-gray-50 p-2 rounded">{getCurrentCard()?.favorite_project}</p>
-                    </div>
-                  )}
-                </div>
-              </div>
-              
-              {/* Action Buttons */}
-              <div className="flex space-x-4 p-6 pt-0">
-                <button
-                  onClick={() => handleSwipe('pass', discoveryMode === 'ai')}
-                  className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-600 font-semibold py-3 px-6 rounded-xl transition-all duration-200 flex items-center justify-center space-x-2"
-                >
-                  <span>👎</span>
-                  <span>Pass</span>
-                </button>
-                <button
-                  onClick={() => handleSwipe('like', discoveryMode === 'ai')}
-                  className="flex-1 bg-black hover:bg-gray-800 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 flex items-center justify-center space-x-2"
-                >
-                  <span>👍</span>
-                  <span>Like</span>
-                </button>
-              </div>
-            </div>
-          ) : (
-            <div className="bg-white rounded-2xl p-8 text-center shadow-lg border border-gray-200">
-              <div className="text-6xl mb-4">🎯</div>
-              <h3 className="text-xl font-bold text-black mb-2">No More Traders</h3>
-              <p className="text-gray-600 mb-4">
-                {discoveryMode === 'ai' 
-                  ? "You've seen all your AI-matched traders. Try browsing all traders or come back later for new members!"
-                  : "You've seen all available traders. Come back later for new members!"
-                }
-              </p>
-              <button
-                onClick={() => {
-                  if (discoveryMode === 'ai') {
-                    setDiscoveryMode('browse');
-                  } else {
-                    setCurrentCardIndex(0);
-                    setCurrentAiIndex(0);
-                    fetchDiscoveryCards();
-                    fetchAiRecommendations();
-                  }
-                }}
-                className="bg-black hover:bg-gray-800 text-white font-medium py-2 px-4 rounded-lg transition-all"
-              >
-                {discoveryMode === 'ai' ? 'Browse All Traders' : 'Refresh'}
-              </button>
-            </div>
+            </AnimatedPage>
           )}
-        </div>
-      )}
-
-      {/* Matches View */}
-      {currentView === 'matches' && (
-        <div className="max-w-4xl mx-auto pt-8 px-4">
-          <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-200">
-            <h2 className="text-2xl font-bold text-black mb-6">Your Matches</h2>
-            
-            {matches.length === 0 ? (
-              <div className="text-center py-12">
-                <div className="text-6xl mb-4">💫</div>
-                <h3 className="text-xl font-bold text-black mb-2">No Matches Yet</h3>
-                <p className="text-gray-600 mb-4">Start swiping to find your trading partners!</p>
-                <button
-                  onClick={() => setCurrentView('discover')}
-                  className="bg-black hover:bg-gray-800 text-white font-medium py-2 px-4 rounded-lg transition-all"
-                >
-                  Start Discovering
-                </button>
+          
+          {/* Messages View */}
+          {currentView === 'messages' && (
+            <AnimatedPage key="messages">
+              <div className="mb-6">
+                <h2 className="text-2xl font-bold text-black">Messages</h2>
+                <p className="text-gray-600">Chat with your matches</p>
               </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {matches.map((match) => (
-                  <div key={match.match_id} className="border border-gray-200 rounded-xl p-4 hover:shadow-md transition-all">
-                    <div className="flex items-center space-x-3 mb-3">
-                      <img
-                        src={match.other_user.avatar_url}
-                        alt="Match"
-                        className="w-12 h-12 rounded-full object-cover"
+              
+              {matchesWithMessages.length > 0 ? (
+                <StaggeredList className="space-y-2">
+                  {matchesWithMessages.map(match => (
+                    <AnimatedCard 
+                      key={match.match_id} 
+                      className={`p-4 ${match.unread_count > 0 ? 'border-l-4 border-black' : ''}`}
+                      onClick={() => openChatAndMarkRead(match)}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-3">
+                          <AnimatedProfilePicture
+                            src={match.user.avatar_url}
+                            alt={match.user.display_name}
+                            className={match.user.user_status === 'active' ? 'status-online' : ''}
+                          />
+                          <div>
+                            <h3 className="font-semibold text-black">{match.user.display_name}</h3>
+                            <p className="text-sm text-gray-600 truncate max-w-xs">
+                              {match.last_message ? match.last_message.content : 'No messages yet'}
+                            </p>
+                          </div>
+                        </div>
+                        
+                        <div className="flex flex-col items-end">
+                          <div className="text-xs text-gray-500">
+                            {match.last_message ? new Date(match.last_message.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
+                          </div>
+                          {match.unread_count > 0 && (
+                            <div className="badge-animated badge-pulse bg-black text-white text-xs rounded-full w-5 h-5 flex items-center justify-center mt-1">
+                              {match.unread_count}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </AnimatedCard>
+                  ))}
+                </StaggeredList>
+              ) : (
+                <div className="text-center py-12 bg-white rounded-2xl shadow-sm border border-gray-200">
+                  <h3 className="text-xl font-medium text-gray-700 mb-2">No messages yet</h3>
+                  <p className="text-gray-500 mb-6">
+                    Start a conversation with one of your matches!
+                  </p>
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => setCurrentView('matches')}
+                    className="bg-black hover:bg-gray-800 text-white font-medium py-2 px-6 rounded-xl transition-all"
+                  >
+                    View Matches
+                  </motion.button>
+                </div>
+              )}
+            </AnimatedPage>
+          )}
+          
+          {/* Chat View */}
+          {currentView === 'chat' && selectedMatch && (
+            <AnimatedPage key="chat">
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+                {/* Chat Header */}
+                <div className="border-b border-gray-200 p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => setCurrentView('messages')}
+                        className="text-gray-600 hover:text-black"
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                        </svg>
+                      </motion.button>
+                      
+                      <AnimatedProfilePicture
+                        src={selectedMatch.user.avatar_url}
+                        alt={selectedMatch.user.display_name}
+                        className={selectedMatch.user.user_status === 'active' ? 'status-online' : ''}
+                        onClick={() => showUserProfile(selectedMatch.user, 'chat')}
                       />
+                      
                       <div>
-                        <h3 className="font-semibold text-black">{match.other_user.display_name}</h3>
-                        <p className="text-sm text-gray-500">
-                          {match.other_user.trading_experience} • {match.other_user.trading_style}
+                        <h3 className="font-semibold text-black">{selectedMatch.user.display_name}</h3>
+                        <p className="text-xs text-gray-500">
+                          {selectedMatch.user.user_status === 'active' ? 'Active now' : 'Offline'}
                         </p>
                       </div>
                     </div>
                     
-                    {match.other_user.bio && (
-                      <p className="text-sm text-gray-600 mb-3 line-clamp-2">{match.other_user.bio}</p>
-                    )}
-                    
-                    <div className="flex space-x-2 mb-3">
-                      {match.other_user.preferred_tokens?.slice(0, 2).map((token, idx) => (
-                        <span key={idx} className="bg-purple-100 text-purple-800 px-2 py-1 rounded text-xs">
-                          {token}
-                        </span>
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => showUserProfile(selectedMatch.user, 'chat')}
+                      className="text-gray-600 hover:text-black"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </motion.button>
+                  </div>
+                </div>
+                
+                {/* Chat Messages */}
+                <div className="p-4 h-96 overflow-y-auto chat-messages">
+                  {messages.length > 0 ? (
+                    <div className="space-y-4">
+                      {messages.map(message => (
+                        <AnimatedMessage
+                          key={message.message_id}
+                          message={message.content}
+                          isOwn={message.sender_id === currentUser.user_id}
+                          timestamp={message.created_at}
+                        />
                       ))}
-                      {match.other_user.preferred_tokens?.length > 2 && (
-                        <span className="bg-gray-100 text-gray-600 px-2 py-1 rounded text-xs">
-                          +{match.other_user.preferred_tokens.length - 2}
-                        </span>
-                      )}
+                      {isTyping && <TypingIndicator />}
+                      <div ref={messagesEndRef} />
                     </div>
-                    
-                    <button
-                      onClick={() => {
-                        setSelectedMatch(match);
-                        fetchMessages(match.match_id);
-                        setCurrentView('chat');
-                      }}
-                      className="w-full bg-black hover:bg-gray-800 text-white font-medium py-2 px-4 rounded-lg transition-all"
-                    >
-                      💬 Chat
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Messages View */}
-      {currentView === 'messages' && (
-        <div className="max-w-4xl mx-auto pt-8 px-4">
-          <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-200">
-            <h2 className="text-2xl font-bold text-black mb-6">Messages</h2>
-            
-            {matchesWithMessages.length === 0 ? (
-              <div className="text-center py-12">
-                <div className="text-6xl mb-4">💬</div>
-                <h3 className="text-xl font-bold text-black mb-2">No Conversations Yet</h3>
-                <p className="text-gray-600 mb-4">Start matching to begin conversations!</p>
-                <button
-                  onClick={() => setCurrentView('discover')}
-                  className="bg-black hover:bg-gray-800 text-white font-medium py-2 px-4 rounded-lg transition-all"
-                >
-                  Find Traders
-                </button>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {matchesWithMessages.map((match) => (
-                  <div key={match.match_id} className="border border-gray-200 rounded-xl p-4 hover:shadow-md transition-all">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-4">
-                        <div className="relative">
-                          <img
-                            src={match.other_user.avatar_url}
-                            alt="Profile"
-                            className="w-12 h-12 rounded-full object-cover cursor-pointer hover:opacity-80 transition-all"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              showUserProfile(match.other_user, 'messages');
-                            }}
-                            title="Click to view full profile"
-                          />
-                          {match.other_user.user_status === 'active' && (
-                            <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-white rounded-full"></div>
-                          )}
-                        </div>
-                        
-                        <div 
-                          className="flex-1 cursor-pointer"
-                          onClick={() => openChatAndMarkRead(match)}
-                        >
-                          <div className="flex items-center space-x-2 mb-1">
-                            <h3 className="font-semibold text-black">{match.other_user.display_name}</h3>
-                            {match.other_user.trading_experience && (
-                              <span className="bg-gray-100 text-gray-600 px-2 py-1 rounded-full text-xs">
-                                {match.other_user.trading_experience}
-                              </span>
-                            )}
-                          </div>
-                          
-                          {match.latest_message.content ? (
-                            <div className="flex items-center space-x-2">
-                              <p className="text-sm text-gray-600 truncate max-w-xs">
-                                {match.latest_message.sender_id === currentUser?.user_id ? 'You: ' : ''}
-                                {match.latest_message.content}
-                              </p>
-                              {match.latest_message.timestamp && (
-                                <span className="text-xs text-gray-400 whitespace-nowrap">
-                                  {new Date(match.latest_message.timestamp).toLocaleDateString()}
-                                </span>
-                              )}
-                            </div>
-                          ) : (
-                            <p className="text-sm text-gray-400">Start a conversation...</p>
-                          )}
-                        </div>
-                      </div>
-                      
-                      <div className="flex items-center space-x-3">
-                        {match.unread_count > 0 && (
-                          <span className="bg-red-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center font-medium">
-                            {match.unread_count}
-                          </span>
-                        )}
-                        <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                        </svg>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Chat View */}
-      {currentView === 'chat' && selectedMatch && (
-        <div className="max-w-2xl mx-auto pt-8 px-4">
-          <div className="bg-white rounded-2xl shadow-lg border border-gray-200 h-[600px] flex flex-col">
-            {/* Chat Header */}
-            <div className="p-4 border-b border-gray-200 flex items-center space-x-3">
-              <button
-                onClick={() => setCurrentView('matches')}
-                className="text-gray-600 hover:text-black transition-all"
-              >
-                ← Back
-              </button>
-              <img
-                src={selectedMatch.other_user.avatar_url}
-                alt="Match"
-                className="w-10 h-10 rounded-full object-cover cursor-pointer hover:opacity-80 transition-all"
-                onClick={() => showUserProfile(selectedMatch.other_user, 'chat')}
-                title="Click to view full profile"
-              />
-              <div>
-                <h3 className="font-semibold text-black">{selectedMatch.other_user.display_name}</h3>
-                <p className="text-sm text-gray-500">
-                  {selectedMatch.other_user.trading_experience} Trader
-                </p>
-              </div>
-            </div>
-            
-            {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4 chat-messages">
-              <AnimatePresence>
-                {messages.map((message, idx) => (
-                  <AnimatedMessage
-                    key={idx}
-                    message={message.content}
-                    isOwn={message.sender_id === currentUser.user_id}
-                    timestamp={message.timestamp}
-                  />
-                ))}
-                {isTyping && <TypingIndicator />}
-              </AnimatePresence>
-              <div ref={messagesEndRef} />
-            </div>
-            
-            {/* Message Input */}
-            <form onSubmit={handleSendMessage} className="p-4 border-t border-gray-200">
-              <div className="flex space-x-2">
-                <input
-                  type="text"
-                  value={newMessage}
-                  onChange={(e) => setNewMessage(e.target.value)}
-                  placeholder="Type a message..."
-                  className="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-black focus:border-transparent"
-                />
-                <button
-                  type="submit"
-                  disabled={!newMessage.trim()}
-                  className="bg-black hover:bg-gray-800 disabled:opacity-50 text-white font-medium py-2 px-4 rounded-lg transition-all"
-                >
-                  Send
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* Match Modal */}
-      {showMatchModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl p-8 max-w-md w-full text-center">
-            <div className="text-6xl mb-4">🎉</div>
-            <h3 className="text-2xl font-bold text-black mb-2">It's a Match!</h3>
-            <p className="text-gray-600 mb-6">You both liked each other. Start trading together!</p>
-            <div className="flex space-x-3">
-              <button
-                onClick={() => setShowMatchModal(false)}
-                className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-600 font-medium py-2 px-4 rounded-lg transition-all"
-              >
-                Keep Swiping
-              </button>
-              <button
-                onClick={() => {
-                  setShowMatchModal(false);
-                  setCurrentView('matches');
-                }}
-                className="flex-1 bg-black hover:bg-gray-800 text-white font-medium py-2 px-4 rounded-lg transition-all"
-              >
-                Start Chat
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Profile Manager Modal */}
-      {showProfileManager && (
-        <ProfileManager 
-          currentUser={currentUser} 
-          onClose={() => setShowProfileManager(false)} 
-        />
-      )}
-
-      {/* Profile Popup Modal */}
-      {showProfilePopup && selectedProfileUser && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 overflow-y-auto">
-          <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[95vh] overflow-y-auto">
-            {/* Header */}
-            <div className="p-6 border-b border-gray-200 flex items-center justify-between sticky top-0 bg-white z-10">
-              <h2 className="text-2xl font-bold text-black">Trader Profile</h2>
-              <button
-                onClick={() => setShowProfilePopup(false)}
-                className="text-gray-500 hover:text-black transition-all"
-              >
-                ✕
-              </button>
-            </div>
-
-            <div className="p-6 space-y-6">
-              {/* Profile Header */}
-              <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-2xl p-6">
-                <div className="flex flex-col md:flex-row items-center md:items-start space-y-4 md:space-y-0 md:space-x-6">
-                  <img
-                    src={selectedProfileUser.avatar_url}
-                    alt={selectedProfileUser.display_name}
-                    className="w-20 h-20 rounded-full border-4 border-white shadow-lg"
-                  />
-                  
-                  <div className="flex-1 text-center md:text-left">
-                    <h1 className="text-2xl font-bold text-black mb-2">{selectedProfileUser.display_name}</h1>
-                    {selectedProfileUser.show_twitter && selectedProfileUser.twitter_username && (
-                      <p className="text-blue-600 mb-2">🐦 @{selectedProfileUser.twitter_username}</p>
-                    )}
-                    {selectedProfileUser.location && (
-                      <p className="text-gray-600 mb-2">📍 {selectedProfileUser.location}</p>
-                    )}
-                    
-                    <div className="flex flex-wrap justify-center md:justify-start gap-2">
-                      <span className="bg-black text-white px-3 py-1 rounded-full text-sm font-medium">
-                        {selectedProfileUser.trading_experience}
-                      </span>
-                      <span className="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm">
-                        {selectedProfileUser.years_trading} years trading
-                      </span>
-                      <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
-                        {selectedProfileUser.portfolio_size}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Bio */}
-              {selectedProfileUser.bio && (
-                <div>
-                  <h3 className="text-lg font-semibold text-black mb-3">About</h3>
-                  <p className="text-gray-700 leading-relaxed">{selectedProfileUser.bio}</p>
-                </div>
-              )}
-
-              {/* Trading Info */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <h4 className="font-semibold text-gray-800 mb-3">Trading Style</h4>
-                  <div className="space-y-2 text-sm">
-                    <p><span className="text-gray-500">Style:</span> {selectedProfileUser.trading_style}</p>
-                    <p><span className="text-gray-500">Risk Tolerance:</span> {selectedProfileUser.risk_tolerance}</p>
-                    <p><span className="text-gray-500">Trading Hours:</span> {selectedProfileUser.trading_hours}</p>
-                    <p><span className="text-gray-500">Communication:</span> {selectedProfileUser.communication_style}</p>
-                  </div>
-                </div>
-
-                <div>
-                  <h4 className="font-semibold text-gray-800 mb-3">Platforms</h4>
-                  <div className="space-y-2 text-sm">
-                    {selectedProfileUser.preferred_trading_platform && (
-                      <p><span className="text-gray-500">Trading Platform:</span> {selectedProfileUser.preferred_trading_platform}</p>
-                    )}
-                    {selectedProfileUser.preferred_communication_platform && (
-                      <p><span className="text-gray-500">Communication Platform:</span> {selectedProfileUser.preferred_communication_platform}</p>
-                    )}
-                    {selectedProfileUser.favorite_project && (
-                      <p><span className="text-gray-500">Favorite Project:</span> {selectedProfileUser.favorite_project}</p>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* Preferred Tokens */}
-              {selectedProfileUser.preferred_tokens && selectedProfileUser.preferred_tokens.length > 0 && (
-                <div>
-                  <h4 className="font-semibold text-gray-800 mb-3">Preferred Token Categories</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {selectedProfileUser.preferred_tokens.map((token, idx) => (
-                      <span key={idx} className="bg-purple-100 text-purple-800 px-3 py-2 rounded-lg text-sm font-medium">
-                        {token}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Looking For */}
-              {selectedProfileUser.looking_for && selectedProfileUser.looking_for.length > 0 && (
-                <div>
-                  <h4 className="font-semibold text-gray-800 mb-3">Looking For</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {selectedProfileUser.looking_for.map((item, idx) => (
-                      <span key={idx} className="bg-orange-100 text-orange-800 px-3 py-2 rounded-lg text-sm font-medium">
-                        {item}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Trading Stories */}
-              {(selectedProfileUser.best_trade || selectedProfileUser.worst_trade) && (
-                <div className="space-y-4">
-                  <h4 className="font-semibold text-gray-800">Trading Stories</h4>
-                  
-                  {selectedProfileUser.best_trade && (
-                    <div>
-                      <h5 className="text-green-600 font-medium mb-2">💰 Best Trade</h5>
-                      <p className="text-sm text-gray-700 bg-green-50 p-3 rounded-lg">{selectedProfileUser.best_trade}</p>
-                    </div>
-                  )}
-                  
-                  {selectedProfileUser.worst_trade && (
-                    <div>
-                      <h5 className="text-red-600 font-medium mb-2">📉 Learning Experience</h5>
-                      <p className="text-sm text-gray-700 bg-red-50 p-3 rounded-lg">{selectedProfileUser.worst_trade}</p>
+                  ) : (
+                    <div className="h-full flex flex-col items-center justify-center text-center">
+                      <p className="text-gray-500 mb-4">No messages yet</p>
+                      <p className="text-sm text-gray-400">Send a message to start the conversation!</p>
                     </div>
                   )}
                 </div>
-              )}
-
-              {/* Action Buttons */}
-              <div className="flex space-x-4 pt-4 border-t border-gray-200">
-                {profilePopupContext === 'discover' ? (
-                  // Discover context - Show Like/Pass buttons
-                  <>
-                    <button
-                      onClick={() => {
-                        handleSwipe('pass', discoveryMode === 'ai');
-                        setShowProfilePopup(false);
-                      }}
-                      className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-600 font-medium py-3 px-6 rounded-lg transition-all flex items-center justify-center space-x-2"
+                
+                {/* Chat Input */}
+                <div className="border-t border-gray-200 p-4">
+                  <form onSubmit={handleSendMessage} className="flex space-x-2">
+                    <input
+                      type="text"
+                      value={newMessage}
+                      onChange={(e) => setNewMessage(e.target.value)}
+                      className="chat-input flex-1"
+                      placeholder="Type a message..."
+                    />
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      type="submit"
+                      disabled={!newMessage.trim()}
+                      className="bg-black hover:bg-gray-800 disabled:opacity-50 text-white p-3 rounded-full transition-all"
                     >
-                      <span>👎</span>
-                      <span>Pass</span>
-                    </button>
-                    <button
-                      onClick={() => {
-                        handleSwipe('like', discoveryMode === 'ai');
-                        setShowProfilePopup(false);
-                      }}
-                      className="flex-1 bg-black hover:bg-gray-800 text-white font-medium py-3 px-6 rounded-lg transition-all flex items-center justify-center space-x-2"
-                    >
-                      <span>👍</span>
-                      <span>Like</span>
-                    </button>
-                  </>
-                ) : (
-                  // All other contexts - Show Chat button
-                  <>
-                    <button
-                      onClick={() => {
-                        setShowProfilePopup(false);
-                        // Find the match for this user and open chat
-                        const match = matches.find(m => m.other_user.user_id === selectedProfileUser.user_id);
-                        if (match) {
-                          setSelectedMatch(match);
-                          fetchMessages(match.match_id);
-                          setCurrentView('chat');
-                        }
-                      }}
-                      className="flex-1 bg-black hover:bg-gray-800 text-white font-medium py-3 px-6 rounded-lg transition-all"
-                    >
-                      💬 Start Chat
-                    </button>
-                    <button
-                      onClick={() => setShowProfilePopup(false)}
-                      className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-3 px-6 rounded-lg transition-all"
-                    >
-                      Close
-                    </button>
-                  </>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Profile Popup Modal */}
-      {showProfilePopup && selectedProfileUser && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 overflow-y-auto">
-          <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[95vh] overflow-y-auto">
-            {/* Header */}
-            <div className="p-6 border-b border-gray-200 flex items-center justify-between sticky top-0 bg-white z-10">
-              <h2 className="text-2xl font-bold text-black">Trader Profile</h2>
-              <button
-                onClick={() => setShowProfilePopup(false)}
-                className="text-gray-500 hover:text-black transition-all"
-              >
-                ✕
-              </button>
-            </div>
-
-            <div className="p-6 space-y-6">
-              {/* Profile Header */}
-              <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-2xl p-6">
-                <div className="flex flex-col md:flex-row items-center md:items-start space-y-4 md:space-y-0 md:space-x-6">
-                  <img
-                    src={selectedProfileUser.avatar_url}
-                    alt={selectedProfileUser.display_name}
-                    className="w-20 h-20 rounded-full border-4 border-white shadow-lg"
-                  />
-                  
-                  <div className="flex-1 text-center md:text-left">
-                    <h1 className="text-2xl font-bold text-black mb-2">{selectedProfileUser.display_name}</h1>
-                    {selectedProfileUser.show_twitter && selectedProfileUser.twitter_username && (
-                      <p className="text-blue-600 mb-2">🐦 @{selectedProfileUser.twitter_username}</p>
-                    )}
-                    {selectedProfileUser.location && (
-                      <p className="text-gray-600 mb-2">📍 {selectedProfileUser.location}</p>
-                    )}
-                    
-                    <div className="flex flex-wrap justify-center md:justify-start gap-2">
-                      <span className="bg-black text-white px-3 py-1 rounded-full text-sm font-medium">
-                        {selectedProfileUser.trading_experience}
-                      </span>
-                      <span className="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm">
-                        {selectedProfileUser.years_trading} years trading
-                      </span>
-                      <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
-                        {selectedProfileUser.portfolio_size}
-                      </span>
-                    </div>
-                  </div>
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                      </svg>
+                    </motion.button>
+                  </form>
                 </div>
               </div>
-
-              {/* Bio */}
-              {selectedProfileUser.bio && (
-                <div>
-                  <h3 className="text-lg font-semibold text-black mb-3">About</h3>
-                  <p className="text-gray-700 leading-relaxed">{selectedProfileUser.bio}</p>
-                </div>
-              )}
-
-              {/* Trading Info */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <h4 className="font-semibold text-gray-800 mb-3">Trading Style</h4>
-                  <div className="space-y-2 text-sm">
-                    <p><span className="text-gray-500">Style:</span> {selectedProfileUser.trading_style}</p>
-                    <p><span className="text-gray-500">Risk Tolerance:</span> {selectedProfileUser.risk_tolerance}</p>
-                    <p><span className="text-gray-500">Trading Hours:</span> {selectedProfileUser.trading_hours}</p>
-                    <p><span className="text-gray-500">Communication:</span> {selectedProfileUser.communication_style}</p>
-                  </div>
-                </div>
-
-                <div>
-                  <h4 className="font-semibold text-gray-800 mb-3">Platforms</h4>
-                  <div className="space-y-2 text-sm">
-                    {selectedProfileUser.preferred_trading_platform && (
-                      <p><span className="text-gray-500">Trading Platform:</span> {selectedProfileUser.preferred_trading_platform}</p>
-                    )}
-                    {selectedProfileUser.preferred_communication_platform && (
-                      <p><span className="text-gray-500">Communication Platform:</span> {selectedProfileUser.preferred_communication_platform}</p>
-                    )}
-                    {selectedProfileUser.favorite_project && (
-                      <p><span className="text-gray-500">Favorite Project:</span> {selectedProfileUser.favorite_project}</p>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* Preferred Tokens */}
-              {selectedProfileUser.preferred_tokens && selectedProfileUser.preferred_tokens.length > 0 && (
-                <div>
-                  <h4 className="font-semibold text-gray-800 mb-3">Preferred Token Categories</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {selectedProfileUser.preferred_tokens.map((token, idx) => (
-                      <span key={idx} className="bg-purple-100 text-purple-800 px-3 py-2 rounded-lg text-sm font-medium">
-                        {token}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Looking For */}
-              {selectedProfileUser.looking_for && selectedProfileUser.looking_for.length > 0 && (
-                <div>
-                  <h4 className="font-semibold text-gray-800 mb-3">Looking For</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {selectedProfileUser.looking_for.map((item, idx) => (
-                      <span key={idx} className="bg-orange-100 text-orange-800 px-3 py-2 rounded-lg text-sm font-medium">
-                        {item}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Trading Stories */}
-              {(selectedProfileUser.best_trade || selectedProfileUser.worst_trade) && (
-                <div className="space-y-4">
-                  <h4 className="font-semibold text-gray-800">Trading Stories</h4>
-                  
-                  {selectedProfileUser.best_trade && (
-                    <div>
-                      <h5 className="text-green-600 font-medium mb-2">💰 Best Trade</h5>
-                      <p className="text-sm text-gray-700 bg-green-50 p-3 rounded-lg">{selectedProfileUser.best_trade}</p>
-                    </div>
-                  )}
-                  
-                  {selectedProfileUser.worst_trade && (
-                    <div>
-                      <h5 className="text-red-600 font-medium mb-2">📉 Learning Experience</h5>
-                      <p className="text-sm text-gray-700 bg-red-50 p-3 rounded-lg">{selectedProfileUser.worst_trade}</p>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* Action Buttons */}
-              <div className="flex space-x-4 pt-4 border-t border-gray-200">
-                <button
-                  onClick={() => {
-                    setShowProfilePopup(false);
-                    // Find the match for this user and open chat
-                    const match = matches.find(m => m.other_user.user_id === selectedProfileUser.user_id);
-                    if (match) {
-                      setSelectedMatch(match);
-                      fetchMessages(match.match_id);
-                      setCurrentView('chat');
-                    }
-                  }}
-                  className="flex-1 bg-black hover:bg-gray-800 text-white font-medium py-3 px-6 rounded-lg transition-all"
-                >
-                  💬 Start Chat
-                </button>
-                <button
-                  onClick={() => setShowProfilePopup(false)}
-                  className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-3 px-6 rounded-lg transition-all"
-                >
-                  Close
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
+            </AnimatedPage>
+          )}
+        </AnimatePresence>
+      </div>
+      
       {/* Match Celebration Modal */}
       <MatchCelebration
         isVisible={showMatchModal}
         onClose={() => setShowMatchModal(false)}
-        user={selectedMatch?.other_user}
+        user={getCurrentCard()}
       />
-
-      {/* Toast Notifications */}
+      
+      {/* Toast Notification */}
       <ToastNotification
         message={toastMessage}
         type={toastType}
         isVisible={showToast}
         onClose={() => setShowToast(false)}
       />
+      
+      {/* Profile Popup */}
+      {showProfilePopup && selectedProfileUser && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            className="bg-white rounded-2xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+          >
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-black">Trader Profile</h2>
+                <motion.button
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={() => setShowProfilePopup(false)}
+                  className="text-gray-500 hover:text-black"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </motion.button>
+              </div>
+              
+              <div className="flex flex-col md:flex-row md:space-x-6">
+                <div className="md:w-1/3 flex flex-col items-center mb-6 md:mb-0">
+                  <AnimatedProfilePicture
+                    src={selectedProfileUser.avatar_url}
+                    alt={selectedProfileUser.display_name}
+                    size="w-32 h-32"
+                    className={selectedProfileUser.user_status === 'active' ? 'status-online' : ''}
+                  />
+                  
+                  <h3 className="text-xl font-bold text-black mt-4">{selectedProfileUser.display_name}</h3>
+                  
+                  {selectedProfileUser.location && (
+                    <p className="text-gray-600 flex items-center mt-1">
+                      <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                      </svg>
+                      {selectedProfileUser.location}
+                    </p>
+                  )}
+                  
+                  {selectedProfileUser.show_twitter && selectedProfileUser.twitter_username && (
+                    <a
+                      href={`https://twitter.com/${selectedProfileUser.twitter_username}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-500 hover:text-blue-600 flex items-center mt-2"
+                    >
+                      <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723 10.054 10.054 0 01-3.127 1.184 4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z" />
+                      </svg>
+                      @{selectedProfileUser.twitter_username}
+                    </a>
+                  )}
+                  
+                  {profilePopupContext === 'chat' || profilePopupContext === 'messages' ? (
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => {
+                        setShowProfilePopup(false);
+                        setCurrentView('chat');
+                      }}
+                      className="bg-black hover:bg-gray-800 text-white font-medium py-2 px-6 rounded-xl mt-4 w-full transition-all"
+                    >
+                      Back to Chat
+                    </motion.button>
+                  ) : (
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => {
+                        const match = matches.find(m => m.user.user_id === selectedProfileUser.user_id);
+                        if (match) {
+                          setShowProfilePopup(false);
+                          openChatAndMarkRead(match);
+                        }
+                      }}
+                      className="bg-black hover:bg-gray-800 text-white font-medium py-2 px-6 rounded-xl mt-4 w-full transition-all"
+                    >
+                      Message
+                    </motion.button>
+                  )}
+                </div>
+                
+                <div className="md:w-2/3">
+                  {selectedProfileUser.bio && (
+                    <div className="mb-6">
+                      <h4 className="text-sm font-semibold text-gray-500 uppercase mb-2">Bio</h4>
+                      <p className="text-gray-800">{selectedProfileUser.bio}</p>
+                    </div>
+                  )}
+                  
+                  <div className="grid grid-cols-2 gap-4 mb-6">
+                    {selectedProfileUser.trading_experience && (
+                      <div>
+                        <h4 className="text-sm font-semibold text-gray-500 uppercase mb-1">Experience</h4>
+                        <p className="text-gray-800">{selectedProfileUser.trading_experience}</p>
+                      </div>
+                    )}
+                    
+                    {selectedProfileUser.years_trading > 0 && (
+                      <div>
+                        <h4 className="text-sm font-semibold text-gray-500 uppercase mb-1">Years Trading</h4>
+                        <p className="text-gray-800">{selectedProfileUser.years_trading} {selectedProfileUser.years_trading === 1 ? 'year' : 'years'}</p>
+                      </div>
+                    )}
+                    
+                    {selectedProfileUser.trading_style && (
+                      <div>
+                        <h4 className="text-sm font-semibold text-gray-500 uppercase mb-1">Trading Style</h4>
+                        <p className="text-gray-800">{selectedProfileUser.trading_style}</p>
+                      </div>
+                    )}
+                    
+                    {selectedProfileUser.portfolio_size && (
+                      <div>
+                        <h4 className="text-sm font-semibold text-gray-500 uppercase mb-1">Portfolio Size</h4>
+                        <p className="text-gray-800">{selectedProfileUser.portfolio_size}</p>
+                      </div>
+                    )}
+                    
+                    {selectedProfileUser.risk_tolerance && (
+                      <div>
+                        <h4 className="text-sm font-semibold text-gray-500 uppercase mb-1">Risk Tolerance</h4>
+                        <p className="text-gray-800">{selectedProfileUser.risk_tolerance}</p>
+                      </div>
+                    )}
+                    
+                    {selectedProfileUser.trading_hours && (
+                      <div>
+                        <h4 className="text-sm font-semibold text-gray-500 uppercase mb-1">Trading Hours</h4>
+                        <p className="text-gray-800">{selectedProfileUser.trading_hours}</p>
+                      </div>
+                    )}
+                  </div>
+                  
+                  {selectedProfileUser.preferred_tokens && selectedProfileUser.preferred_tokens.length > 0 && (
+                    <div className="mb-6">
+                      <h4 className="text-sm font-semibold text-gray-500 uppercase mb-2">Preferred Tokens</h4>
+                      <div className="flex flex-wrap gap-2">
+                        {selectedProfileUser.preferred_tokens.map(token => (
+                          <span key={token} className="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm">
+                            {token}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {selectedProfileUser.looking_for && selectedProfileUser.looking_for.length > 0 && (
+                    <div className="mb-6">
+                      <h4 className="text-sm font-semibold text-gray-500 uppercase mb-2">Looking For</h4>
+                      <div className="flex flex-wrap gap-2">
+                        {selectedProfileUser.looking_for.map(item => (
+                          <span key={item} className="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm">
+                            {item}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {selectedProfileUser.best_trade && (
+                    <div className="mb-4">
+                      <h4 className="text-sm font-semibold text-gray-500 uppercase mb-1">Best Trade</h4>
+                      <p className="text-gray-800">{selectedProfileUser.best_trade}</p>
+                    </div>
+                  )}
+                  
+                  {selectedProfileUser.worst_trade && (
+                    <div className="mb-4">
+                      <h4 className="text-sm font-semibold text-gray-500 uppercase mb-1">Worst Trade</h4>
+                      <p className="text-gray-800">{selectedProfileUser.worst_trade}</p>
+                    </div>
+                  )}
+                  
+                  {selectedProfileUser.favorite_project && (
+                    <div>
+                      <h4 className="text-sm font-semibold text-gray-500 uppercase mb-1">Favorite Project</h4>
+                      <p className="text-gray-800">{selectedProfileUser.favorite_project}</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      )}
+      
+      {/* Profile Manager Modal */}
+      {showProfileManager && (
+        <ProfileManager
+          user={currentUser}
+          onClose={() => setShowProfileManager(false)}
+          onUpdate={(updatedUser) => {
+            setCurrentUser(updatedUser);
+            setShowProfileManager(false);
+          }}
+        />
+      )}
     </div>
   );
 }
 
+// Main App Component
 function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/profile/:username" element={<PublicProfile />} />
-        <Route path="/*" element={<AppContent />} />
+        <Route path="/profile/:userId" element={<PublicProfileWrapper />} />
+        <Route path="/" element={<AppContent />} />
       </Routes>
     </Router>
   );
+}
+
+// Wrapper for Public Profile with useParams
+function PublicProfileWrapper() {
+  const { userId } = useParams();
+  return <PublicProfile userId={userId} />;
 }
 
 export default App;
