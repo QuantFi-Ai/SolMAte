@@ -1353,6 +1353,22 @@ function AppContent() {
                 </span>
               )}
             </button>
+            <button
+              onClick={() => {
+                setCurrentView('messages');
+                fetchMatchesWithMessages();
+              }}
+              className={`px-4 py-2 rounded-lg font-medium transition-all relative ${
+                currentView === 'messages' ? 'bg-black text-white' : 'text-gray-600 hover:text-black'
+              }`}
+            >
+              💬 Messages
+              {matchesWithMessages.length > 0 && matchesWithMessages.reduce((total, match) => total + match.unread_count, 0) > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                  {matchesWithMessages.reduce((total, match) => total + match.unread_count, 0)}
+                </span>
+              )}
+            </button>
           </div>
           <div className="flex items-center space-x-3">
             {/* Status Toggle */}
