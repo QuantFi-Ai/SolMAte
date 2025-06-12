@@ -184,6 +184,7 @@ function AppContent() {
               fetchMatches(validatedUser);
               fetchMatchesWithMessages(validatedUser);
               fetchMatchesWithMessages(validatedUser);
+              fetchMatchesWithMessages(validatedUser);
             }
           } else {
             // Invalid session, go to login
