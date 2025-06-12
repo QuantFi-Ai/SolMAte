@@ -1574,9 +1574,25 @@ function AppContent() {
                     </div>
                     
                     <div className="flex items-center space-x-2">
+                      <span className="text-sm font-medium text-gray-500">Portfolio:</span>
+                      <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">
+                        💰 {getCurrentCard()?.portfolio_size}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="flex items-center space-x-2">
                       <span className="text-sm font-medium text-gray-500">Risk:</span>
                       <span className="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs">
                         {getCurrentCard()?.risk_tolerance}
+                      </span>
+                    </div>
+                    
+                    <div className="flex items-center space-x-2">
+                      <span className="text-sm font-medium text-gray-500">Hours:</span>
+                      <span className="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs">
+                        🕐 {getCurrentCard()?.trading_hours}
                       </span>
                     </div>
                   </div>
