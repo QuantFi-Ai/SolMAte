@@ -655,17 +655,31 @@ function AppContent() {
     setShowProfileDropdown(false);
   };
 
-  const handleSendMessage = (e) => {
+  const handleSendMessage = async (e) => {
     e.preventDefault();
-    if (!newMessage.trim() || !selectedMatch || !ws) return;
+    if (!newMessage.trim() || !selectedMatch) return;
     
-    ws.send(JSON.stringify({
-      type: 'chat_message',
-      match_id: selectedMatch.match_id,
-      content: newMessage.trim()
-    }));
-    
-    setNewMessage('');
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/messages`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          match_id: selectedMatch.match_id,
+          sender_id: currentUser.user_id,
+          content: newMessage.trim()
+        })
+      });
+      
+      if (response.ok) {
+        // Refresh messages
+        fetchMessages(selectedMatch.match_id);
+        setNewMessage('');
+      } else {
+        console.error('Failed to send message');
+      }
+    } catch (error) {
+      console.error('Error sending message:', error);
+    }
   };
 
   const handleTokenToggle = (token) => {
