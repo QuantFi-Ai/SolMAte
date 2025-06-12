@@ -209,41 +209,16 @@ function AppContent() {
     }
   }, []);
 
-  // Setup WebSocket when user is logged in
+  // Setup WebSocket when user is logged in (disabled for now - using HTTP polling)
   useEffect(() => {
-    if (currentUser && !ws) {
-      // Convert HTTPS URL to WSS for WebSocket
-      const wsUrl = API_BASE_URL.replace('https://', 'wss://') + `/api/ws/${currentUser.user_id}`;
-      const websocket = new WebSocket(wsUrl);
-      
-      websocket.onopen = () => {
-        console.log('WebSocket connected');
-      };
-      
-      websocket.onmessage = (event) => {
-        const data = JSON.parse(event.data);
-        if (data.type === 'new_match') {
-          setShowMatchModal(true);
-          fetchMatches();
-        } else if (data.type === 'chat_message') {
-          setMessages(prev => [...prev, data.message]);
-        }
-      };
-      
-      websocket.onerror = (error) => {
-        console.error('WebSocket error:', error);
-      };
-      
-      websocket.onclose = () => {
-        console.log('WebSocket disconnected');
-      };
-      
-      setWs(websocket);
-      
-      return () => {
-        websocket.close();
-      };
-    }
+    // WebSocket functionality disabled - using HTTP polling for chat instead
+    // This prevents connection errors while keeping chat functional
+    return () => {
+      if (ws) {
+        ws.close();
+        setWs(null);
+      }
+    };
   }, [currentUser, ws]);
 
   // Auto-refresh messages when in chat view
