@@ -123,9 +123,6 @@ function AppContent() {
   // Profile popup modal state
   const [showProfilePopup, setShowProfilePopup] = useState(false);
   const [selectedProfileUser, setSelectedProfileUser] = useState(null);
-  
-  // Profile popup modal state
-  const [showProfilePopup, setShowProfilePopup] = useState(false);
   const [selectedProfileUser, setSelectedProfileUser] = useState(null);
 
   // Validate session with backend
