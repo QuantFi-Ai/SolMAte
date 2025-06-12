@@ -544,8 +544,9 @@ function AppContent() {
     await markMessagesAsRead(match.match_id);
   };
 
-  const showUserProfile = (user) => {
+  const showUserProfile = (user, context = 'matches') => {
     setSelectedProfileUser(user);
+    setProfilePopupContext(context);
     setShowProfilePopup(true);
   };
 
