@@ -1596,12 +1596,6 @@ function AppContent() {
                       </span>
                     </div>
                     
-                    <div className="flex items-center space-x-2">
-                      <span className="text-sm font-medium text-gray-500">Hours:</span>
-                      <span className="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs">
-                        🕐 {getCurrentCard()?.trading_hours}
-                      </span>
-                    </div>
                   </div>
 
                   {/* Communication Preferences */}
