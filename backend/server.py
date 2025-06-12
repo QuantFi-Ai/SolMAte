@@ -1511,9 +1511,21 @@ async def mark_messages_read(match_id: str, user_data: dict):
         if not user_id:
             raise HTTPException(status_code=400, detail="user_id required")
         
-        # Update last_read_at timestamp for this user in this match
-        # For now, we'll just return success since we're using a simple unread logic
-        # In a real implementation, you'd store last_read_at per user per match
+        # Create or update a read_status collection to track when users last read messages
+        read_status_collection = db.read_status
+        
+        read_status = {
+            "user_id": user_id,
+            "match_id": match_id,
+            "last_read_at": datetime.utcnow()
+        }
+        
+        # Upsert the read status
+        read_status_collection.update_one(
+            {"user_id": user_id, "match_id": match_id},
+            {"$set": read_status},
+            upsert=True
+        )
         
         return {"message": "Messages marked as read"}
         
