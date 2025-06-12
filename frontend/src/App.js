@@ -124,6 +124,7 @@ function AppContent() {
   const [showProfilePopup, setShowProfilePopup] = useState(false);
   const [selectedProfileUser, setSelectedProfileUser] = useState(null);
   const [profilePopupContext, setProfilePopupContext] = useState(''); // 'discover', 'matches', 'messages', 'chat'
+  const [profilePopupContext, setProfilePopupContext] = useState(''); // 'discover', 'matches', 'messages', 'chat'
 
   // Validate session with backend
   const validateSession = async (userData) => {
