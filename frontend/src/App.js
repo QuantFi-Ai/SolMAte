@@ -1332,7 +1332,7 @@ function AppContent() {
                 currentView === 'messages' ? 'bg-black text-white' : 'text-gray-600 hover:text-black'
               }`}
             >
-              💬 Messages
+              Messages
               {matchesWithMessages.length > 0 && matchesWithMessages.reduce((total, match) => total + match.unread_count, 0) > 0 && (
                 <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
                   {matchesWithMessages.reduce((total, match) => total + match.unread_count, 0)}
