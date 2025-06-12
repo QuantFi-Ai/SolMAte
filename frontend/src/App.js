@@ -540,14 +540,6 @@ function AppContent() {
   };
 
 
-  const openChatAndMarkRead = async (match) => {
-    setSelectedMatch(match);
-    setCurrentView('chat');
-    
-    // Fetch messages and mark as read
-    await fetchMessages(match.match_id);
-    await markMessagesAsRead(match.match_id);
-  };
 
   const handleFileUpload = async (event) => {
     const file = event.target.files[0];
