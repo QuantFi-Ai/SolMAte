@@ -497,6 +497,21 @@ function AppContent() {
     }
   };
 
+  const fetchMatchesWithMessages = async (user = currentUser) => {
+    if (!user) return;
+    try {
+      console.log('💬 Fetching matches with messages for user:', user.user_id);
+      const response = await fetch(`${API_BASE_URL}/api/matches-with-messages/${user.user_id}`);
+      if (response.ok) {
+        const matchesData = await response.json();
+        console.log('📧 Matches with messages data received:', matchesData.length, 'matches');
+        setMatchesWithMessages(matchesData);
+      }
+    } catch (error) {
+      console.error('❌ Error fetching matches with messages:', error);
+    }
+  };
+
   const fetchMessages = async (matchId) => {
     try {
       const response = await fetch(`${API_BASE_URL}/api/messages/${matchId}`);
