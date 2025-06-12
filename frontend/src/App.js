@@ -223,31 +223,20 @@ function AppContent() {
     };
   }, [currentUser, ws]);
 
-  // Auto-refresh messages when in chat view
+  // Auto-refresh messages and unread counts
   useEffect(() => {
     let messagePolling;
-    if (currentView === 'chat' && selectedMatch) {
-      // Poll for new messages every 3 seconds
-      messagePolling = setInterval(() => {
-        fetchMessages(selectedMatch.match_id);
-      }, 3000);
-    }
     
-    return () => {
-      if (messagePolling) {
-        clearInterval(messagePolling);
-      }
-    };
-  }, [currentView, selectedMatch]);
-
-  // Auto-refresh messages when in chat view
-  useEffect(() => {
-    let messagePolling;
     if (currentView === 'chat' && selectedMatch) {
-      // Poll for new messages every 3 seconds
+      // Poll for new messages every 3 seconds when in chat
       messagePolling = setInterval(() => {
         fetchMessages(selectedMatch.match_id);
       }, 3000);
+    } else if (currentView === 'messages') {
+      // Poll for unread count updates every 5 seconds when in Messages view
+      messagePolling = setInterval(() => {
+        fetchMatchesWithMessages();
+      }, 5000);
     }
     
     return () => {
