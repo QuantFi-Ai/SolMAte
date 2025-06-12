@@ -138,10 +138,11 @@ function AppContent() {
   // Profile dropdown state
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   
-  // Profile popup modal state
-  const [showProfilePopup, setShowProfilePopup] = useState(false);
-  const [selectedProfileUser, setSelectedProfileUser] = useState(null);
-  const [profilePopupContext, setProfilePopupContext] = useState(''); // 'discover', 'matches', 'messages', 'chat'
+  // Additional state for animations and toasts
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const [toastType, setToastType] = useState('info');
+  const [isTyping, setIsTyping] = useState(false);
 
   // Validate session with backend
   const validateSession = async (userData) => {
