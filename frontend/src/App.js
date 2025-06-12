@@ -162,6 +162,17 @@ function AppContent() {
     setTimeout(() => setIsTyping(false), duration);
   };
 
+
+  // Toast notification helper
+  const showToastNotification = (message, type = 'info') => {
+    setToastMessage(message);
+    setToastType(type);
+    setTimeout(() => setIsTyping(false), duration);
+  };
+
+  // Validate session with backend
+  const validateSession = async (userData) => {
+    try {
       const response = await fetch(`${API_BASE_URL}/api/user/${userData.user_id}`);
       if (response.ok) {
         const currentUserData = await response.json();
