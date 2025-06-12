@@ -472,11 +472,15 @@ function AppContent() {
 
   const fetchMatches = async () => {
     try {
+      console.log('🔍 Fetching matches for user:', currentUser.user_id);
       const response = await fetch(`${API_BASE_URL}/api/matches/${currentUser.user_id}`);
+      console.log('📡 Matches response status:', response.status);
       const matchesData = await response.json();
+      console.log('📊 Matches data received:', matchesData);
       setMatches(matchesData);
+      console.log('✅ Matches state updated, count:', matchesData.length);
     } catch (error) {
-      console.error('Error fetching matches:', error);
+      console.error('❌ Error fetching matches:', error);
     }
   };
 
