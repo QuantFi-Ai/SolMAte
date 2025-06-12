@@ -544,6 +544,11 @@ function AppContent() {
     await markMessagesAsRead(match.match_id);
   };
 
+  const showUserProfile = (user) => {
+    setSelectedProfileUser(user);
+    setShowProfilePopup(true);
+  };
+
 
 
   const handleFileUpload = async (event) => {
