@@ -288,6 +288,7 @@ class EmailSignup(BaseModel):
     email: EmailStr
     password: str
     display_name: str
+    referral_code: Optional[str] = None
 
 class EmailLogin(BaseModel):
     email: EmailStr
