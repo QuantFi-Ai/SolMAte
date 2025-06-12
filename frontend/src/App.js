@@ -205,6 +205,14 @@ function AppContent() {
 
   // Handle auth callback and session restoration on page load
   useEffect(() => {
+    // Check for referral code in URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const referralCode = urlParams.get('ref');
+    
+    if (referralCode) {
+      validateReferralCode(referralCode);
+    }
+
     // First, check for stored user session
     const storedUser = localStorage.getItem('solm8_user');
     if (storedUser && !currentUser) {
@@ -248,7 +256,6 @@ function AppContent() {
     }
 
     // Then check for auth callback URL params
-    const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('auth_success') === 'true') {
       const userId = urlParams.get('user_id');
       
@@ -259,6 +266,25 @@ function AppContent() {
       alert('Authentication failed. Please try again.');
     }
   }, []);
+
+  // Validate referral code
+  const validateReferralCode = async (code) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/referrals/validate/${code}`);
+      if (response.ok) {
+        const data = await response.json();
+        if (data.valid) {
+          setReferralInfo(data);
+          setEmailForm(prev => ({ ...prev, referral_code: code }));
+          showToastNotification(`🎉 ${data.message}`, 'success');
+        } else {
+          showToastNotification(data.message, 'error');
+        }
+      }
+    } catch (error) {
+      console.error('Error validating referral code:', error);
+    }
+  };
 
   // Setup WebSocket when user is logged in (disabled for now - using HTTP polling)
   useEffect(() => {
