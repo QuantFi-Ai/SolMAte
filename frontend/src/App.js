@@ -177,7 +177,7 @@ function AppContent() {
               setCurrentView('profile-setup');
             } else {
               setCurrentView('discover');
-              // Fetch data when restoring session
+              console.log('🔄 Session restored, fetching data...');
               fetchDiscoveryCards();
               fetchAiRecommendations();
               fetchMatches();
