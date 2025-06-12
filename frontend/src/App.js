@@ -263,6 +263,23 @@ function AppContent() {
     };
   }, [currentView, selectedMatch]);
 
+  // Auto-refresh messages when in chat view
+  useEffect(() => {
+    let messagePolling;
+    if (currentView === 'chat' && selectedMatch) {
+      // Poll for new messages every 3 seconds
+      messagePolling = setInterval(() => {
+        fetchMessages(selectedMatch.match_id);
+      }, 3000);
+    }
+    
+    return () => {
+      if (messagePolling) {
+        clearInterval(messagePolling);
+      }
+    };
+  }, [currentView, selectedMatch]);
+
   // Auto-scroll to bottom of messages
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
