@@ -688,7 +688,10 @@ function AppContent() {
       const result = await response.json();
       if (result.matched) {
         setShowMatchModal(true);
+        showToastNotification(`🎉 You matched with ${currentCard.display_name}!`, 'success');
         fetchMatches();
+      } else if (action === 'like') {
+        showToastNotification('Like sent! 💙', 'info');
       }
       
       if (isAiRecommendation) {
@@ -707,6 +710,7 @@ function AppContent() {
       }
     } catch (error) {
       console.error('Error swiping:', error);
+      showToastNotification('Something went wrong. Please try again.', 'error');
     }
   };
 
