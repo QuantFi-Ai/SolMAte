@@ -1523,7 +1523,9 @@ function AppContent() {
                 <img
                   src={getCurrentCard()?.avatar_url}
                   alt="Profile"
-                  className="w-full h-96 object-cover"
+                  className="w-full h-96 object-cover cursor-pointer hover:opacity-95 transition-all"
+                  onClick={() => showUserProfile(getCurrentCard())}
+                  title="Click to view full profile"
                 />
                 {/* Status Indicator */}
                 {getCurrentCard()?.user_status === 'active' && (
