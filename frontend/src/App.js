@@ -549,6 +549,11 @@ function AppContent() {
     setShowProfilePopup(true);
   };
 
+  const showUserProfile = (user) => {
+    setSelectedProfileUser(user);
+    setShowProfilePopup(true);
+  };
+
 
 
   const handleFileUpload = async (event) => {
