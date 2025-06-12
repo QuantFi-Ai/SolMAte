@@ -181,6 +181,9 @@ function AppContent() {
               fetchDiscoveryCards();
               fetchAiRecommendations();
               fetchMatches();
+              fetchDiscoveryCards();
+              fetchAiRecommendations();
+              fetchMatches();
             }
           } else {
             // Invalid session, go to login
