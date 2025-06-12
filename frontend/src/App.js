@@ -18,6 +18,7 @@ import {
   FloatingActionButton,
   AnimatedProfilePicture
 } from './AnimatedComponents';
+import { ReferralDashboard, SupportModal } from './ReferralComponents';
 import PublicProfile from './PublicProfile';
 import ProfileManager from './ProfileManager';
 import LandingPage from './LandingPage';
