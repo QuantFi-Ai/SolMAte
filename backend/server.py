@@ -1503,6 +1503,23 @@ async def get_match_messages(match_id: str, limit: int = 50):
     
     return list(reversed(messages))
 
+@app.post("/api/messages/{match_id}/mark-read")
+async def mark_messages_read(match_id: str, user_data: dict):
+    """Mark messages as read for a user in a match"""
+    try:
+        user_id = user_data.get("user_id")
+        if not user_id:
+            raise HTTPException(status_code=400, detail="user_id required")
+        
+        # Update last_read_at timestamp for this user in this match
+        # For now, we'll just return success since we're using a simple unread logic
+        # In a real implementation, you'd store last_read_at per user per match
+        
+        return {"message": "Messages marked as read"}
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to mark messages as read: {str(e)}")
+
 @app.post("/api/messages")
 async def send_message(message_data: dict):
     """Send a message in a match"""
