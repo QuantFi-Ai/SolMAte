@@ -17,6 +17,7 @@ function AppContent() {
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const [currentAiIndex, setCurrentAiIndex] = useState(0);
   const [matches, setMatches] = useState([]);
+  const [matchesWithMessages, setMatchesWithMessages] = useState([]);
   const [selectedMatch, setSelectedMatch] = useState(null);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
