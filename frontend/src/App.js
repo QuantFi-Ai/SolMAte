@@ -2051,26 +2051,18 @@ function AppContent() {
             </div>
             
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
-              {messages.map((message, idx) => (
-                <div
-                  key={idx}
-                  className={`flex ${message.sender_id === currentUser.user_id ? 'justify-end' : 'justify-start'}`}
-                >
-                  <div
-                    className={`max-w-xs px-4 py-2 rounded-lg ${
-                      message.sender_id === currentUser.user_id
-                        ? 'bg-black text-white'
-                        : 'bg-gray-100 text-black'
-                    }`}
-                  >
-                    <p className="text-sm">{message.content}</p>
-                    <p className="text-xs mt-1 opacity-70">
-                      {new Date(message.timestamp).toLocaleTimeString()}
-                    </p>
-                  </div>
-                </div>
-              ))}
+            <div className="flex-1 overflow-y-auto p-4 space-y-4 chat-messages">
+              <AnimatePresence>
+                {messages.map((message, idx) => (
+                  <AnimatedMessage
+                    key={idx}
+                    message={message.content}
+                    isOwn={message.sender_id === currentUser.user_id}
+                    timestamp={message.timestamp}
+                  />
+                ))}
+                {isTyping && <TypingIndicator />}
+              </AnimatePresence>
               <div ref={messagesEndRef} />
             </div>
             
