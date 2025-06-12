@@ -2479,6 +2479,21 @@ function AppContent() {
           </div>
         </div>
       )}
+
+      {/* Match Celebration Modal */}
+      <MatchCelebration
+        isVisible={showMatchModal}
+        onClose={() => setShowMatchModal(false)}
+        user={selectedMatch?.other_user}
+      />
+
+      {/* Toast Notifications */}
+      <ToastNotification
+        message={toastMessage}
+        type={toastType}
+        isVisible={showToast}
+        onClose={() => setShowToast(false)}
+      />
     </div>
   );
 }
