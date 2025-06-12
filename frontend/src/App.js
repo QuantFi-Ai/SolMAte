@@ -1440,42 +1440,55 @@ function AppContent() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Navigation */}
-      <nav className="bg-white border-b border-gray-200 p-4">
+      <motion.nav 
+        initial={{ y: -50, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        className="bg-white border-b border-gray-200 p-4"
+      >
         <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-black">Solm8</h1>
+          <motion.h1 
+            whileHover={{ scale: 1.05 }}
+            className="text-2xl font-bold text-black cursor-pointer"
+          >
+            Solm8
+          </motion.h1>
           <div className="flex space-x-4">
-            <button
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               onClick={() => setCurrentView('discover')}
-              className={`px-4 py-2 rounded-lg font-medium transition-all ${
-                currentView === 'discover' ? 'bg-black text-white' : 'text-gray-600 hover:text-black'
+              className={`nav-tab px-4 py-2 rounded-lg font-medium transition-all ${
+                currentView === 'discover' ? 'active bg-black text-white' : 'text-gray-600 hover:text-black'
               }`}
             >
               Discover
-            </button>
-            <button
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               onClick={() => setCurrentView('matches')}
-              className={`px-4 py-2 rounded-lg font-medium transition-all ${
-                currentView === 'matches' ? 'bg-black text-white' : 'text-gray-600 hover:text-black'
+              className={`nav-tab px-4 py-2 rounded-lg font-medium transition-all relative ${
+                currentView === 'matches' ? 'active bg-black text-white' : 'text-gray-600 hover:text-black'
               }`}
             >
               Matches ({matches.length})
-            </button>
-            <button
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               onClick={() => {
                 setCurrentView('messages');
                 fetchMatchesWithMessages();
               }}
-              className={`px-4 py-2 rounded-lg font-medium transition-all relative ${
-                currentView === 'messages' ? 'bg-black text-white' : 'text-gray-600 hover:text-black'
+              className={`nav-tab px-4 py-2 rounded-lg font-medium transition-all relative ${
+                currentView === 'messages' ? 'active bg-black text-white' : 'text-gray-600 hover:text-black'
               }`}
             >
               Messages
-              {matchesWithMessages.length > 0 && matchesWithMessages.reduce((total, match) => total + match.unread_count, 0) > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                  {matchesWithMessages.reduce((total, match) => total + match.unread_count, 0)}
-                </span>
-              )}
-            </button>
+              <AnimatedBadge 
+                count={matchesWithMessages.length > 0 ? matchesWithMessages.reduce((total, match) => total + match.unread_count, 0) : 0}
+              />
+            </motion.button>
           </div>
           <div className="flex items-center space-x-3">
             {/* Status Toggle */}
