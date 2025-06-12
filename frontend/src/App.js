@@ -2169,7 +2169,7 @@ function AppContent() {
                     </button>
                   </>
                 ) : (
-                  // Matches/Messages/Chat context - Show Chat button
+                  // All other contexts - Show Chat button
                   <>
                     <button
                       onClick={() => {
