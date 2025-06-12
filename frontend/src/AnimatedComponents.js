@@ -269,7 +269,7 @@ export const LoadingDots = ({ size = "sm" }) => {
   };
 
   return (
-    <div className="loading-dots">
+    <div className="flex items-center justify-center space-x-1">
       {[0, 1, 2].map((index) => (
         <motion.div
           key={index}
