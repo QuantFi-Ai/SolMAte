@@ -177,6 +177,10 @@ function AppContent() {
               setCurrentView('profile-setup');
             } else {
               setCurrentView('discover');
+              // Fetch data when restoring session
+              fetchDiscoveryCards();
+              fetchAiRecommendations();
+              fetchMatches();
             }
           } else {
             // Invalid session, go to login
