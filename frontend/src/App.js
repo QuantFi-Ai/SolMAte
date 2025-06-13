@@ -1998,7 +1998,7 @@ function AppContent() {
                       <div>
                         <h3 className="font-semibold text-black">{selectedMatch.user?.display_name || 'Unknown User'}</h3>
                         <p className="text-xs text-gray-500">
-                          {selectedMatch.user.user_status === 'active' ? 'Active now' : 'Offline'}
+                          {selectedMatch.user?.user_status === 'active' ? 'Active now' : 'Offline'}
                         </p>
                       </div>
                     </div>
