@@ -257,6 +257,21 @@ frontend:
       - working: true
         agent: "testing"
         comment: "✅ TESTED: Code review confirms that the Discovery system is properly implemented. The fetchDiscoveryCards and fetchAiRecommendations functions correctly fetch data from the API and update the state with the results. The 'Loading traders...' message appears only when getCurrentCards().length === 0, which means it will show while data is being loaded and disappear once data is available. The implementation properly handles both 'Browse Traders' and 'AI Recommended' sections."
+        
+  - task: "Preview Profile and Share on Twitter"
+    implemented: true
+    working: false
+    file: "/app/frontend/src/App.js"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "Testing the new Preview Profile and Share on Twitter functionality to verify that users can preview their profile and share it on Twitter."
+      - working: false
+        agent: "testing"
+        comment: "❌ TESTED: Unable to test the Preview Profile and Share on Twitter functionality due to issues with the profile setup process. The code review shows that the functionality is implemented in App.js with handlePreviewProfile and handleShareProfile functions, but we couldn't access the profile dropdown menu to test it. The implementation includes: 1) Preview Profile opens the user's public profile in a new tab, 2) Share on Twitter opens a Twitter share dialog with the profile URL and referral code, 3) Both options are present in the profile dropdown menu with proper icons."
 
 metadata:
   created_by: "testing_agent"
