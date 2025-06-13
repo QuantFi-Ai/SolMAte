@@ -285,12 +285,13 @@ frontend:
 metadata:
   created_by: "testing_agent"
   version: "1.0"
-  test_sequence: 8
+  test_sequence: 9
   run_ui: true
 
 test_plan:
   current_focus:
-    - "Preview Profile and Share on Twitter"
+    - "Discovery System Fix"
+    - "Profile Picture Click Functionality"
   stuck_tasks:
     - "Preview Profile and Share on Twitter"
   test_all: false
