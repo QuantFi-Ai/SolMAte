@@ -1949,15 +1949,19 @@ function AppContent() {
                 ) : (
                   <div className="text-center py-12">
                     <h3 className="text-xl font-medium text-gray-700 mb-2">
-                      {getCurrentCards().length === 0 && getCurrentIndex() === 0 ? 'Loading traders...' : 'No more traders to discover'}
+                      {(discoveryMode === 'browse' && discoveryLoading) || (discoveryMode === 'ai' && aiRecommendationsLoading) 
+                        ? 'Loading traders...' 
+                        : 'No traders available right now'}
                     </h3>
-                    {getCurrentCards().length === 0 && getCurrentIndex() === 0 ? (
+                    {(discoveryMode === 'browse' && discoveryLoading) || (discoveryMode === 'ai' && aiRecommendationsLoading) ? (
                       <div className="flex justify-center">
                         <LoadingDots size="lg" />
                       </div>
                     ) : (
                       <p className="text-gray-500">
-                        Check back later for more traders to connect with!
+                        {discoveryMode === 'browse' 
+                          ? 'You\'ve seen all available traders. Check back later for new matches!' 
+                          : 'No AI recommendations available. Check back later for new matches!'}
                       </p>
                     )}
                   </div>
