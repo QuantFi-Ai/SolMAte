@@ -589,6 +589,8 @@ function AppContent() {
       console.log('❌ No user provided to fetchDiscoveryCards');
       return;
     }
+    
+    setDiscoveryLoading(true);
     try {
       console.log('📡 Fetching discovery cards from:', `${API_BASE_URL}/api/discover/${user.user_id}`);
       const response = await fetch(`${API_BASE_URL}/api/discover/${user.user_id}`);
@@ -596,10 +598,10 @@ function AppContent() {
       if (response.ok) {
         const data = await response.json();
         console.log('📋 Discovery data received:', data?.length, 'cards');
-        console.log('🔍 Raw discovery data:', data); // NEW: Log the actual data
+        console.log('🔍 Raw discovery data:', data);
         const filteredData = filterCardsByStatus(data || []);
         console.log('✅ Filtered discovery cards:', filteredData?.length, 'cards');
-        console.log('🔍 Filtered data:', filteredData); // NEW: Log filtered data
+        console.log('🔍 Filtered data:', filteredData);
         setDiscoveryCards(filteredData);
       } else {
         console.log('❌ Discovery API error:', response.status, response.statusText);
@@ -608,6 +610,8 @@ function AppContent() {
       }
     } catch (error) {
       console.error('❌ Error fetching discovery cards:', error);
+    } finally {
+      setDiscoveryLoading(false);
     }
   };
 
@@ -617,6 +621,8 @@ function AppContent() {
       console.log('❌ No user provided to fetchAiRecommendations');
       return;
     }
+    
+    setAiRecommendationsLoading(true);
     try {
       console.log('📡 Fetching AI recommendations from:', `${API_BASE_URL}/api/ai-recommendations/${user.user_id}`);
       const response = await fetch(`${API_BASE_URL}/api/ai-recommendations/${user.user_id}`);
@@ -624,14 +630,20 @@ function AppContent() {
       if (response.ok) {
         const data = await response.json();
         console.log('📋 AI recommendations data received:', data?.length, 'cards');
+        console.log('🔍 Raw AI data:', data);
         const filteredData = filterCardsByStatus(data || []);
         console.log('✅ Filtered AI recommendations:', filteredData?.length, 'cards');
+        console.log('🔍 Filtered AI data:', filteredData);
         setAiRecommendations(filteredData);
       } else {
         console.log('❌ AI recommendations API error:', response.status, response.statusText);
+        const errorText = await response.text();
+        console.log('❌ Error response:', errorText);
       }
     } catch (error) {
       console.error('❌ Error fetching AI recommendations:', error);
+    } finally {
+      setAiRecommendationsLoading(false);
     }
   };
 
