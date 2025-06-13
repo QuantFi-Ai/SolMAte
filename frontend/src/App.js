@@ -46,6 +46,7 @@ function AppContent() {
   // Discovery loading states
   const [discoveryLoading, setDiscoveryLoading] = useState(false);
   const [aiRecommendationsLoading, setAiRecommendationsLoading] = useState(false);
+  const [discoveryMode, setDiscoveryMode] = useState('browse'); // 'browse' or 'ai'
   const [profileForm, setProfileForm] = useState({
     bio: '',
     location: '',
