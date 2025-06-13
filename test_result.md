@@ -295,8 +295,7 @@ test_plan:
   current_focus:
     - "Discovery System Fix"
     - "Profile Picture Click Functionality"
-  stuck_tasks:
-    - "Preview Profile and Share on Twitter"
+  stuck_tasks: []
   test_all: false
   test_priority: "high_first"
 
