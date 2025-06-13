@@ -35,9 +35,20 @@ const PublicProfile = () => {
   };
 
   const shareOnTwitter = () => {
-    const text = `Check out ${profile.display_name}'s trading profile on Solm8!`;
-    const url = window.location.href;
-    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, '_blank');
+    // Get referral code from URL if present
+    const urlParams = new URLSearchParams(window.location.search);
+    const referralCode = urlParams.get('ref');
+    
+    // Create share text
+    const text = `Check out ${profile.display_name}'s trading profile on Solm8! 🚀\n\nConnect with crypto traders on the premier platform for finding your perfect trading partner.\n\n#Solm8 #CryptoTrading #TradingPartner`;
+    
+    // Include referral code in the shared URL if present
+    let url = window.location.href;
+    if (referralCode && !url.includes('ref=')) {
+      url += (url.includes('?') ? '&' : '?') + `ref=${referralCode}`;
+    }
+    
+    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, '_blank', 'width=550,height=420');
   };
 
   if (loading) {
