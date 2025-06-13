@@ -307,10 +307,18 @@ function AppContent() {
 
   // Handle preview profile
   const handlePreviewProfile = () => {
-    if (currentUser?.username) {
-      const profileUrl = `${window.location.origin}/profile/${currentUser.username}`;
+    console.log('🔍 Preview Profile clicked');
+    console.log('Current user:', currentUser);
+    console.log('Username:', currentUser?.username);
+    console.log('User ID:', currentUser?.user_id);
+    
+    if (currentUser?.user_id) {
+      // Use user_id for the route since that's what the route expects
+      const profileUrl = `${window.location.origin}/profile/${currentUser.user_id}`;
+      console.log('Opening profile URL:', profileUrl);
       window.open(profileUrl, '_blank');
     } else {
+      console.log('❌ No user ID available');
       showToastNotification('Profile not available for preview', 'error');
     }
   };
