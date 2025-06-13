@@ -1989,14 +1989,14 @@ function AppContent() {
                       </motion.button>
                       
                       <AnimatedProfilePicture
-                        src={selectedMatch.user.avatar_url}
-                        alt={selectedMatch.user.display_name}
-                        className={selectedMatch.user.user_status === 'active' ? 'status-online' : ''}
+                        src={selectedMatch.user?.avatar_url || '/api/placeholder/40/40'}
+                        alt={selectedMatch.user?.display_name || 'User'}
+                        className={selectedMatch.user?.user_status === 'active' ? 'status-online' : ''}
                         onClick={() => showUserProfile(selectedMatch.user, 'chat')}
                       />
                       
                       <div>
-                        <h3 className="font-semibold text-black">{selectedMatch.user.display_name}</h3>
+                        <h3 className="font-semibold text-black">{selectedMatch.user?.display_name || 'Unknown User'}</h3>
                         <p className="text-xs text-gray-500">
                           {selectedMatch.user.user_status === 'active' ? 'Active now' : 'Offline'}
                         </p>
