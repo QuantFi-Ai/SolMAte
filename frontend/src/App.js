@@ -43,7 +43,9 @@ function AppContent() {
   const [ws, setWs] = useState(null);
   const [showMatchModal, setShowMatchModal] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const [discoveryMode, setDiscoveryMode] = useState('browse'); // 'browse' or 'ai'
+  // Discovery loading states
+  const [discoveryLoading, setDiscoveryLoading] = useState(false);
+  const [aiRecommendationsLoading, setAiRecommendationsLoading] = useState(false);
   const [profileForm, setProfileForm] = useState({
     bio: '',
     location: '',
