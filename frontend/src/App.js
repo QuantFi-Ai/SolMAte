@@ -1989,16 +1989,16 @@ function AppContent() {
                       </motion.button>
                       
                       <AnimatedProfilePicture
-                        src={selectedMatch.user?.avatar_url || '/api/placeholder/40/40'}
-                        alt={selectedMatch.user?.display_name || 'User'}
-                        className={selectedMatch.user?.user_status === 'active' ? 'status-online' : ''}
-                        onClick={() => showUserProfile(selectedMatch.user, 'chat')}
+                        src={selectedMatch.other_user?.avatar_url || '/api/placeholder/40/40'}
+                        alt={selectedMatch.other_user?.display_name || 'User'}
+                        className={selectedMatch.other_user?.user_status === 'active' ? 'status-online' : ''}
+                        onClick={() => showUserProfile(selectedMatch.other_user, 'chat')}
                       />
                       
                       <div>
-                        <h3 className="font-semibold text-black">{selectedMatch.user?.display_name || 'Unknown User'}</h3>
+                        <h3 className="font-semibold text-black">{selectedMatch.other_user?.display_name || 'Unknown User'}</h3>
                         <p className="text-xs text-gray-500">
-                          {selectedMatch.user?.user_status === 'active' ? 'Active now' : 'Offline'}
+                          {selectedMatch.other_user?.user_status === 'active' ? 'Active now' : 'Offline'}
                         </p>
                       </div>
                     </div>
@@ -2006,7 +2006,7 @@ function AppContent() {
                     <motion.button
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
-                      onClick={() => showUserProfile(selectedMatch.user, 'chat')}
+                      onClick={() => showUserProfile(selectedMatch.other_user, 'chat')}
                       className="text-gray-600 hover:text-black"
                     >
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
