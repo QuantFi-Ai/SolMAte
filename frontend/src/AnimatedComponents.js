@@ -429,11 +429,12 @@ export const FloatingActionButton = ({ children, onClick, className = "" }) => {
 };
 
 // Profile Picture with Hover Animation
-export const AnimatedProfilePicture = ({ src, alt, size = "w-12 h-12", className = "" }) => {
+export const AnimatedProfilePicture = ({ src, alt, size = "w-12 h-12", className = "", onClick }) => {
   return (
     <motion.div
       whileHover={{ scale: 1.05 }}
-      className={`${size} rounded-full overflow-hidden profile-picture ${className}`}
+      onClick={onClick}
+      className={`${size} rounded-full overflow-hidden profile-picture ${className} ${onClick ? 'cursor-pointer' : ''}`}
     >
       <motion.img
         whileHover={{ scale: 1.1 }}
