@@ -286,6 +286,65 @@ function AppContent() {
     }
   };
 
+  // Get or generate user's referral code
+  const getUserReferralCode = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/referrals/generate/${currentUser.user_id}`, {
+        method: 'POST'
+      });
+      if (response.ok) {
+        const data = await response.json();
+        return data.referral_code;
+      }
+    } catch (error) {
+      console.error('Error getting referral code:', error);
+    }
+    return null;
+  };
+
+  // Handle preview profile
+  const handlePreviewProfile = () => {
+    if (currentUser?.username) {
+      const profileUrl = `${window.location.origin}/profile/${currentUser.username}`;
+      window.open(profileUrl, '_blank');
+    } else {
+      showToastNotification('Profile not available for preview', 'error');
+    }
+  };
+
+  // Handle share profile on Twitter
+  const handleShareProfile = async () => {
+    if (!currentUser?.username) {
+      showToastNotification('Profile not available for sharing', 'error');
+      return;
+    }
+
+    try {
+      // Get user's referral code
+      const referralCode = await getUserReferralCode();
+      
+      // Create profile URL with referral code
+      let profileUrl = `${window.location.origin}/profile/${currentUser.username}`;
+      if (referralCode) {
+        profileUrl += `?ref=${referralCode}`;
+      }
+
+      // Create Twitter share text
+      const shareText = `Check out my trading profile on Solm8! 🚀\n\nConnect with me and other crypto traders on the premier platform for finding your perfect trading partner.\n\n#Solm8 #CryptoTrading #TradingPartner`;
+      
+      // Create Twitter share URL
+      const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(profileUrl)}`;
+      
+      // Open Twitter share dialog
+      window.open(twitterUrl, '_blank', 'width=550,height=420');
+      
+      showToastNotification('Twitter share opened! 🐦', 'success');
+    } catch (error) {
+      console.error('Error sharing profile:', error);
+      showToastNotification('Failed to share profile', 'error');
+    }
+  };
+
   // Setup WebSocket when user is logged in (disabled for now - using HTTP polling)
   useEffect(() => {
     // WebSocket functionality disabled - using HTTP polling for chat instead
