@@ -805,8 +805,6 @@ function AppContent() {
         setShowMatchModal(true);
         showToastNotification(`🎉 You matched with ${currentCard.display_name}!`, 'success');
         fetchMatches();
-      } else if (action === 'like') {
-        showToastNotification('Like sent! 💙', 'info');
       }
       
       if (isAiRecommendation) {
