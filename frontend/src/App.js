@@ -1856,13 +1856,13 @@ function AppContent() {
                     >
                       <div className="flex items-center space-x-3">
                         <AnimatedProfilePicture
-                          src={match.user.avatar_url}
-                          alt={match.user.display_name}
-                          className={match.user.user_status === 'active' ? 'status-online' : ''}
+                          src={match.user?.avatar_url || '/api/placeholder/40/40'}
+                          alt={match.user?.display_name || 'User'}
+                          className={match.user?.user_status === 'active' ? 'status-online' : ''}
                         />
                         <div>
-                          <h3 className="font-semibold text-black">{match.user.display_name}</h3>
-                          <p className="text-sm text-gray-600">{match.user.trading_style || 'Trader'}</p>
+                          <h3 className="font-semibold text-black">{match.user?.display_name || 'Unknown User'}</h3>
+                          <p className="text-sm text-gray-600">{match.user?.trading_style || 'Trader'}</p>
                         </div>
                       </div>
                       
