@@ -251,6 +251,7 @@ test_plan:
     - "Support System"
     - "Referral System"
     - "Referral Link"
+    - "Messages Tab Fix"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
