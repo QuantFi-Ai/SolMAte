@@ -1852,17 +1852,17 @@ function AppContent() {
                     <AnimatedCard 
                       key={match.match_id} 
                       className="p-4"
-                      onClick={() => showUserProfile(match.user, 'matches')}
+                      onClick={() => showUserProfile(match.other_user, 'matches')}
                     >
                       <div className="flex items-center space-x-3">
                         <AnimatedProfilePicture
-                          src={match.user?.avatar_url || '/api/placeholder/40/40'}
-                          alt={match.user?.display_name || 'User'}
-                          className={match.user?.user_status === 'active' ? 'status-online' : ''}
+                          src={match.other_user?.avatar_url || '/api/placeholder/40/40'}
+                          alt={match.other_user?.display_name || 'User'}
+                          className={match.other_user?.user_status === 'active' ? 'status-online' : ''}
                         />
                         <div>
-                          <h3 className="font-semibold text-black">{match.user?.display_name || 'Unknown User'}</h3>
-                          <p className="text-sm text-gray-600">{match.user?.trading_style || 'Trader'}</p>
+                          <h3 className="font-semibold text-black">{match.other_user?.display_name || 'Unknown User'}</h3>
+                          <p className="text-sm text-gray-600">{match.other_user?.trading_style || 'Trader'}</p>
                         </div>
                       </div>
                       
@@ -1924,12 +1924,12 @@ function AppContent() {
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-3">
                           <AnimatedProfilePicture
-                            src={match.user?.avatar_url || '/api/placeholder/40/40'}
-                            alt={match.user?.display_name || 'User'}
-                            className={match.user?.user_status === 'active' ? 'status-online' : ''}
+                            src={match.other_user?.avatar_url || '/api/placeholder/40/40'}
+                            alt={match.other_user?.display_name || 'User'}
+                            className={match.other_user?.user_status === 'active' ? 'status-online' : ''}
                           />
                           <div>
-                            <h3 className="font-semibold text-black">{match.user?.display_name || 'Unknown User'}</h3>
+                            <h3 className="font-semibold text-black">{match.other_user?.display_name || 'Unknown User'}</h3>
                             <p className="text-sm text-gray-600 truncate max-w-xs">
                               {match.last_message ? match.last_message.content : 'No messages yet'}
                             </p>
