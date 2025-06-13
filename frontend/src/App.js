@@ -1842,7 +1842,8 @@ function AppContent() {
                           src={getCurrentCard().avatar_url}
                           alt={getCurrentCard().display_name}
                           size="w-20 h-20"
-                          className={getCurrentCard().user_status === 'active' ? 'status-online' : ''}
+                          className={`cursor-pointer ${getCurrentCard().user_status === 'active' ? 'status-online' : ''}`}
+                          onClick={() => showUserProfile(getCurrentCard(), 'discover')}
                         />
                         <div className="flex-1">
                           <div className="flex items-center justify-between">
