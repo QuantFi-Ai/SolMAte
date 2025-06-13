@@ -1934,9 +1934,9 @@ function AppContent() {
                 ) : (
                   <div className="text-center py-12">
                     <h3 className="text-xl font-medium text-gray-700 mb-2">
-                      {getCurrentCards().length === 0 ? 'Loading traders...' : 'No more traders to discover'}
+                      {getCurrentCards().length === 0 && getCurrentIndex() === 0 ? 'Loading traders...' : 'No more traders to discover'}
                     </h3>
-                    {getCurrentCards().length === 0 ? (
+                    {getCurrentCards().length === 0 && getCurrentIndex() === 0 ? (
                       <div className="flex justify-center">
                         <LoadingDots size="lg" />
                       </div>
