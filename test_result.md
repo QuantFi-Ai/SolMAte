@@ -260,6 +260,9 @@ frontend:
       - working: true
         agent: "testing"
         comment: "✅ CODE REVIEW: The enhanced logging in the discovery functions should help debug the 'Loading traders...' issue. The fetchDiscoveryCards function (lines 583-605) now includes detailed console logs with emoji indicators (🔍, 📡, 📊, ✅, ❌) that track the API call process, response status, and data filtering. The fetchAiRecommendations function (lines 607-629) has similar logging. The 'Loading traders...' message appears only when getCurrentCards().length === 0 (line 1932), which is the correct behavior. The implementation includes proper error handling and state updates. The enhanced logging will make it easier to identify where any issues might be occurring in the discovery data flow."
+      - working: true
+        agent: "testing"
+        comment: "✅ CODE REVIEW: The discovery system fix for the 'Loading traders...' vs 'No more traders' issue is properly implemented. The code in App.js (line 1937) correctly shows 'Loading traders...' only when getCurrentCards().length === 0 && getCurrentIndex() === 0, and shows 'No more traders to discover' when all cards have been swiped. This ensures users will see the appropriate message based on the state of the discovery system."
         
   - task: "Preview Profile and Share on Twitter"
     implemented: true
