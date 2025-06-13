@@ -593,11 +593,15 @@ function AppContent() {
       if (response.ok) {
         const data = await response.json();
         console.log('📋 Discovery data received:', data?.length, 'cards');
+        console.log('🔍 Raw discovery data:', data); // NEW: Log the actual data
         const filteredData = filterCardsByStatus(data || []);
         console.log('✅ Filtered discovery cards:', filteredData?.length, 'cards');
+        console.log('🔍 Filtered data:', filteredData); // NEW: Log filtered data
         setDiscoveryCards(filteredData);
       } else {
         console.log('❌ Discovery API error:', response.status, response.statusText);
+        const errorText = await response.text();
+        console.log('❌ Error response:', errorText);
       }
     } catch (error) {
       console.error('❌ Error fetching discovery cards:', error);
