@@ -281,9 +281,9 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Discovery System Fix"
-    - "Messages Tab Fix"
-  stuck_tasks: []
+    - "Preview Profile and Share on Twitter"
+  stuck_tasks:
+    - "Preview Profile and Share on Twitter"
   test_all: false
   test_priority: "high_first"
 
