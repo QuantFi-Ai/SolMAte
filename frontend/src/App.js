@@ -2187,6 +2187,13 @@ function AppContent() {
 
       {/* Support Modal */}
       <SupportModal
+      />
+
+      {/* Public Profile Modal */}
+      <PublicProfileModal
+        isOpen={showPublicProfileModal}
+        onClose={() => setShowPublicProfileModal(false)}
+        user={currentUser}
         isOpen={showSupportModal}
         onClose={() => setShowSupportModal(false)}
       />
