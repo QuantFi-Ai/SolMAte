@@ -2198,20 +2198,11 @@ function AppContent() {
         onClose={() => setShowPublicProfileModal(false)}
         user={currentUser}
       />
+      
+      {/* Support Modal */}
+      <SupportModal
         isOpen={showSupportModal}
-      {/* Public Profile Modal */}
-      <PublicProfileModal
-        isOpen={showPublicProfileModal}
-        onClose={() => setShowPublicProfileModal(false)}
-        user={currentUser}
-      />
         onClose={() => setShowSupportModal(false)}
-      {/* Public Profile Modal */}
-      <PublicProfileModal
-        isOpen={showPublicProfileModal}
-        onClose={() => setShowPublicProfileModal(false)}
-        user={currentUser}
-      />
       />
 
       {/* Toast Notification */}
