@@ -167,7 +167,6 @@ function AppContent() {
         user={currentUser}
       />
   const [showPublicProfileModal, setShowPublicProfileModal] = useState(false);
-
   // Profile popup modal state
   const [showProfilePopup, setShowProfilePopup] = useState(false);
   const [selectedProfileUser, setSelectedProfileUser] = useState(null);
