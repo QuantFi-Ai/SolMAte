@@ -5,7 +5,7 @@ import string
 from datetime import datetime
 
 # Base URL
-base_url = "https://8134b81b-ad13-497e-ba8a-ecdf0793b0b4.preview.emergentagent.com/api"
+base_url = "https://2cb408cb-0812-4c97-821c-53c0d3b60524.preview.emergentagent.com/api"
 
 def create_test_user():
     """Create a test user and return the user ID"""

@@ -4,7 +4,7 @@ import time
 from pymongo import MongoClient
 
 # API Base URL
-API_BASE_URL = "https://8134b81b-ad13-497e-ba8a-ecdf0793b0b4.preview.emergentagent.com"
+API_BASE_URL = "https://2cb408cb-0812-4c97-821c-53c0d3b60524.preview.emergentagent.com"
 MONGO_URL = "mongodb://localhost:27017"
 
 def print_separator():

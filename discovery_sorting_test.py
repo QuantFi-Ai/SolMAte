@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 import time
 
 class DiscoverySortingTester:
-    def __init__(self, base_url="https://8134b81b-ad13-497e-ba8a-ecdf0793b0b4.preview.emergentagent.com"):
+    def __init__(self, base_url="https://2cb408cb-0812-4c97-821c-53c0d3b60524.preview.emergentagent.com"):
         self.base_url = base_url
         self.test_users = []
         
