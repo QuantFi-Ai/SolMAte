@@ -1,190 +1,305 @@
-import os
 from pymongo import MongoClient
+from datetime import datetime
 
-def cleanup_matching_data():
-    """
-    Clean up demo users and duplicate swipes from the database
-    to fix matching system issues.
-    """
-    print("🧹 Starting database cleanup for matching system...")
-    
-    # Connect to MongoDB
-    MONGO_URL = os.environ.get('MONGO_URL', 'mongodb://localhost:27017')
-    client = MongoClient(MONGO_URL)
-    db = client.solm8_db
-    
-    # Step 1: Identify and remove demo users
-    print("\n1️⃣ Cleaning up demo users...")
-    
-    # Find users with auth_method = 'demo'
-    demo_users = list(db.users.find({"auth_method": "demo"}))
-    print(f"Found {len(demo_users)} users with auth_method = 'demo'")
-    
-    # Find users with suspicious usernames
-    suspicious_patterns = ['demo_', 'crypto_whale_', 'sol_degen_', 'test_']
-    suspicious_query = {"$or": [{"username": {"$regex": pattern}} for pattern in suspicious_patterns]}
-    suspicious_users = list(db.users.find(suspicious_query))
-    print(f"Found {len(suspicious_users)} users with suspicious usernames")
-    
-    # Combine and deduplicate user IDs to remove
-    user_ids_to_remove = set()
-    
-    for user in demo_users:
-        user_ids_to_remove.add(user.get('user_id'))
-        print(f"  Will remove demo user: {user.get('username')} (ID: {user.get('user_id')})")
-    
-    for user in suspicious_users:
-        if user.get('auth_method') != 'email':  # Don't remove real email users
-            user_ids_to_remove.add(user.get('user_id'))
-            print(f"  Will remove suspicious user: {user.get('username')} (ID: {user.get('user_id')})")
-    
-    # Remove demo users
-    if user_ids_to_remove:
-        result = db.users.delete_many({"user_id": {"$in": list(user_ids_to_remove)}})
-        print(f"Removed {result.deleted_count} demo/suspicious users")
+class MatchingSystemCleanup:
+    def __init__(self):
+        self.mongo_client = MongoClient("mongodb://localhost:27017")
+        self.db = self.mongo_client.solm8_db
+        self.users_collection = self.db.users
+        self.swipes_collection = self.db.swipes
+        self.matches_collection = self.db.matches
+        self.messages_collection = self.db.messages
+
+    def check_for_duplicate_swipes(self):
+        """Check for and remove duplicate swipes"""
+        print("\n🔍 Checking for Duplicate Swipes...")
         
-        # Also remove any matches involving these users
-        result = db.matches.delete_many({
-            "$or": [
-                {"user1_id": {"$in": list(user_ids_to_remove)}},
-                {"user2_id": {"$in": list(user_ids_to_remove)}}
-            ]
-        })
-        print(f"Removed {result.deleted_count} matches involving demo/suspicious users")
+        # Get all swipes
+        all_swipes = list(self.swipes_collection.find())
+        print(f"Total swipes in database: {len(all_swipes)}")
         
-        # Also remove any swipes involving these users
-        result = db.swipes.delete_many({
-            "$or": [
-                {"swiper_id": {"$in": list(user_ids_to_remove)}},
-                {"target_id": {"$in": list(user_ids_to_remove)}}
-            ]
-        })
-        print(f"Removed {result.deleted_count} swipes involving demo/suspicious users")
-    else:
-        print("No demo/suspicious users to remove")
-    
-    # Step 2: Clean up duplicate swipes
-    print("\n2️⃣ Cleaning up duplicate swipes...")
-    
-    # Find all swipes
-    all_swipes = list(db.swipes.find())
-    print(f"Found {len(all_swipes)} total swipes")
-    
-    # Track unique swiper-target pairs
-    unique_pairs = {}
-    duplicate_swipe_ids = []
-    
-    for swipe in all_swipes:
-        swipe_id = swipe.get('swipe_id')
-        swiper_id = swipe.get('swiper_id')
-        target_id = swipe.get('target_id')
-        action = swipe.get('action')
-        pair_key = f"{swiper_id}_{target_id}_{action}"
+        # Track swipes by swiper-target pair
+        swipe_pairs = {}
+        duplicates = []
         
-        if pair_key in unique_pairs:
-            # This is a duplicate, mark for removal
-            duplicate_swipe_ids.append(swipe_id)
+        for swipe in all_swipes:
+            pair_key = f"{swipe['swiper_id']}_{swipe['target_id']}"
+            if pair_key in swipe_pairs:
+                # This is a duplicate
+                duplicates.append(swipe)
+                swipe_pairs[pair_key].append(swipe)
+            else:
+                swipe_pairs[pair_key] = [swipe]
+        
+        # Count pairs with duplicates
+        duplicate_pairs = {k: v for k, v in swipe_pairs.items() if len(v) > 1}
+        
+        print(f"Found {len(duplicates)} duplicate swipes across {len(duplicate_pairs)} swiper-target pairs")
+        
+        # Remove duplicates (keep the most recent swipe for each pair)
+        if duplicate_pairs:
+            print("\nRemoving duplicate swipes...")
+            removed_count = 0
+            
+            for pair, swipes in duplicate_pairs.items():
+                # Sort by timestamp (newest first)
+                sorted_swipes = sorted(swipes, key=lambda x: x.get('timestamp', datetime.min), reverse=True)
+                
+                # Keep the most recent swipe, remove the rest
+                for swipe in sorted_swipes[1:]:
+                    self.swipes_collection.delete_one({"swipe_id": swipe["swipe_id"]})
+                    removed_count += 1
+                    print(f"Removed duplicate swipe: {swipe['swiper_id']} → {swipe['target_id']} (ID: {swipe['swipe_id']})")
+            
+            print(f"\n✅ Removed {removed_count} duplicate swipes")
         else:
-            # This is the first occurrence, keep it
-            unique_pairs[pair_key] = swipe_id
-    
-    # Remove duplicate swipes
-    if duplicate_swipe_ids:
-        result = db.swipes.delete_many({"swipe_id": {"$in": duplicate_swipe_ids}})
-        print(f"Removed {result.deleted_count} duplicate swipes")
-    else:
-        print("No duplicate swipes to remove")
-    
-    # Step 3: Check for orphaned matches
-    print("\n3️⃣ Checking for orphaned matches...")
-    
-    # Find all matches
-    all_matches = list(db.matches.find())
-    print(f"Found {len(all_matches)} total matches")
-    
-    # Check each match to ensure both users exist
-    orphaned_match_ids = []
-    
-    for match in all_matches:
-        match_id = match.get('match_id')
-        user1_id = match.get('user1_id')
-        user2_id = match.get('user2_id')
+            print("✅ No duplicate swipes found")
         
-        user1 = db.users.find_one({"user_id": user1_id})
-        user2 = db.users.find_one({"user_id": user2_id})
+        return duplicate_pairs
+
+    def check_for_demo_users(self):
+        """Check for and remove demo users"""
+        print("\n🔍 Checking for Demo Users...")
         
-        if not user1 or not user2:
-            orphaned_match_ids.append(match_id)
-            print(f"  Orphaned match found: {match_id} (User1 exists: {bool(user1)}, User2 exists: {bool(user2)})")
-    
-    # Remove orphaned matches
-    if orphaned_match_ids:
-        result = db.matches.delete_many({"match_id": {"$in": orphaned_match_ids}})
-        print(f"Removed {result.deleted_count} orphaned matches")
+        # Get users with auth_method = 'demo'
+        demo_users = list(self.users_collection.find({"auth_method": "demo"}))
+        print(f"Users with auth_method='demo': {len(demo_users)}")
         
-        # Also remove messages for these matches
-        result = db.messages.delete_many({"match_id": {"$in": orphaned_match_ids}})
-        print(f"Removed {result.deleted_count} messages from orphaned matches")
-    else:
-        print("No orphaned matches to remove")
-    
-    # Step 4: Check for inconsistent matches (missing mutual likes)
-    print("\n4️⃣ Checking for inconsistent matches...")
-    
-    # Find all matches again (after orphaned ones were removed)
-    all_matches = list(db.matches.find())
-    
-    # Check each match to ensure both users liked each other
-    inconsistent_match_ids = []
-    
-    for match in all_matches:
-        match_id = match.get('match_id')
-        user1_id = match.get('user1_id')
-        user2_id = match.get('user2_id')
+        # Check for suspicious usernames
+        suspicious_patterns = ["demo", "test", "dummy", "fake"]
+        suspicious_users = []
         
-        # Check if both users liked each other
-        user1_liked_user2 = db.swipes.find_one({
-            "swiper_id": user1_id,
-            "target_id": user2_id,
-            "action": "like"
-        })
+        for pattern in suspicious_patterns:
+            users = list(self.users_collection.find({
+                "$and": [
+                    {"auth_method": {"$ne": "email"}},  # Don't include regular email users
+                    {"$or": [
+                        {"username": {"$regex": pattern, "$options": "i"}},
+                        {"display_name": {"$regex": pattern, "$options": "i"}}
+                    ]}
+                ]
+            }))
+            suspicious_users.extend(users)
         
-        user2_liked_user1 = db.swipes.find_one({
-            "swiper_id": user2_id,
-            "target_id": user1_id,
-            "action": "like"
-        })
+        # Remove duplicates
+        suspicious_user_ids = set()
+        unique_suspicious_users = []
         
-        if not user1_liked_user2 or not user2_liked_user1:
-            inconsistent_match_ids.append(match_id)
-            print(f"  Inconsistent match found: {match_id}")
-            print(f"    User1 liked User2: {bool(user1_liked_user2)}")
-            print(f"    User2 liked User1: {bool(user2_liked_user1)}")
-    
-    # Remove inconsistent matches
-    if inconsistent_match_ids:
-        result = db.matches.delete_many({"match_id": {"$in": inconsistent_match_ids}})
-        print(f"Removed {result.deleted_count} inconsistent matches")
+        for user in suspicious_users:
+            if user["user_id"] not in suspicious_user_ids:
+                suspicious_user_ids.add(user["user_id"])
+                unique_suspicious_users.append(user)
         
-        # Also remove messages for these matches
-        result = db.messages.delete_many({"match_id": {"$in": inconsistent_match_ids}})
-        print(f"Removed {result.deleted_count} messages from inconsistent matches")
-    else:
-        print("No inconsistent matches to remove")
-    
-    print("\n✅ Database cleanup completed successfully!")
-    
-    # Print summary of current database state
-    users_count = db.users.count_documents({})
-    matches_count = db.matches.count_documents({})
-    swipes_count = db.swipes.count_documents({})
-    messages_count = db.messages.count_documents({})
-    
-    print("\n📊 Current Database State:")
-    print(f"  Users: {users_count}")
-    print(f"  Matches: {matches_count}")
-    print(f"  Swipes: {swipes_count}")
-    print(f"  Messages: {messages_count}")
+        print(f"Suspicious users (not marked as demo): {len(unique_suspicious_users)}")
+        
+        # Show demo users
+        if demo_users:
+            print("\nDemo users:")
+            for i, user in enumerate(demo_users):
+                print(f"{i+1}. User ID: {user['user_id']}, Username: {user['username']}, Display Name: {user['display_name']}")
+        
+        # Show suspicious users
+        if unique_suspicious_users:
+            print("\nSuspicious users:")
+            for i, user in enumerate(unique_suspicious_users):
+                print(f"{i+1}. User ID: {user['user_id']}, Username: {user['username']}, Display Name: {user['display_name']}, Auth Method: {user.get('auth_method', 'None')}")
+        
+        # Remove demo users and their associated data
+        users_to_remove = demo_users + unique_suspicious_users
+        
+        if users_to_remove:
+            print("\nRemoving demo and suspicious users...")
+            removed_count = 0
+            removed_swipes = 0
+            removed_matches = 0
+            removed_messages = 0
+            
+            for user in users_to_remove:
+                user_id = user["user_id"]
+                
+                # Remove user's swipes
+                swipe_result = self.swipes_collection.delete_many({
+                    "$or": [
+                        {"swiper_id": user_id},
+                        {"target_id": user_id}
+                    ]
+                })
+                removed_swipes += swipe_result.deleted_count
+                
+                # Remove user's matches
+                match_result = self.matches_collection.delete_many({
+                    "$or": [
+                        {"user1_id": user_id},
+                        {"user2_id": user_id}
+                    ]
+                })
+                removed_matches += match_result.deleted_count
+                
+                # Remove user's messages
+                message_result = self.messages_collection.delete_many({
+                    "sender_id": user_id
+                })
+                removed_messages += message_result.deleted_count
+                
+                # Remove the user
+                self.users_collection.delete_one({"user_id": user_id})
+                removed_count += 1
+                
+                print(f"Removed user: {user['display_name']} ({user_id})")
+            
+            print(f"\n✅ Removed {removed_count} users")
+            print(f"✅ Removed {removed_swipes} swipes")
+            print(f"✅ Removed {removed_matches} matches")
+            print(f"✅ Removed {removed_messages} messages")
+        else:
+            print("✅ No demo or suspicious users to remove")
+        
+        return demo_users, unique_suspicious_users
+
+    def check_for_asymmetric_matches(self):
+        """Check for and fix asymmetric matches (where one user can see the match but the other can't)"""
+        print("\n🔍 Checking for Asymmetric Matches...")
+        
+        # Get all matches
+        all_matches = list(self.matches_collection.find())
+        print(f"Total matches in database: {len(all_matches)}")
+        
+        # Check if both users in each match exist
+        asymmetric_matches = []
+        
+        for match in all_matches:
+            user1 = self.users_collection.find_one({"user_id": match["user1_id"]})
+            user2 = self.users_collection.find_one({"user_id": match["user2_id"]})
+            
+            if not user1 or not user2:
+                asymmetric_matches.append(match)
+        
+        print(f"Found {len(asymmetric_matches)} asymmetric matches (where one or both users don't exist)")
+        
+        # Remove asymmetric matches
+        if asymmetric_matches:
+            print("\nRemoving asymmetric matches...")
+            removed_count = 0
+            
+            for match in asymmetric_matches:
+                # Remove associated messages
+                self.messages_collection.delete_many({"match_id": match["match_id"]})
+                
+                # Remove the match
+                self.matches_collection.delete_one({"match_id": match["match_id"]})
+                removed_count += 1
+                
+                print(f"Removed asymmetric match: {match['match_id']} between {match['user1_id']} and {match['user2_id']}")
+            
+            print(f"\n✅ Removed {removed_count} asymmetric matches")
+        else:
+            print("✅ No asymmetric matches found")
+        
+        return asymmetric_matches
+
+    def check_for_missing_mutual_likes(self):
+        """Check for mutual likes that should have created matches but didn't"""
+        print("\n🔍 Checking for Missing Mutual Likes...")
+        
+        # Get all swipes
+        all_swipes = list(self.swipes_collection.find({"action": "like"}))
+        print(f"Total 'like' swipes in database: {len(all_swipes)}")
+        
+        # Find mutual likes
+        swipe_pairs = {}
+        for swipe in all_swipes:
+            swiper_id = swipe["swiper_id"]
+            target_id = swipe["target_id"]
+            
+            # Add to swipe pairs
+            if (swiper_id, target_id) not in swipe_pairs:
+                swipe_pairs[(swiper_id, target_id)] = swipe
+        
+        # Check for mutual likes
+        mutual_likes = []
+        for (swiper_id, target_id), swipe in swipe_pairs.items():
+            if (target_id, swiper_id) in swipe_pairs:
+                # This is a mutual like
+                mutual_likes.append((swiper_id, target_id))
+        
+        print(f"Found {len(mutual_likes)} mutual likes")
+        
+        # Check which mutual likes don't have matches
+        missing_matches = []
+        for user1_id, user2_id in mutual_likes:
+            match = self.matches_collection.find_one({
+                "$or": [
+                    {"user1_id": user1_id, "user2_id": user2_id},
+                    {"user1_id": user2_id, "user2_id": user1_id}
+                ]
+            })
+            
+            if not match:
+                missing_matches.append((user1_id, user2_id))
+        
+        print(f"Found {len(missing_matches)} mutual likes without matches")
+        
+        # Create missing matches
+        if missing_matches:
+            print("\nCreating missing matches...")
+            created_count = 0
+            
+            for user1_id, user2_id in missing_matches:
+                # Check if both users still exist
+                user1 = self.users_collection.find_one({"user_id": user1_id})
+                user2 = self.users_collection.find_one({"user_id": user2_id})
+                
+                if not user1 or not user2:
+                    print(f"Skipping match creation for {user1_id} and {user2_id} - one or both users don't exist")
+                    continue
+                
+                # Create the match
+                match_data = {
+                    "match_id": str(uuid.uuid4()),
+                    "user1_id": user1_id,
+                    "user2_id": user2_id,
+                    "created_at": datetime.utcnow(),
+                    "last_message_at": datetime.utcnow()
+                }
+                
+                self.matches_collection.insert_one(match_data)
+                created_count += 1
+                
+                print(f"Created missing match between {user1_id} and {user2_id}")
+            
+            print(f"\n✅ Created {created_count} missing matches")
+        else:
+            print("✅ No missing matches to create")
+        
+        return missing_matches
+
+    def run_cleanup(self):
+        """Run all cleanup operations"""
+        print("🧹 Starting Matching System Cleanup")
+        
+        # Step 1: Check for and remove duplicate swipes
+        duplicate_pairs = self.check_for_duplicate_swipes()
+        
+        # Step 2: Check for and remove demo users
+        demo_users, suspicious_users = self.check_for_demo_users()
+        
+        # Step 3: Check for and fix asymmetric matches
+        asymmetric_matches = self.check_for_asymmetric_matches()
+        
+        # Step 4: Check for and create missing matches
+        missing_matches = self.check_for_missing_mutual_likes()
+        
+        # Print summary
+        print("\n📊 Cleanup Summary:")
+        print(f"Duplicate swipes removed: {sum(len(swipes) - 1 for swipes in duplicate_pairs.values()) if duplicate_pairs else 0}")
+        print(f"Demo users removed: {len(demo_users)}")
+        print(f"Suspicious users removed: {len(suspicious_users)}")
+        print(f"Asymmetric matches removed: {len(asymmetric_matches)}")
+        print(f"Missing matches created: {len(missing_matches)}")
+        
+        print("\n✅ Matching system cleanup complete")
 
 if __name__ == "__main__":
-    cleanup_matching_data()
+    import uuid
+    cleanup = MatchingSystemCleanup()
+    cleanup.run_cleanup()
