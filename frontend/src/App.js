@@ -19,6 +19,7 @@ import {
   AnimatedProfilePicture
 } from './AnimatedComponents';
 import { ReferralDashboard, SupportModal } from './ReferralComponents';
+import PublicProfileModal from './PublicProfileModal';
 import PublicProfile from './PublicProfile';
 import ProfileManager from './ProfileManager';
 import LandingPage from './LandingPage';
