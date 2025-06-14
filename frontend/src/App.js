@@ -299,7 +299,6 @@ function AppContent() {
 
   // Handle preview profile
   const handlePreviewProfile = () => {
-    console.log('🔍 Public Profile clicked - showing modal');
     setShowPublicProfileModal(true);
   };
 
