@@ -148,12 +148,6 @@ function AppContent() {
   // Support and Referral modals
   const [showReferralDashboard, setShowReferralDashboard] = useState(false);
   const [showSupportModal, setShowSupportModal] = useState(false);
-      {/* Public Profile Modal */}
-      <PublicProfileModal
-        isOpen={showPublicProfileModal}
-        onClose={() => setShowPublicProfileModal(false)}
-        user={currentUser}
-      />
   const [showPublicProfileModal, setShowPublicProfileModal] = useState(false);
   // Profile popup modal state
   const [showProfilePopup, setShowProfilePopup] = useState(false);
