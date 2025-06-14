@@ -2190,8 +2190,6 @@ function AppContent() {
         currentUser={currentUser}
       />
 
-      {/* Support Modal */}
-      <SupportModal
       {/* Public Profile Modal */}
       <PublicProfileModal
         isOpen={showPublicProfileModal}
