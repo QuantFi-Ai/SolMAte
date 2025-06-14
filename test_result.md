@@ -308,8 +308,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Discovery System Fix"
-    - "Profile Picture Click Functionality"
+    - "Public Profile Modal"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
