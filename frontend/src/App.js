@@ -19,12 +19,6 @@ import {
   AnimatedProfilePicture
 } from './AnimatedComponents';
 import { ReferralDashboard, SupportModal } from './ReferralComponents';
-import PublicProfileModal from './PublicProfileModal';
-import PublicProfile from './PublicProfile';
-import ProfileManager from './ProfileManager';
-import LandingPage from './LandingPage';
-import './App.css';
-
 const API_BASE_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
 
 // Solana wallet configuration
