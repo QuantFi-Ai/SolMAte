@@ -153,6 +153,7 @@ function AppContent() {
   // Support and Referral modals
   const [showReferralDashboard, setShowReferralDashboard] = useState(false);
   const [showSupportModal, setShowSupportModal] = useState(false);
+  const [showPublicProfileModal, setShowPublicProfileModal] = useState(false);
 
   // Profile popup modal state
   const [showProfilePopup, setShowProfilePopup] = useState(false);
