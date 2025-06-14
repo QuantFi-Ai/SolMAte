@@ -19,6 +19,12 @@ import {
   AnimatedProfilePicture
 } from './AnimatedComponents';
 import { ReferralDashboard, SupportModal } from './ReferralComponents';
+      {/* Public Profile Modal */}
+      <PublicProfileModal
+        isOpen={showPublicProfileModal}
+        onClose={() => setShowPublicProfileModal(false)}
+        user={currentUser}
+      />
 import PublicProfileModal from './PublicProfileModal';
 import PublicProfile from './PublicProfile';
 import ProfileManager from './ProfileManager';
@@ -154,6 +160,12 @@ function AppContent() {
   // Support and Referral modals
   const [showReferralDashboard, setShowReferralDashboard] = useState(false);
   const [showSupportModal, setShowSupportModal] = useState(false);
+      {/* Public Profile Modal */}
+      <PublicProfileModal
+        isOpen={showPublicProfileModal}
+        onClose={() => setShowPublicProfileModal(false)}
+        user={currentUser}
+      />
   const [showPublicProfileModal, setShowPublicProfileModal] = useState(false);
   const [showPublicProfileModal, setShowPublicProfileModal] = useState(false);
 
@@ -1726,6 +1738,12 @@ function AppContent() {
                   <button
                     onClick={() => {
                       setShowSupportModal(true);
+      {/* Public Profile Modal */}
+      <PublicProfileModal
+        isOpen={showPublicProfileModal}
+        onClose={() => setShowPublicProfileModal(false)}
+        user={currentUser}
+      />
                       setShowProfileDropdown(false);
                     }}
                     className="flex items-center space-x-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-all"
@@ -2188,8 +2206,26 @@ function AppContent() {
 
       {/* Support Modal */}
       <SupportModal
+      {/* Public Profile Modal */}
+      <PublicProfileModal
+        isOpen={showPublicProfileModal}
+        onClose={() => setShowPublicProfileModal(false)}
+        user={currentUser}
+      />
         isOpen={showSupportModal}
+      {/* Public Profile Modal */}
+      <PublicProfileModal
+        isOpen={showPublicProfileModal}
+        onClose={() => setShowPublicProfileModal(false)}
+        user={currentUser}
+      />
         onClose={() => setShowSupportModal(false)}
+      {/* Public Profile Modal */}
+      <PublicProfileModal
+        isOpen={showPublicProfileModal}
+        onClose={() => setShowPublicProfileModal(false)}
+        user={currentUser}
+      />
       />
 
       {/* Toast Notification */}
