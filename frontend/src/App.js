@@ -1958,6 +1958,7 @@ function AppContent() {
                 <p className="text-gray-600">Traders who liked you back</p>
               </div>
               
+              {console.log('🔍 Matches render check:', { matchesLength: matches.length, matches: matches })}
               {matches.length > 0 ? (
                 <StaggeredList className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {matches.map(match => (
