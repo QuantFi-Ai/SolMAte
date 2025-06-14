@@ -19,12 +19,6 @@ import {
   AnimatedProfilePicture
 } from './AnimatedComponents';
 import { ReferralDashboard, SupportModal } from './ReferralComponents';
-      {/* Public Profile Modal */}
-      <PublicProfileModal
-        isOpen={showPublicProfileModal}
-        onClose={() => setShowPublicProfileModal(false)}
-        user={currentUser}
-      />
 import PublicProfileModal from './PublicProfileModal';
 import PublicProfile from './PublicProfile';
 import ProfileManager from './ProfileManager';
