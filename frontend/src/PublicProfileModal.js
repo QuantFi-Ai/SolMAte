@@ -1,9 +1,77 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AnimatedButton } from './AnimatedComponents';
 
 const PublicProfileModal = ({ isOpen, onClose, user }) => {
+  const [showShareMenu, setShowShareMenu] = useState(false);
+  const [showSocialLinksForm, setShowSocialLinksForm] = useState(false);
+  const [showTradingHighlights, setShowTradingHighlights] = useState(false);
+  const [socialLinks, setSocialLinks] = useState({
+    twitter: '',
+    discord: '',
+    telegram: '',
+    website: '',
+    linkedin: ''
+  });
+  
   if (!isOpen || !user) return null;
+
+  // Share profile function
+  const handleShareProfile = async () => {
+    try {
+      // Get user's referral code
+      const referralCode = await getUserReferralCode();
+      
+      // Create profile URL with referral code
+      let profileUrl = `${window.location.origin}/profile/${user.username}`;
+      if (referralCode) {
+        profileUrl += `?ref=${referralCode}`;
+      }
+
+      // Create share text
+      const shareText = `Check out my trading profile on Solm8! 🚀\n\nConnect with me and other crypto traders.\n\n#Solm8 #CryptoTrading`;
+      
+      // Create Twitter share URL
+      const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(profileUrl)}`;
+      
+      // Open Twitter share dialog
+      window.open(twitterUrl, '_blank', 'width=550,height=420');
+      
+    } catch (error) {
+      console.error('Error sharing profile:', error);
+    }
+  };
+
+  const getUserReferralCode = async () => {
+    try {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/referrals/generate/${user.user_id}`, {
+        method: 'POST'
+      });
+      if (response.ok) {
+        const data = await response.json();
+        return data.referral_code;
+      }
+    } catch (error) {
+      console.error('Error getting referral code:', error);
+    }
+    return null;
+  };
+
+  const copyProfileLink = async () => {
+    try {
+      const referralCode = await getUserReferralCode();
+      let profileUrl = `${window.location.origin}/profile/${user.username}`;
+      if (referralCode) {
+        profileUrl += `?ref=${referralCode}`;
+      }
+      
+      await navigator.clipboard.writeText(profileUrl);
+      alert('Profile link copied to clipboard!');
+    } catch (error) {
+      console.error('Error copying to clipboard:', error);
+      alert('Failed to copy link');
+    }
+  };
 
   return (
     <AnimatePresence>
