@@ -150,6 +150,8 @@ function AppContent() {
   const [showReferralDashboard, setShowReferralDashboard] = useState(false);
   const [showSupportModal, setShowSupportModal] = useState(false);
   const [showPublicProfileModal, setShowPublicProfileModal] = useState(false);
+  const [showProfilePopup, setShowProfilePopup] = useState(false);
+  const [selectedProfileUser, setSelectedProfileUser] = useState(null);
   // Toast notification helper
   const showToastNotification = (message, type = 'info') => {
     setToastMessage(message);
