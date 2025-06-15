@@ -83,6 +83,115 @@ const PublicProfileModal = ({ isOpen, onClose, user }) => {
     }
   };
 
+  // Handle image file selection
+  const handleImageUpload = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        alert('Please select an image file');
+        return;
+      }
+      
+      // Validate file size (5MB limit)
+      if (file.size > 5 * 1024 * 1024) {
+        alert('Image must be smaller than 5MB');
+        return;
+      }
+      
+      setHighlightImage(file);
+    }
+  };
+
+  // Save trading highlight
+  const handleSaveTradingHighlight = async () => {
+    if (!tradingHighlight.title.trim()) {
+      alert('Please enter a title for your trading highlight');
+      return;
+    }
+
+    setIsUploading(true);
+    
+    try {
+      let imageData = '';
+      
+      // Convert image to base64 if provided
+      if (highlightImage) {
+        const reader = new FileReader();
+        imageData = await new Promise((resolve, reject) => {
+          reader.onload = () => {
+            const base64 = reader.result.split(',')[1]; // Remove data:image/... prefix
+            resolve(base64);
+          };
+          reader.onerror = reject;
+          reader.readAsDataURL(highlightImage);
+        });
+      }
+
+      // Prepare highlight data
+      const highlightData = {
+        ...tradingHighlight,
+        image_data: imageData
+      };
+
+      // Send to backend
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/save-trading-highlight/${user.user_id}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(highlightData)
+      });
+
+      if (response.ok) {
+        alert('Trading highlight saved successfully!');
+        // Reset form
+        setTradingHighlight({
+          title: '',
+          description: '',
+          profit_loss: '',
+          percentage_gain: '',
+          highlight_type: 'pnl_screenshot',
+          date_achieved: new Date().toISOString().split('T')[0]
+        });
+        setHighlightImage(null);
+        setShowTradingHighlights(false);
+      } else {
+        const error = await response.json();
+        throw new Error(error.detail || 'Failed to save trading highlight');
+      }
+    } catch (error) {
+      console.error('Error saving trading highlight:', error);
+      alert(`Failed to save trading highlight: ${error.message}`);
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  // Save social links
+  const handleSaveSocialLinks = async () => {
+    try {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/update-social-links/${user.user_id}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(socialLinks)
+      });
+
+      if (response.ok) {
+        alert('Social links saved successfully!');
+        setShowSocialLinksForm(false);
+      } else {
+        const error = await response.json();
+        throw new Error(error.detail || 'Failed to save social links');
+      }
+    } catch (error) {
+      console.error('Error saving social links:', error);
+      alert(`Failed to save social links: ${error.message}`);
+    }
+  };
+
   return (
     <AnimatePresence>
       <motion.div
@@ -241,7 +350,10 @@ const PublicProfileModal = ({ isOpen, onClose, user }) => {
                   </div>
                 </div>
                 <div className="flex justify-end mt-4">
-                  <button className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-all">
+                  <button 
+                    onClick={handleSaveSocialLinks}
+                    className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-all"
+                  >
                     Save Social Links
                   </button>
                 </div>
@@ -263,14 +375,20 @@ const PublicProfileModal = ({ isOpen, onClose, user }) => {
                     <input
                       type="file"
                       accept="image/*"
+                      onChange={handleImageUpload}
                       className="w-full border border-green-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-green-500"
                     />
+                    {highlightImage && (
+                      <p className="text-sm text-green-600 mt-1">Selected: {highlightImage.name}</p>
+                    )}
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-green-700 mb-2">Title</label>
                     <input
                       type="text"
                       placeholder="e.g., My Best SOL Trade"
+                      value={tradingHighlight.title}
+                      onChange={(e) => setTradingHighlight({...tradingHighlight, title: e.target.value})}
                       className="w-full border border-green-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-green-500"
                     />
                   </div>
@@ -279,6 +397,8 @@ const PublicProfileModal = ({ isOpen, onClose, user }) => {
                     <textarea
                       placeholder="Tell the story behind this trade..."
                       rows="3"
+                      value={tradingHighlight.description}
+                      onChange={(e) => setTradingHighlight({...tradingHighlight, description: e.target.value})}
                       className="w-full border border-green-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-green-500"
                     />
                   </div>
@@ -288,6 +408,8 @@ const PublicProfileModal = ({ isOpen, onClose, user }) => {
                       <input
                         type="text"
                         placeholder="e.g., +$5,000"
+                        value={tradingHighlight.profit_loss}
+                        onChange={(e) => setTradingHighlight({...tradingHighlight, profit_loss: e.target.value})}
                         className="w-full border border-green-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-green-500"
                       />
                     </div>
@@ -296,14 +418,20 @@ const PublicProfileModal = ({ isOpen, onClose, user }) => {
                       <input
                         type="text"
                         placeholder="e.g., +250%"
+                        value={tradingHighlight.percentage_gain}
+                        onChange={(e) => setTradingHighlight({...tradingHighlight, percentage_gain: e.target.value})}
                         className="w-full border border-green-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-green-500"
                       />
                     </div>
                   </div>
                 </div>
                 <div className="flex justify-end mt-4">
-                  <button className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-all">
-                    Save Trading Highlight
+                  <button 
+                    onClick={handleSaveTradingHighlight}
+                    disabled={isUploading}
+                    className="bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white px-4 py-2 rounded-lg transition-all"
+                  >
+                    {isUploading ? 'Saving...' : 'Save Trading Highlight'}
                   </button>
                 </div>
               </motion.div>
