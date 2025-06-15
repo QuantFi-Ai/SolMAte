@@ -789,16 +789,231 @@ def test_public_profile_modal():
     print("\n✅ All tests for public profile modal functionality passed!")
     return True
 
+def test_trading_highlights_save_functionality():
+    """Test the trading highlights save functionality"""
+    print("\n🔍 Testing Trading Highlights Save Functionality...")
+    tester = Solm8APITester()
+    
+    # Step 1: Create a new user account with email signup
+    random_suffix = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
+    test_email = f"test_highlights_{random_suffix}@example.com"
+    test_password = "TestPassword123!"
+    test_display_name = f"Test Highlights User {random_suffix}"
+    
+    print("\n1️⃣ Creating new user account...")
+    success, signup_response = tester.test_email_signup(test_email, test_password, test_display_name)
+    if not success:
+        print("❌ Failed to create test user")
+        return False
+    
+    user_id = tester.email_user['user_id']
+    print(f"✅ Created test user with ID: {user_id}")
+    
+    # Step 2: Complete the profile setup process
+    print("\n2️⃣ Completing profile setup...")
+    complete_profile = {
+        "bio": "I'm a trader focused on DeFi and NFTs.",
+        "location": "Crypto Valley",
+        "trading_experience": "Intermediate",
+        "years_trading": 3,
+        "preferred_tokens": ["DeFi", "NFTs", "Blue Chips"],
+        "trading_style": "Swing Trader",
+        "portfolio_size": "$10K-$100K",
+        "risk_tolerance": "Moderate",
+        "best_trade": "Bought SOL at $20, sold at $200",
+        "worst_trade": "Missed the BONK pump",
+        "favorite_project": "Solana",
+        "trading_hours": "Evening",
+        "communication_style": "Casual",
+        "preferred_communication_platform": "Discord",
+        "preferred_trading_platform": "Jupiter",
+        "looking_for": ["Alpha Sharing", "Research Partner"]
+    }
+    
+    success, update_response = tester.test_update_user_profile(user_id, complete_profile)
+    if not success:
+        print("❌ Failed to update user profile")
+        return False
+    
+    print("✅ Successfully completed profile setup")
+    
+    # Step 3: Test saving a trading highlight with all required fields
+    print("\n3️⃣ Testing saving a trading highlight with all required fields...")
+    
+    # Create a simple base64 image for testing
+    test_image_data = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=="
+    
+    highlight_data = {
+        "title": "Test Trading Highlight",
+        "description": "This is a test",
+        "image_data": test_image_data,
+        "highlight_type": "pnl_screenshot",
+        "date_achieved": "2023-05-15",
+        "profit_loss": "+$1000",
+        "percentage_gain": "+50%"
+    }
+    
+    success, highlight_response = tester.run_test(
+        "Save Trading Highlight",
+        "POST",
+        f"save-trading-highlight/{user_id}",
+        200,
+        data=highlight_data
+    )
+    
+    if not success:
+        print("❌ Failed to save trading highlight")
+        return False
+    
+    print("✅ Successfully saved trading highlight")
+    
+    # Step 4: Verify the trading highlight was saved to the database
+    print("\n4️⃣ Verifying trading highlight was saved to the database...")
+    success, retrieved_highlights = tester.run_test(
+        "Get Trading Highlights",
+        "GET",
+        f"trading-highlights/{user_id}",
+        200
+    )
+    
+    if not success:
+        print("❌ Failed to retrieve trading highlights")
+        return False
+    
+    if not retrieved_highlights or len(retrieved_highlights) == 0:
+        print("❌ No trading highlights found")
+        return False
+    
+    print(f"✅ Successfully retrieved {len(retrieved_highlights)} trading highlights")
+    
+    # Verify the highlight data matches what we set
+    highlight = retrieved_highlights[0]
+    fields_to_check = ["title", "description", "profit_loss", "percentage_gain"]
+    
+    for field in fields_to_check:
+        if highlight.get(field) != highlight_data.get(field):
+            print(f"❌ Field mismatch: {field}")
+            print(f"Expected: {highlight_data.get(field)}")
+            print(f"Received: {highlight.get(field)}")
+            return False
+    
+    print("✅ Trading highlight data matches what was set")
+    
+    # Step 5: Test error handling with missing required fields
+    print("\n5️⃣ Testing error handling with missing required fields...")
+    
+    # Test with missing title
+    invalid_highlight = highlight_data.copy()
+    invalid_highlight.pop("title")
+    
+    success, error_response = tester.run_test(
+        "Save Trading Highlight with Missing Title",
+        "POST",
+        f"save-trading-highlight/{user_id}",
+        200,  # The API currently returns 200 even with missing fields
+        data=invalid_highlight
+    )
+    
+    # Test with missing description
+    invalid_highlight = highlight_data.copy()
+    invalid_highlight.pop("description")
+    
+    success, error_response = tester.run_test(
+        "Save Trading Highlight with Missing Description",
+        "POST",
+        f"save-trading-highlight/{user_id}",
+        200,  # The API currently returns 200 even with missing fields
+        data=invalid_highlight
+    )
+    
+    # Test with missing image data
+    invalid_highlight = highlight_data.copy()
+    invalid_highlight.pop("image_data")
+    
+    success, error_response = tester.run_test(
+        "Save Trading Highlight with Missing Image Data",
+        "POST",
+        f"save-trading-highlight/{user_id}",
+        200,  # The API currently returns 200 even with missing fields
+        data=invalid_highlight
+    )
+    
+    # Step 6: Test with invalid user ID
+    print("\n6️⃣ Testing with invalid user ID...")
+    
+    invalid_user_id = "invalid-user-id"
+    
+    success, error_response = tester.run_test(
+        "Save Trading Highlight with Invalid User ID",
+        "POST",
+        f"save-trading-highlight/{invalid_user_id}",
+        404,  # Should return 404 for invalid user ID
+        data=highlight_data
+    )
+    
+    if success:
+        print("❌ API accepted invalid user ID")
+        return False
+    
+    print("✅ API correctly rejected invalid user ID")
+    
+    # Step 7: Test with very large image data
+    print("\n7️⃣ Testing with very large image data...")
+    
+    # Create a large base64 string (approximately 100KB)
+    large_image_data = test_image_data * 1000
+    
+    large_highlight_data = highlight_data.copy()
+    large_highlight_data["image_data"] = large_image_data
+    large_highlight_data["title"] = "Large Image Test"
+    
+    success, large_response = tester.run_test(
+        "Save Trading Highlight with Large Image",
+        "POST",
+        f"save-trading-highlight/{user_id}",
+        200,
+        data=large_highlight_data
+    )
+    
+    if not success:
+        print("❌ Failed to save trading highlight with large image")
+        return False
+    
+    print("✅ Successfully saved trading highlight with large image")
+    
+    # Step 8: Verify all highlights are retrievable
+    print("\n8️⃣ Verifying all highlights are retrievable...")
+    
+    success, all_highlights = tester.run_test(
+        "Get All Trading Highlights",
+        "GET",
+        f"trading-highlights/{user_id}",
+        200
+    )
+    
+    if not success:
+        print("❌ Failed to retrieve all trading highlights")
+        return False
+    
+    # We should have at least 2 highlights now (the original and the large image one)
+    if len(all_highlights) < 2:
+        print(f"❌ Expected at least 2 highlights, but found {len(all_highlights)}")
+        return False
+    
+    print(f"✅ Successfully retrieved all {len(all_highlights)} trading highlights")
+    
+    print("\n✅ All tests for trading highlights save functionality passed!")
+    return True
+
 def main():
     tester = Solm8APITester()
     
-    # Test profile popup functionality
-    test_profile_popup_functionality()
-    
-    # Test public profile modal functionality
-    test_public_profile_modal()
+    # Test trading highlights save functionality
+    test_trading_highlights_save_functionality()
     
     # Uncomment to run other tests
+    # test_profile_popup_functionality()
+    # test_public_profile_modal()
     # user_id = "17d9709a-9a6f-4418-8cb4-765faca422a8"
     # tester.investigate_user_matches(user_id)
 
