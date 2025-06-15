@@ -2426,7 +2426,7 @@ function App() {
 // Wrapper for Public Profile with useParams
 function PublicProfileWrapper() {
   const { userId } = useParams();
-  return <PublicProfile userId={userId} />;
+  return <PublicProfilePage username={userId} />;
 }
 
 export default App;
