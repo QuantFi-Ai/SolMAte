@@ -32,7 +32,7 @@ const PublicProfileModal = ({ isOpen, onClose, user }) => {
       const referralCode = await getUserReferralCode();
       
       // Create profile URL with referral code
-      let profileUrl = `${window.location.origin}/profile/${user.username}`;
+      let profileUrl = `https://Solm8.com/profile/${user.username}`;
       if (referralCode) {
         profileUrl += `?ref=${referralCode}`;
       }
@@ -70,7 +70,7 @@ const PublicProfileModal = ({ isOpen, onClose, user }) => {
   const copyProfileLink = async () => {
     try {
       const referralCode = await getUserReferralCode();
-      let profileUrl = `${window.location.origin}/profile/${user.username}`;
+      let profileUrl = `https://Solm8.com/profile/${user.username}`;
       if (referralCode) {
         profileUrl += `?ref=${referralCode}`;
       }
@@ -82,6 +82,11 @@ const PublicProfileModal = ({ isOpen, onClose, user }) => {
       console.error('Error copying to clipboard:', error);
       alert('Failed to copy link');
     }
+  };
+
+  const previewPublicProfile = () => {
+    const profileUrl = `https://Solm8.com/profile/${user.username}`;
+    window.open(profileUrl, '_blank');
   };
 
   // Handle image file selection
@@ -243,14 +248,14 @@ const PublicProfileModal = ({ isOpen, onClose, user }) => {
               <div className="flex items-center space-x-3">
                 {/* Preview Button */}
                 <button
-                  onClick={() => window.open(`/profile/${user.username}`, '_blank')}
+                  onClick={previewPublicProfile}
                   className="bg-gray-800 text-white hover:bg-gray-700 px-6 py-3 rounded-xl flex items-center space-x-2 transition-all duration-300 font-medium"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                   </svg>
-                  <span>Preview Public Profile</span>
+                  <span>Preview</span>
                 </button>
                 
                 {/* Share Button */}
@@ -262,7 +267,7 @@ const PublicProfileModal = ({ isOpen, onClose, user }) => {
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
                     </svg>
-                    <span>Share Profile</span>
+                    <span>Share</span>
                   </button>
                   
                   {showShareMenu && (
