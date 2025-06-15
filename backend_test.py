@@ -595,11 +595,208 @@ def test_profile_popup_functionality():
     print("✅ All tests for profile popup functionality passed!")
     return True
 
+def test_public_profile_modal():
+    """Test the enhanced public profile modal functionality"""
+    print("\n🔍 Testing Public Profile Modal Functionality...")
+    tester = Solm8APITester()
+    
+    # Step 1: Create a new user account with email signup
+    random_suffix = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
+    test_email = f"test_public_profile_{random_suffix}@example.com"
+    test_password = "TestPassword123!"
+    test_display_name = f"Test Public Profile User {random_suffix}"
+    
+    print("\n1️⃣ Creating new user account...")
+    success, signup_response = tester.test_email_signup(test_email, test_password, test_display_name)
+    if not success:
+        print("❌ Failed to create test user")
+        return False
+    
+    user_id = tester.email_user['user_id']
+    print(f"✅ Created test user with ID: {user_id}")
+    
+    # Step 2: Complete the profile setup process
+    print("\n2️⃣ Completing profile setup...")
+    complete_profile = {
+        "bio": "I'm a trader focused on DeFi and NFTs.",
+        "location": "Crypto Valley",
+        "trading_experience": "Intermediate",
+        "years_trading": 3,
+        "preferred_tokens": ["DeFi", "NFTs", "Blue Chips"],
+        "trading_style": "Swing Trader",
+        "portfolio_size": "$10K-$100K",
+        "risk_tolerance": "Moderate",
+        "best_trade": "Bought SOL at $20, sold at $200",
+        "worst_trade": "Missed the BONK pump",
+        "favorite_project": "Solana",
+        "trading_hours": "Evening",
+        "communication_style": "Casual",
+        "preferred_communication_platform": "Discord",
+        "preferred_trading_platform": "Jupiter",
+        "looking_for": ["Alpha Sharing", "Research Partner"]
+    }
+    
+    success, update_response = tester.test_update_user_profile(user_id, complete_profile)
+    if not success:
+        print("❌ Failed to update user profile")
+        return False
+    
+    print("✅ Successfully completed profile setup")
+    
+    # Step 3: Verify the user data can be retrieved via the API
+    print("\n3️⃣ Verifying user data retrieval...")
+    success, user_data = tester.test_get_user(user_id)
+    if not success:
+        print("❌ Failed to retrieve user data")
+        return False
+    
+    print("✅ Successfully retrieved user data")
+    
+    # Step 4: Test the public profile endpoint
+    print("\n4️⃣ Testing public profile endpoint...")
+    success, public_profile = tester.run_test(
+        "Get Public Profile",
+        "GET",
+        f"public-profile/{user_data['username']}",
+        200
+    )
+    
+    if not success:
+        print("❌ Failed to retrieve public profile")
+        return False
+    
+    print("✅ Successfully retrieved public profile")
+    
+    # Step 5: Test social links functionality
+    print("\n5️⃣ Testing social links functionality...")
+    social_links = {
+        "twitter": "test_twitter_handle",
+        "discord": "test_discord#1234",
+        "telegram": "test_telegram",
+        "website": "https://example.com"
+    }
+    
+    success, social_response = tester.run_test(
+        "Update Social Links",
+        "POST",
+        f"update-social-links/{user_id}",
+        200,
+        data=social_links
+    )
+    
+    if not success:
+        print("❌ Failed to update social links")
+        return False
+    
+    print("✅ Successfully updated social links")
+    
+    # Step 6: Verify social links were saved
+    success, retrieved_links = tester.run_test(
+        "Get Social Links",
+        "GET",
+        f"social-links/{user_id}",
+        200
+    )
+    
+    if not success:
+        print("❌ Failed to retrieve social links")
+        return False
+    
+    print("✅ Successfully retrieved social links")
+    
+    # Verify the links match what we set
+    links_match = all(
+        retrieved_links.get(key) == value 
+        for key, value in social_links.items() 
+        if key in retrieved_links
+    )
+    
+    if not links_match:
+        print("❌ Retrieved social links don't match what was set")
+        print(f"Expected: {social_links}")
+        print(f"Received: {retrieved_links}")
+        return False
+    
+    print("✅ Social links match what was set")
+    
+    # Step 7: Test trading highlights functionality
+    print("\n6️⃣ Testing trading highlights functionality...")
+    
+    # Create a simple base64 image for testing
+    test_image_data = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=="
+    
+    highlight_data = {
+        "title": "Test Trading Highlight",
+        "description": "This is a test trading highlight",
+        "image_data": test_image_data,
+        "highlight_type": "pnl_screenshot",
+        "date_achieved": "2023-05-15",
+        "profit_loss": "+$5000",
+        "percentage_gain": "+250%"
+    }
+    
+    success, highlight_response = tester.run_test(
+        "Save Trading Highlight",
+        "POST",
+        f"save-trading-highlight/{user_id}",
+        200,
+        data=highlight_data
+    )
+    
+    if not success:
+        print("❌ Failed to save trading highlight")
+        return False
+    
+    print("✅ Successfully saved trading highlight")
+    
+    # Step 8: Verify trading highlights were saved
+    success, retrieved_highlights = tester.run_test(
+        "Get Trading Highlights",
+        "GET",
+        f"trading-highlights/{user_id}",
+        200
+    )
+    
+    if not success:
+        print("❌ Failed to retrieve trading highlights")
+        return False
+    
+    if not retrieved_highlights or len(retrieved_highlights) == 0:
+        print("❌ No trading highlights found")
+        return False
+    
+    print(f"✅ Successfully retrieved {len(retrieved_highlights)} trading highlights")
+    
+    # Step 9: Test referral code generation for sharing
+    print("\n7️⃣ Testing referral code generation...")
+    success, referral_response = tester.run_test(
+        "Generate Referral Code",
+        "POST",
+        f"referrals/generate/{user_id}",
+        200
+    )
+    
+    if not success:
+        print("❌ Failed to generate referral code")
+        return False
+    
+    if not referral_response.get("referral_code"):
+        print("❌ No referral code in response")
+        return False
+    
+    print(f"✅ Successfully generated referral code: {referral_response.get('referral_code')}")
+    
+    print("\n✅ All tests for public profile modal functionality passed!")
+    return True
+
 def main():
     tester = Solm8APITester()
     
     # Test profile popup functionality
     test_profile_popup_functionality()
+    
+    # Test public profile modal functionality
+    test_public_profile_modal()
     
     # Uncomment to run other tests
     # user_id = "17d9709a-9a6f-4418-8cb4-765faca422a8"
