@@ -438,12 +438,172 @@ class Solm8APITester:
         
         return True
 
+def test_profile_popup_functionality():
+    """Test the profile popup functionality by creating a user and verifying profile data"""
+    print("\n🔍 Testing Profile Popup Functionality...")
+    tester = Solm8APITester()
+    
+    # Step 1: Create a new user account with email signup
+    random_suffix = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
+    test_email = f"test_profile_{random_suffix}@example.com"
+    test_password = "TestPassword123!"
+    test_display_name = f"Test Profile User {random_suffix}"
+    
+    print("\n1️⃣ Creating new user account...")
+    success, signup_response = tester.test_email_signup(test_email, test_password, test_display_name)
+    if not success:
+        print("❌ Failed to create test user")
+        return False
+    
+    user_id = tester.email_user['user_id']
+    print(f"✅ Created test user with ID: {user_id}")
+    
+    # Step 2: Complete the profile setup process
+    print("\n2️⃣ Completing profile setup...")
+    complete_profile = {
+        "bio": "I'm a trader focused on DeFi and NFTs.",
+        "location": "Crypto Valley",
+        "trading_experience": "Intermediate",
+        "years_trading": 3,
+        "preferred_tokens": ["DeFi", "NFTs", "Blue Chips"],
+        "trading_style": "Swing Trader",
+        "portfolio_size": "$10K-$100K",
+        "risk_tolerance": "Moderate",
+        "best_trade": "Bought SOL at $20, sold at $200",
+        "worst_trade": "Missed the BONK pump",
+        "favorite_project": "Solana",
+        "trading_hours": "Evening",
+        "communication_style": "Casual",
+        "preferred_communication_platform": "Discord",
+        "preferred_trading_platform": "Jupiter",
+        "looking_for": ["Alpha Sharing", "Research Partner"]
+    }
+    
+    success, update_response = tester.test_update_user_profile(user_id, complete_profile)
+    if not success:
+        print("❌ Failed to update user profile")
+        return False
+    
+    print("✅ Successfully completed profile setup")
+    
+    # Step 3: Verify the user data can be retrieved via the API
+    print("\n3️⃣ Verifying user data retrieval...")
+    success, user_data = tester.test_get_user(user_id)
+    if not success:
+        print("❌ Failed to retrieve user data")
+        return False
+    
+    print("✅ Successfully retrieved user data")
+    
+    # Step 4: Check that all required fields for the profile popup are present in the response
+    print("\n4️⃣ Checking required fields for profile popup...")
+    required_fields = [
+        "user_id", "display_name", "avatar_url", "bio", "location", 
+        "trading_experience", "years_trading", "preferred_tokens", 
+        "trading_style", "portfolio_size", "risk_tolerance",
+        "best_trade", "worst_trade", "favorite_project", 
+        "trading_hours", "communication_style", 
+        "preferred_communication_platform", "preferred_trading_platform",
+        "looking_for", "user_status"
+    ]
+    
+    missing_fields = []
+    for field in required_fields:
+        if field not in user_data or user_data[field] is None:
+            missing_fields.append(field)
+    
+    if missing_fields:
+        print(f"❌ Missing required fields: {', '.join(missing_fields)}")
+        return False
+    
+    print("✅ All required fields for profile popup are present")
+    
+    # Step 5: Verify profile_complete flag is set to true
+    print("\n5️⃣ Verifying profile_complete flag...")
+    if not user_data.get("profile_complete"):
+        print("❌ profile_complete flag is not set to true")
+        return False
+    
+    print("✅ profile_complete flag is set to true")
+    
+    # Step 6: Verify the user appears in discovery results
+    print("\n6️⃣ Creating another user to test discovery...")
+    
+    # Create another user to test discovery
+    random_suffix2 = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
+    test_email2 = f"test_discover_{random_suffix2}@example.com"
+    test_password2 = "TestPassword123!"
+    test_display_name2 = f"Test Discover User {random_suffix2}"
+    
+    success, signup_response2 = tester.test_email_signup(test_email2, test_password2, test_display_name2)
+    if not success:
+        print("❌ Failed to create second test user")
+        return False
+    
+    user_id2 = tester.email_user['user_id']
+    print(f"✅ Created second test user with ID: {user_id2}")
+    
+    # Complete the second user's profile
+    complete_profile2 = {
+        "trading_experience": "Beginner",
+        "preferred_tokens": ["Meme Coins", "GameFi"],
+        "trading_style": "HODLer",
+        "portfolio_size": "$1K-$10K"
+    }
+    
+    success, _ = tester.test_update_user_profile(user_id2, complete_profile2)
+    if not success:
+        print("❌ Failed to update second user's profile")
+        return False
+    
+    print("✅ Successfully completed second user's profile")
+    
+    # Test discovery endpoint
+    print("\n7️⃣ Testing discovery endpoint...")
+    success, discover_response = tester.run_test(
+        "Get Discovery Users",
+        "GET",
+        f"discover/{user_id2}",
+        200
+    )
+    
+    if not success:
+        print("❌ Failed to get discovery users")
+        return False
+    
+    # Check if the first user appears in discovery results
+    first_user_found = False
+    for user in discover_response:
+        if user.get("user_id") == user_id:
+            first_user_found = True
+            break
+    
+    if not first_user_found:
+        print("❌ First user not found in discovery results")
+        return False
+    
+    print("✅ First user found in discovery results")
+    
+    # Test clicking on profile (simulated by getting user data)
+    print("\n8️⃣ Testing profile data retrieval (simulating profile click)...")
+    success, profile_data = tester.test_get_user(user_id)
+    if not success:
+        print("❌ Failed to retrieve profile data")
+        return False
+    
+    print("✅ Successfully retrieved profile data")
+    print("✅ All tests for profile popup functionality passed!")
+    return True
+
 def main():
     tester = Solm8APITester()
     
-    # Investigate matches for the specified user ID
-    user_id = "17d9709a-9a6f-4418-8cb4-765faca422a8"
-    tester.investigate_user_matches(user_id)
+    # Test profile popup functionality
+    test_profile_popup_functionality()
+    
+    # Uncomment to run other tests
+    # user_id = "17d9709a-9a6f-4418-8cb4-765faca422a8"
+    # tester.investigate_user_matches(user_id)
 
 if __name__ == "__main__":
     main()
