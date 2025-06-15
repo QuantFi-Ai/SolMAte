@@ -4,8 +4,7 @@ import { AnimatedButton } from './AnimatedComponents';
 
 const PublicProfileModal = ({ isOpen, onClose, user }) => {
   const [showShareMenu, setShowShareMenu] = useState(false);
-  const [showSocialLinksForm, setShowSocialLinksForm] = useState(false);
-  const [showTradingHighlights, setShowTradingHighlights] = useState(false);
+  const [activeTab, setActiveTab] = useState('overview');
   const [socialLinks, setSocialLinks] = useState({
     twitter: '',
     discord: '',
@@ -39,13 +38,14 @@ const PublicProfileModal = ({ isOpen, onClose, user }) => {
       }
 
       // Create share text
-      const shareText = `Check out my trading profile on Solm8! 🚀\n\nConnect with me and other crypto traders.\n\n#Solm8 #CryptoTrading`;
+      const shareText = `🚀 Check out my Solm8 trading profile!\n\nI'm ${user.trading_experience} trader specializing in ${user.preferred_tokens?.join(', ') || 'crypto trading'}.\n\nConnect with me and other elite Solana traders.\n\n#Solm8 #SolanaTrading #CryptoTrader`;
       
       // Create Twitter share URL
       const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(profileUrl)}`;
       
       // Open Twitter share dialog
       window.open(twitterUrl, '_blank', 'width=550,height=420');
+      setShowShareMenu(false);
       
     } catch (error) {
       console.error('Error sharing profile:', error);
@@ -76,7 +76,8 @@ const PublicProfileModal = ({ isOpen, onClose, user }) => {
       }
       
       await navigator.clipboard.writeText(profileUrl);
-      alert('Profile link copied to clipboard!');
+      alert('🔗 Profile link copied to clipboard!');
+      setShowShareMenu(false);
     } catch (error) {
       console.error('Error copying to clipboard:', error);
       alert('Failed to copy link');
@@ -144,7 +145,7 @@ const PublicProfileModal = ({ isOpen, onClose, user }) => {
       });
 
       if (response.ok) {
-        alert('Trading highlight saved successfully!');
+        alert('🎉 Trading highlight saved successfully!');
         // Reset form
         setTradingHighlight({
           title: '',
@@ -155,7 +156,6 @@ const PublicProfileModal = ({ isOpen, onClose, user }) => {
           date_achieved: new Date().toISOString().split('T')[0]
         });
         setHighlightImage(null);
-        setShowTradingHighlights(false);
       } else {
         const error = await response.json();
         throw new Error(error.detail || 'Failed to save trading highlight');
@@ -180,8 +180,7 @@ const PublicProfileModal = ({ isOpen, onClose, user }) => {
       });
 
       if (response.ok) {
-        alert('Social links saved successfully!');
-        setShowSocialLinksForm(false);
+        alert('🎉 Social links saved successfully!');
       } else {
         const error = await response.json();
         throw new Error(error.detail || 'Failed to save social links');
@@ -198,358 +197,451 @@ const PublicProfileModal = ({ isOpen, onClose, user }) => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+        className="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm flex items-center justify-center p-4 z-50"
         onClick={onClose}
       >
         <motion.div
-          initial={{ scale: 0.9, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          exit={{ scale: 0.9, opacity: 0 }}
-          className="bg-white rounded-2xl p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto"
+          initial={{ scale: 0.9, opacity: 0, y: 20 }}
+          animate={{ scale: 1, opacity: 1, y: 0 }}
+          exit={{ scale: 0.9, opacity: 0, y: 20 }}
+          className="bg-gradient-to-br from-white to-gray-50 rounded-3xl p-0 max-w-5xl w-full max-h-[95vh] overflow-hidden shadow-2xl border border-gray-100"
           onClick={(e) => e.stopPropagation()}
         >
-          {/* Header */}
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-black">Your Public Profile</h2>
-            <div className="flex items-center space-x-2">
-              {/* Share Button */}
-              <div className="relative">
-                <button
-                  onClick={() => setShowShareMenu(!showShareMenu)}
-                  className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-all"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
-                  </svg>
-                  <span>Share</span>
-                </button>
-                
-                {showShareMenu && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
-                    <button
-                      onClick={handleShareProfile}
-                      className="flex items-center space-x-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-all"
-                    >
-                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
-                      </svg>
-                      <span>Share on Twitter</span>
-                    </button>
-                    <button
-                      onClick={copyProfileLink}
-                      className="flex items-center space-x-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-all"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                      </svg>
-                      <span>Copy Link</span>
-                    </button>
+          {/* Hero Header */}
+          <div className="relative bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-700 p-8 text-white">
+            <div className="absolute inset-0 bg-black bg-opacity-20"></div>
+            <div className="relative flex items-center justify-between">
+              <div className="flex items-center space-x-6">
+                <div className="relative">
+                  <img
+                    src={user.avatar_url || '/api/placeholder/96/96'}
+                    alt={user.display_name}
+                    className="w-24 h-24 rounded-full border-4 border-white shadow-lg object-cover"
+                  />
+                  <div className="absolute -bottom-2 -right-2 bg-green-500 w-8 h-8 rounded-full border-4 border-white flex items-center justify-center">
+                    <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
                   </div>
-                )}
+                </div>
+                <div>
+                  <h1 className="text-3xl font-bold mb-1">{user.display_name}</h1>
+                  <p className="text-blue-100 text-lg">@{user.username}</p>
+                  <div className="flex items-center space-x-4 mt-2">
+                    <span className="bg-white bg-opacity-20 px-3 py-1 rounded-full text-sm font-medium">
+                      {user.trading_experience} Trader
+                    </span>
+                    {user.years_trading && (
+                      <span className="bg-white bg-opacity-20 px-3 py-1 rounded-full text-sm font-medium">
+                        {user.years_trading} Years Experience
+                      </span>
+                    )}
+                  </div>
+                </div>
               </div>
               
-              <button
-                onClick={onClose}
-                className="text-gray-500 hover:text-gray-700 text-2xl"
-              >
-                ×
-              </button>
+              {/* Header Actions */}
+              <div className="flex items-center space-x-3">
+                {/* Share Button */}
+                <div className="relative">
+                  <button
+                    onClick={() => setShowShareMenu(!showShareMenu)}
+                    className="bg-white bg-opacity-20 hover:bg-opacity-30 backdrop-blur text-white px-6 py-3 rounded-xl flex items-center space-x-2 transition-all duration-300 border border-white border-opacity-30"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
+                    </svg>
+                    <span className="font-medium">Share Profile</span>
+                  </button>
+                  
+                  {showShareMenu && (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      className="absolute right-0 top-full mt-2 w-64 bg-white rounded-xl shadow-xl border border-gray-200 py-2 z-50"
+                    >
+                      <button
+                        onClick={handleShareProfile}
+                        className="flex items-center space-x-3 w-full px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 transition-all"
+                      >
+                        <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
+                          <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+                          </svg>
+                        </div>
+                        <div>
+                          <p className="font-medium">Share on Twitter</p>
+                          <p className="text-xs text-gray-500">Share with your followers</p>
+                        </div>
+                      </button>
+                      <button
+                        onClick={copyProfileLink}
+                        className="flex items-center space-x-3 w-full px-4 py-3 text-sm text-gray-700 hover:bg-purple-50 transition-all"
+                      >
+                        <div className="w-8 h-8 bg-purple-500 rounded-lg flex items-center justify-center">
+                          <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                          </svg>
+                        </div>
+                        <div>
+                          <p className="font-medium">Copy Link</p>
+                          <p className="text-xs text-gray-500">Get shareable link</p>
+                        </div>
+                      </button>
+                    </motion.div>
+                  )}
+                </div>
+                
+                <button
+                  onClick={onClose}
+                  className="bg-white bg-opacity-20 hover:bg-opacity-30 backdrop-blur text-white p-3 rounded-xl transition-all duration-300"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+            
+            {user.bio && (
+              <p className="text-blue-100 mt-4 text-lg leading-relaxed max-w-2xl">{user.bio}</p>
+            )}
+          </div>
+
+          {/* Navigation Tabs */}
+          <div className="bg-white border-b border-gray-200">
+            <div className="flex space-x-8 px-8">
+              {[
+                { id: 'overview', label: 'Trading Profile', icon: '📊' },
+                { id: 'screenshots', label: 'Trading Screenshots', icon: '📸' },
+                { id: 'social', label: 'Social & Links', icon: '🔗' }
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex items-center space-x-2 py-4 px-2 border-b-2 font-medium text-sm transition-all ${
+                    activeTab === tab.id
+                      ? 'border-purple-600 text-purple-600'
+                      : 'border-transparent text-gray-500 hover:text-gray-700'
+                  }`}
+                >
+                  <span>{tab.icon}</span>
+                  <span>{tab.label}</span>
+                </button>
+              ))}
             </div>
           </div>
 
-          {/* Profile Content */}
-          <div className="space-y-6">
-            {/* Profile Header */}
-            <div className="text-center">
-              <div className="w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden">
-                <img
-                  src={user.avatar_url || '/api/placeholder/96/96'}
-                  alt={user.display_name}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <h1 className="text-3xl font-bold text-black mb-2">{user.display_name}</h1>
-              <p className="text-lg text-gray-600">@{user.username}</p>
-              {user.bio && (
-                <p className="text-gray-700 mt-4 max-w-2xl mx-auto">{user.bio}</p>
-              )}
-            </div>
-
-            {/* Action Buttons */}
-            <div className="flex justify-center space-x-4">
-              <button
-                onClick={() => setShowSocialLinksForm(!showSocialLinksForm)}
-                className="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-all"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-                </svg>
-                <span>Add Social Links</span>
-              </button>
-              
-              <button
-                onClick={() => setShowTradingHighlights(!showTradingHighlights)}
-                className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-all"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-                <span>Add Screenshots</span>
-              </button>
-            </div>
-
-            {/* Social Links Form */}
-            {showSocialLinksForm && (
+          {/* Content Area */}
+          <div className="overflow-y-auto max-h-[60vh] p-8">
+            {/* Overview Tab */}
+            {activeTab === 'overview' && (
               <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                className="bg-purple-50 rounded-xl p-6"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="space-y-8"
               >
-                <h3 className="text-lg font-bold text-purple-800 mb-4">Add Social Links</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-purple-700 mb-2">Twitter</label>
-                    <input
-                      type="text"
-                      placeholder="@yourusername"
-                      value={socialLinks.twitter}
-                      onChange={(e) => setSocialLinks({...socialLinks, twitter: e.target.value})}
-                      className="w-full border border-purple-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-purple-500"
-                    />
+                {/* Quick Stats */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-2xl border border-blue-200">
+                    <div className="text-2xl font-bold text-blue-800">{user.trading_experience}</div>
+                    <div className="text-blue-600 text-sm">Experience Level</div>
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-purple-700 mb-2">Discord</label>
-                    <input
-                      type="text"
-                      placeholder="username#1234"
-                      value={socialLinks.discord}
-                      onChange={(e) => setSocialLinks({...socialLinks, discord: e.target.value})}
-                      className="w-full border border-purple-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-purple-500"
-                    />
+                  <div className="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-2xl border border-green-200">
+                    <div className="text-2xl font-bold text-green-800">{user.years_trading || 0}Y</div>
+                    <div className="text-green-600 text-sm">Years Trading</div>
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-purple-700 mb-2">Telegram</label>
-                    <input
-                      type="text"
-                      placeholder="@yourusername"
-                      value={socialLinks.telegram}
-                      onChange={(e) => setSocialLinks({...socialLinks, telegram: e.target.value})}
-                      className="w-full border border-purple-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-purple-500"
-                    />
+                  <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-4 rounded-2xl border border-purple-200">
+                    <div className="text-2xl font-bold text-purple-800">{user.trading_style}</div>
+                    <div className="text-purple-600 text-sm">Trading Style</div>
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-purple-700 mb-2">Website</label>
-                    <input
-                      type="url"
-                      placeholder="https://yourwebsite.com"
-                      value={socialLinks.website}
-                      onChange={(e) => setSocialLinks({...socialLinks, website: e.target.value})}
-                      className="w-full border border-purple-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-purple-500"
-                    />
+                  <div className="bg-gradient-to-br from-orange-50 to-orange-100 p-4 rounded-2xl border border-orange-200">
+                    <div className="text-2xl font-bold text-orange-800">{user.portfolio_size}</div>
+                    <div className="text-orange-600 text-sm">Portfolio Size</div>
                   </div>
                 </div>
-                <div className="flex justify-end mt-4">
-                  <button 
-                    onClick={handleSaveSocialLinks}
-                    className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-all"
-                  >
-                    Save Social Links
-                  </button>
+
+                {/* Preferred Tokens */}
+                {user.preferred_tokens && user.preferred_tokens.length > 0 && (
+                  <div className="bg-gradient-to-r from-yellow-50 to-amber-50 p-6 rounded-2xl border border-yellow-200">
+                    <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                      <span className="text-2xl mr-2">🪙</span>
+                      Preferred Token Categories
+                    </h3>
+                    <div className="flex flex-wrap gap-3">
+                      {user.preferred_tokens.map((token, index) => (
+                        <span
+                          key={index}
+                          className="px-4 py-2 bg-gradient-to-r from-yellow-400 to-amber-400 text-white rounded-full text-sm font-semibold shadow-lg transform hover:scale-105 transition-all"
+                        >
+                          {token}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Trading Goals */}
+                {user.looking_for && user.looking_for.length > 0 && (
+                  <div className="bg-gradient-to-r from-emerald-50 to-green-50 p-6 rounded-2xl border border-emerald-200">
+                    <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                      <span className="text-2xl mr-2">🎯</span>
+                      Trading Goals & Interests
+                    </h3>
+                    <div className="flex flex-wrap gap-3">
+                      {user.looking_for.map((goal, index) => (
+                        <span
+                          key={index}
+                          className="px-4 py-2 bg-gradient-to-r from-emerald-400 to-green-400 text-white rounded-full text-sm font-semibold shadow-lg transform hover:scale-105 transition-all"
+                        >
+                          {goal}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Trading Details */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {user.communication_style && (
+                    <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+                      <h4 className="font-bold text-gray-800 mb-3 flex items-center">
+                        <span className="text-xl mr-2">💬</span>
+                        Communication Style
+                      </h4>
+                      <p className="text-gray-600">{user.communication_style}</p>
+                    </div>
+                  )}
+
+                  {user.trading_hours && (
+                    <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+                      <h4 className="font-bold text-gray-800 mb-3 flex items-center">
+                        <span className="text-xl mr-2">⏰</span>
+                        Active Trading Hours
+                      </h4>
+                      <p className="text-gray-600">{user.trading_hours}</p>
+                    </div>
+                  )}
+
+                  {user.preferred_trading_platform && (
+                    <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+                      <h4 className="font-bold text-gray-800 mb-3 flex items-center">
+                        <span className="text-xl mr-2">⚡</span>
+                        Preferred Platform
+                      </h4>
+                      <p className="text-gray-600">{user.preferred_trading_platform}</p>
+                    </div>
+                  )}
+
+                  {user.location && (
+                    <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+                      <h4 className="font-bold text-gray-800 mb-3 flex items-center">
+                        <span className="text-xl mr-2">📍</span>
+                        Location
+                      </h4>
+                      <p className="text-gray-600">{user.location}</p>
+                    </div>
+                  )}
                 </div>
               </motion.div>
             )}
 
-            {/* Trading Highlights Form */}
-            {showTradingHighlights && (
+            {/* Trading Screenshots Tab */}
+            {activeTab === 'screenshots' && (
               <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                className="bg-green-50 rounded-xl p-6"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="space-y-6"
               >
-                <h3 className="text-lg font-bold text-green-800 mb-4">Add Trading Screenshots</h3>
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-green-700 mb-2">Upload P&L Screenshot</label>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleImageUpload}
-                      className="w-full border border-green-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-green-500"
-                    />
-                    {highlightImage && (
-                      <p className="text-sm text-green-600 mt-1">Selected: {highlightImage.name}</p>
-                    )}
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-green-700 mb-2">Title</label>
-                    <input
-                      type="text"
-                      placeholder="e.g., My Best SOL Trade"
-                      value={tradingHighlight.title}
-                      onChange={(e) => setTradingHighlight({...tradingHighlight, title: e.target.value})}
-                      className="w-full border border-green-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-green-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-green-700 mb-2">Description</label>
-                    <textarea
-                      placeholder="Tell the story behind this trade..."
-                      rows="3"
-                      value={tradingHighlight.description}
-                      onChange={(e) => setTradingHighlight({...tradingHighlight, description: e.target.value})}
-                      className="w-full border border-green-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-green-500"
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-green-700 mb-2">Profit/Loss</label>
-                      <input
-                        type="text"
-                        placeholder="e.g., +$5,000"
-                        value={tradingHighlight.profit_loss}
-                        onChange={(e) => setTradingHighlight({...tradingHighlight, profit_loss: e.target.value})}
-                        className="w-full border border-green-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-green-500"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-green-700 mb-2">Percentage Gain</label>
-                      <input
-                        type="text"
-                        placeholder="e.g., +250%"
-                        value={tradingHighlight.percentage_gain}
-                        onChange={(e) => setTradingHighlight({...tradingHighlight, percentage_gain: e.target.value})}
-                        className="w-full border border-green-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-green-500"
-                      />
-                    </div>
-                  </div>
+                <div className="text-center mb-8">
+                  <h3 className="text-2xl font-bold text-gray-800 mb-2">📸 Trading Screenshots & Highlights</h3>
+                  <p className="text-gray-600">Showcase your best trades and achievements</p>
                 </div>
-                <div className="flex justify-end mt-4">
-                  <button 
-                    onClick={handleSaveTradingHighlight}
-                    disabled={isUploading}
-                    className="bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white px-4 py-2 rounded-lg transition-all"
-                  >
-                    {isUploading ? 'Saving...' : 'Save Trading Highlight'}
-                  </button>
+
+                <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-8 border border-green-200">
+                  <div className="text-center mb-6">
+                    <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                    </div>
+                    <h4 className="text-xl font-bold text-green-800 mb-2">Add Trading Screenshot</h4>
+                    <p className="text-green-600">Upload your P&L screenshots, trading achievements, or portfolio highlights</p>
+                  </div>
+
+                  <div className="space-y-6">
+                    <div>
+                      <label className="block text-sm font-semibold text-green-800 mb-3">Upload Screenshot</label>
+                      <div className="border-2 border-dashed border-green-300 rounded-xl p-6 text-center hover:border-green-400 transition-all">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleImageUpload}
+                          className="hidden"
+                          id="screenshot-upload"
+                        />
+                        <label htmlFor="screenshot-upload" className="cursor-pointer">
+                          <div className="space-y-2">
+                            <svg className="w-12 h-12 text-green-400 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                            </svg>
+                            <p className="text-green-700 font-medium">Click to upload or drag and drop</p>
+                            <p className="text-green-600 text-sm">PNG, JPG, GIF up to 5MB</p>
+                          </div>
+                        </label>
+                      </div>
+                      {highlightImage && (
+                        <p className="text-sm text-green-600 mt-2 flex items-center">
+                          <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          </svg>
+                          Selected: {highlightImage.name}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-semibold text-green-800 mb-2">Title</label>
+                        <input
+                          type="text"
+                          placeholder="e.g., My Best SOL Trade"
+                          value={tradingHighlight.title}
+                          onChange={(e) => setTradingHighlight({...tradingHighlight, title: e.target.value})}
+                          className="w-full border border-green-300 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-semibold text-green-800 mb-2">Date</label>
+                        <input
+                          type="date"
+                          value={tradingHighlight.date_achieved}
+                          onChange={(e) => setTradingHighlight({...tradingHighlight, date_achieved: e.target.value})}
+                          className="w-full border border-green-300 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-semibold text-green-800 mb-2">Description</label>
+                      <textarea
+                        placeholder="Tell the story behind this trade..."
+                        rows="3"
+                        value={tradingHighlight.description}
+                        onChange={(e) => setTradingHighlight({...tradingHighlight, description: e.target.value})}
+                        className="w-full border border-green-300 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-semibold text-green-800 mb-2">Profit/Loss</label>
+                        <input
+                          type="text"
+                          placeholder="e.g., +$5,000"
+                          value={tradingHighlight.profit_loss}
+                          onChange={(e) => setTradingHighlight({...tradingHighlight, profit_loss: e.target.value})}
+                          className="w-full border border-green-300 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-semibold text-green-800 mb-2">Percentage Gain</label>
+                        <input
+                          type="text"
+                          placeholder="e.g., +250%"
+                          value={tradingHighlight.percentage_gain}
+                          onChange={(e) => setTradingHighlight({...tradingHighlight, percentage_gain: e.target.value})}
+                          className="w-full border border-green-300 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="flex justify-end">
+                      <button 
+                        onClick={handleSaveTradingHighlight}
+                        disabled={isUploading}
+                        className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 disabled:opacity-50 text-white px-8 py-3 rounded-xl transition-all duration-300 font-semibold shadow-lg transform hover:scale-105"
+                      >
+                        {isUploading ? (
+                          <span className="flex items-center">
+                            <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            Saving...
+                          </span>
+                        ) : (
+                          'Save Trading Highlight'
+                        )}
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </motion.div>
             )}
 
-            {/* Basic Info */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {user.location && (
-                <div className="text-center p-4 bg-gray-50 rounded-xl">
-                  <h3 className="font-semibold text-gray-800 mb-2">📍 Location</h3>
-                  <p className="text-gray-600">{user.location}</p>
-                </div>
-              )}
-              
-              {user.timezone && (
-                <div className="text-center p-4 bg-gray-50 rounded-xl">
-                  <h3 className="font-semibold text-gray-800 mb-2">🌍 Timezone</h3>
-                  <p className="text-gray-600">{user.timezone}</p>
-                </div>
-              )}
-            </div>
-
-            {/* Trading Info */}
-            <div className="space-y-4">
-              <h3 className="text-xl font-bold text-black">Trading Profile</h3>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {user.trading_experience && (
-                  <div className="p-4 bg-blue-50 rounded-xl">
-                    <h4 className="font-semibold text-blue-800 mb-2">📈 Experience Level</h4>
-                    <p className="text-blue-700">{user.trading_experience}</p>
-                  </div>
-                )}
-                
-                {user.years_trading && (
-                  <div className="p-4 bg-green-50 rounded-xl">
-                    <h4 className="font-semibold text-green-800 mb-2">⏱️ Years Trading</h4>
-                    <p className="text-green-700">{user.years_trading} years</p>
-                  </div>
-                )}
-                
-                {user.trading_style && (
-                  <div className="p-4 bg-purple-50 rounded-xl">
-                    <h4 className="font-semibold text-purple-800 mb-2">🎯 Trading Style</h4>
-                    <p className="text-purple-700">{user.trading_style}</p>
-                  </div>
-                )}
-                
-                {user.portfolio_size && (
-                  <div className="p-4 bg-orange-50 rounded-xl">
-                    <h4 className="font-semibold text-orange-800 mb-2">💼 Portfolio Size</h4>
-                    <p className="text-orange-700">{user.portfolio_size}</p>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Preferred Tokens */}
-            {user.preferred_tokens && user.preferred_tokens.length > 0 && (
-              <div>
-                <h3 className="text-xl font-bold text-black mb-4">🪙 Preferred Tokens</h3>
-                <div className="flex flex-wrap gap-2">
-                  {user.preferred_tokens.map((token, index) => (
-                    <span
-                      key={index}
-                      className="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm font-medium"
-                    >
-                      {token}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Trading Goals */}
-            {user.looking_for && user.looking_for.length > 0 && (
-              <div>
-                <h3 className="text-xl font-bold text-black mb-4">🎯 Trading Goals</h3>
-                <div className="flex flex-wrap gap-2">
-                  {user.looking_for.map((goal, index) => (
-                    <span
-                      key={index}
-                      className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium"
-                    >
-                      {goal}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Communication Preferences */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {user.communication_style && (
-                <div className="p-4 bg-gray-50 rounded-xl">
-                  <h3 className="text-lg font-semibold text-gray-800 mb-2">💬 Communication Style</h3>
-                  <p className="text-gray-600">{user.communication_style}</p>
-                </div>
-              )}
-
-              {user.trading_hours && (
-                <div className="p-4 bg-gray-50 rounded-xl">
-                  <h3 className="text-lg font-semibold text-gray-800 mb-2">⏰ Trading Hours</h3>
-                  <p className="text-gray-600">{user.trading_hours}</p>
-                </div>
-              )}
-            </div>
-
-            {/* Close Button */}
-            <div className="flex justify-center pt-4">
-              <AnimatedButton
-                onClick={onClose}
-                variant="secondary"
-                className="px-8"
+            {/* Social & Links Tab */}
+            {activeTab === 'social' && (
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="space-y-6"
               >
-                Close Preview
-              </AnimatedButton>
-            </div>
+                <div className="text-center mb-8">
+                  <h3 className="text-2xl font-bold text-gray-800 mb-2">🔗 Social Links & Connections</h3>
+                  <p className="text-gray-600">Connect with other traders across platforms</p>
+                </div>
+
+                <div className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-2xl p-8 border border-purple-200">
+                  <div className="text-center mb-6">
+                    <div className="w-16 h-16 bg-purple-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                      </svg>
+                    </div>
+                    <h4 className="text-xl font-bold text-purple-800 mb-2">Add Your Social Links</h4>
+                    <p className="text-purple-600">Let other traders connect with you on your preferred platforms</p>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {[
+                      { key: 'twitter', label: 'Twitter', placeholder: '@yourusername', icon: '🐦', color: 'blue' },
+                      { key: 'discord', label: 'Discord', placeholder: 'username#1234', icon: '🎮', color: 'indigo' },
+                      { key: 'telegram', label: 'Telegram', placeholder: '@yourusername', icon: '✈️', color: 'cyan' },
+                      { key: 'website', label: 'Website', placeholder: 'https://yourwebsite.com', icon: '🌐', color: 'green' }
+                    ].map((social) => (
+                      <div key={social.key}>
+                        <label className="block text-sm font-semibold text-purple-800 mb-2 flex items-center">
+                          <span className="mr-2">{social.icon}</span>
+                          {social.label}
+                        </label>
+                        <div className="relative">
+                          <input
+                            type={social.key === 'website' ? 'url' : 'text'}
+                            placeholder={social.placeholder}
+                            value={socialLinks[social.key]}
+                            onChange={(e) => setSocialLinks({...socialLinks, [social.key]: e.target.value})}
+                            className="w-full border border-purple-300 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent pl-12"
+                          />
+                          <div className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-6 h-6 bg-${social.color}-500 rounded-lg flex items-center justify-center`}>
+                            <span className="text-xs">{social.icon}</span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="flex justify-end mt-6">
+                    <button 
+                      onClick={handleSaveSocialLinks}
+                      className="bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white px-8 py-3 rounded-xl transition-all duration-300 font-semibold shadow-lg transform hover:scale-105"
+                    >
+                      Save Social Links
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+            )}
           </div>
         </motion.div>
       </motion.div>
