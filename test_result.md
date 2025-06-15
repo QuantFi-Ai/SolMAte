@@ -109,6 +109,21 @@ backend:
       - working: true
         agent: "testing"
         comment: "✅ TESTED: Successfully verified the enhanced public profile modal functionality. Created a comprehensive test that confirms: 1) The /api/public-profile/{username} endpoint returns complete user data for public profiles, 2) The social links functionality works correctly with the /api/update-social-links/{user_id} and /api/social-links/{user_id} endpoints, 3) The trading highlights functionality works correctly with the /api/save-trading-highlight/{user_id} and /api/trading-highlights/{user_id} endpoints, 4) The referral code generation for sharing works correctly with the /api/referrals/generate/{user_id} endpoint. All backend APIs required for the enhanced public profile modal are working correctly."
+      
+  - task: "Trading Highlights Save Functionality"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implemented trading highlights save functionality to allow users to save their trading achievements with images."
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Trading highlights save functionality is working correctly. Successfully verified: 1) Created a test user and completed profile setup, 2) Successfully saved a trading highlight with title, description, profit/loss (+$1000), percentage gain (+50%), and base64 image data, 3) Verified the trading highlight was saved to the database with all fields intact, 4) Successfully retrieved the saved trading highlight via the /api/trading-highlights/{user_id} endpoint, 5) Tested error handling with invalid user ID (returns appropriate 404 error), 6) Tested with large image data (100KB) and verified it was saved correctly, 7) Verified all highlights are retrievable after multiple saves. The API correctly handles all required fields and properly stores and retrieves the trading highlight data."
 
 frontend:
   - task: "Login Page Animations"
