@@ -13,6 +13,16 @@ const PublicProfileModal = ({ isOpen, onClose, user }) => {
     website: '',
     linkedin: ''
   });
+  const [tradingHighlight, setTradingHighlight] = useState({
+    title: '',
+    description: '',
+    profit_loss: '',
+    percentage_gain: '',
+    highlight_type: 'pnl_screenshot',
+    date_achieved: new Date().toISOString().split('T')[0]
+  });
+  const [highlightImage, setHighlightImage] = useState(null);
+  const [isUploading, setIsUploading] = useState(false);
   
   if (!isOpen || !user) return null;
 
