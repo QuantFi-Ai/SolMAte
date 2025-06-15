@@ -204,12 +204,11 @@ const PublicProfileModal = ({ isOpen, onClose, user }) => {
           initial={{ scale: 0.9, opacity: 0, y: 20 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
           exit={{ scale: 0.9, opacity: 0, y: 20 }}
-          className="bg-gradient-to-br from-white to-gray-50 rounded-3xl p-0 max-w-5xl w-full max-h-[95vh] overflow-hidden shadow-2xl border border-gray-100"
+          className="bg-white rounded-3xl p-0 max-w-5xl w-full max-h-[95vh] overflow-hidden shadow-2xl border border-gray-200"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Hero Header */}
-          <div className="relative bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-700 p-8 text-white">
-            <div className="absolute inset-0 bg-black bg-opacity-20"></div>
+          <div className="relative bg-black p-8 text-white">
             <div className="relative flex items-center justify-between">
               <div className="flex items-center space-x-6">
                 <div className="relative">
@@ -218,15 +217,15 @@ const PublicProfileModal = ({ isOpen, onClose, user }) => {
                     alt={user.display_name}
                     className="w-24 h-24 rounded-full border-4 border-white shadow-lg object-cover"
                   />
-                  <div className="absolute -bottom-2 -right-2 bg-green-500 w-8 h-8 rounded-full border-4 border-white flex items-center justify-center">
-                    <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                  <div className="absolute -bottom-2 -right-2 bg-white w-8 h-8 rounded-full border-2 border-black flex items-center justify-center">
+                    <svg className="w-4 h-4 text-black" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                     </svg>
                   </div>
                 </div>
                 <div>
                   <h1 className="text-3xl font-bold mb-1">{user.display_name}</h1>
-                  <p className="text-blue-100 text-lg">@{user.username}</p>
+                  <p className="text-gray-300 text-lg">@{user.username}</p>
                   <div className="flex items-center space-x-4 mt-2">
                     <span className="bg-white bg-opacity-20 px-3 py-1 rounded-full text-sm font-medium">
                       {user.trading_experience} Trader
@@ -246,12 +245,12 @@ const PublicProfileModal = ({ isOpen, onClose, user }) => {
                 <div className="relative">
                   <button
                     onClick={() => setShowShareMenu(!showShareMenu)}
-                    className="bg-white bg-opacity-20 hover:bg-opacity-30 backdrop-blur text-white px-6 py-3 rounded-xl flex items-center space-x-2 transition-all duration-300 border border-white border-opacity-30"
+                    className="bg-white text-black hover:bg-gray-100 px-6 py-3 rounded-xl flex items-center space-x-2 transition-all duration-300 font-medium"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
                     </svg>
-                    <span className="font-medium">Share Profile</span>
+                    <span>Share Profile</span>
                   </button>
                   
                   {showShareMenu && (
@@ -262,9 +261,9 @@ const PublicProfileModal = ({ isOpen, onClose, user }) => {
                     >
                       <button
                         onClick={handleShareProfile}
-                        className="flex items-center space-x-3 w-full px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 transition-all"
+                        className="flex items-center space-x-3 w-full px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-all"
                       >
-                        <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
+                        <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center">
                           <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
                           </svg>
@@ -276,9 +275,9 @@ const PublicProfileModal = ({ isOpen, onClose, user }) => {
                       </button>
                       <button
                         onClick={copyProfileLink}
-                        className="flex items-center space-x-3 w-full px-4 py-3 text-sm text-gray-700 hover:bg-purple-50 transition-all"
+                        className="flex items-center space-x-3 w-full px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-all"
                       >
-                        <div className="w-8 h-8 bg-purple-500 rounded-lg flex items-center justify-center">
+                        <div className="w-8 h-8 bg-gray-800 rounded-lg flex items-center justify-center">
                           <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
                           </svg>
@@ -294,7 +293,7 @@ const PublicProfileModal = ({ isOpen, onClose, user }) => {
                 
                 <button
                   onClick={onClose}
-                  className="bg-white bg-opacity-20 hover:bg-opacity-30 backdrop-blur text-white p-3 rounded-xl transition-all duration-300"
+                  className="bg-white bg-opacity-20 hover:bg-opacity-30 text-white p-3 rounded-xl transition-all duration-300"
                 >
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -304,7 +303,7 @@ const PublicProfileModal = ({ isOpen, onClose, user }) => {
             </div>
             
             {user.bio && (
-              <p className="text-blue-100 mt-4 text-lg leading-relaxed max-w-2xl">{user.bio}</p>
+              <p className="text-gray-200 mt-4 text-lg leading-relaxed max-w-2xl">{user.bio}</p>
             )}
           </div>
 
@@ -321,7 +320,7 @@ const PublicProfileModal = ({ isOpen, onClose, user }) => {
                   onClick={() => setActiveTab(tab.id)}
                   className={`flex items-center space-x-2 py-4 px-2 border-b-2 font-medium text-sm transition-all ${
                     activeTab === tab.id
-                      ? 'border-purple-600 text-purple-600'
+                      ? 'border-black text-black'
                       : 'border-transparent text-gray-500 hover:text-gray-700'
                   }`}
                 >
@@ -343,28 +342,28 @@ const PublicProfileModal = ({ isOpen, onClose, user }) => {
               >
                 {/* Quick Stats */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-2xl border border-blue-200">
-                    <div className="text-2xl font-bold text-blue-800">{user.trading_experience}</div>
-                    <div className="text-blue-600 text-sm">Experience Level</div>
+                  <div className="bg-gray-50 border border-gray-200 p-4 rounded-2xl">
+                    <div className="text-2xl font-bold text-black">{user.trading_experience}</div>
+                    <div className="text-gray-600 text-sm">Experience Level</div>
                   </div>
-                  <div className="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-2xl border border-green-200">
-                    <div className="text-2xl font-bold text-green-800">{user.years_trading || 0}Y</div>
-                    <div className="text-green-600 text-sm">Years Trading</div>
+                  <div className="bg-gray-50 border border-gray-200 p-4 rounded-2xl">
+                    <div className="text-2xl font-bold text-black">{user.years_trading || 0}Y</div>
+                    <div className="text-gray-600 text-sm">Years Trading</div>
                   </div>
-                  <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-4 rounded-2xl border border-purple-200">
-                    <div className="text-2xl font-bold text-purple-800">{user.trading_style}</div>
-                    <div className="text-purple-600 text-sm">Trading Style</div>
+                  <div className="bg-gray-50 border border-gray-200 p-4 rounded-2xl">
+                    <div className="text-2xl font-bold text-black">{user.trading_style}</div>
+                    <div className="text-gray-600 text-sm">Trading Style</div>
                   </div>
-                  <div className="bg-gradient-to-br from-orange-50 to-orange-100 p-4 rounded-2xl border border-orange-200">
-                    <div className="text-2xl font-bold text-orange-800">{user.portfolio_size}</div>
-                    <div className="text-orange-600 text-sm">Portfolio Size</div>
+                  <div className="bg-gray-50 border border-gray-200 p-4 rounded-2xl">
+                    <div className="text-2xl font-bold text-black">{user.portfolio_size}</div>
+                    <div className="text-gray-600 text-sm">Portfolio Size</div>
                   </div>
                 </div>
 
                 {/* Preferred Tokens */}
                 {user.preferred_tokens && user.preferred_tokens.length > 0 && (
-                  <div className="bg-gradient-to-r from-yellow-50 to-amber-50 p-6 rounded-2xl border border-yellow-200">
-                    <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                  <div className="bg-gray-50 border border-gray-200 p-6 rounded-2xl">
+                    <h3 className="text-xl font-bold text-black mb-4 flex items-center">
                       <span className="text-2xl mr-2">🪙</span>
                       Preferred Token Categories
                     </h3>
@@ -372,7 +371,7 @@ const PublicProfileModal = ({ isOpen, onClose, user }) => {
                       {user.preferred_tokens.map((token, index) => (
                         <span
                           key={index}
-                          className="px-4 py-2 bg-gradient-to-r from-yellow-400 to-amber-400 text-white rounded-full text-sm font-semibold shadow-lg transform hover:scale-105 transition-all"
+                          className="px-4 py-2 bg-black text-white rounded-full text-sm font-medium shadow-sm transform hover:scale-105 transition-all"
                         >
                           {token}
                         </span>
@@ -383,8 +382,8 @@ const PublicProfileModal = ({ isOpen, onClose, user }) => {
 
                 {/* Trading Goals */}
                 {user.looking_for && user.looking_for.length > 0 && (
-                  <div className="bg-gradient-to-r from-emerald-50 to-green-50 p-6 rounded-2xl border border-emerald-200">
-                    <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                  <div className="bg-gray-50 border border-gray-200 p-6 rounded-2xl">
+                    <h3 className="text-xl font-bold text-black mb-4 flex items-center">
                       <span className="text-2xl mr-2">🎯</span>
                       Trading Goals & Interests
                     </h3>
@@ -392,7 +391,7 @@ const PublicProfileModal = ({ isOpen, onClose, user }) => {
                       {user.looking_for.map((goal, index) => (
                         <span
                           key={index}
-                          className="px-4 py-2 bg-gradient-to-r from-emerald-400 to-green-400 text-white rounded-full text-sm font-semibold shadow-lg transform hover:scale-105 transition-all"
+                          className="px-4 py-2 bg-gray-800 text-white rounded-full text-sm font-medium shadow-sm transform hover:scale-105 transition-all"
                         >
                           {goal}
                         </span>
@@ -404,8 +403,8 @@ const PublicProfileModal = ({ isOpen, onClose, user }) => {
                 {/* Trading Details */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {user.communication_style && (
-                    <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
-                      <h4 className="font-bold text-gray-800 mb-3 flex items-center">
+                    <div className="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm">
+                      <h4 className="font-bold text-black mb-3 flex items-center">
                         <span className="text-xl mr-2">💬</span>
                         Communication Style
                       </h4>
@@ -414,8 +413,8 @@ const PublicProfileModal = ({ isOpen, onClose, user }) => {
                   )}
 
                   {user.trading_hours && (
-                    <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
-                      <h4 className="font-bold text-gray-800 mb-3 flex items-center">
+                    <div className="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm">
+                      <h4 className="font-bold text-black mb-3 flex items-center">
                         <span className="text-xl mr-2">⏰</span>
                         Active Trading Hours
                       </h4>
@@ -424,8 +423,8 @@ const PublicProfileModal = ({ isOpen, onClose, user }) => {
                   )}
 
                   {user.preferred_trading_platform && (
-                    <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
-                      <h4 className="font-bold text-gray-800 mb-3 flex items-center">
+                    <div className="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm">
+                      <h4 className="font-bold text-black mb-3 flex items-center">
                         <span className="text-xl mr-2">⚡</span>
                         Preferred Platform
                       </h4>
@@ -434,8 +433,8 @@ const PublicProfileModal = ({ isOpen, onClose, user }) => {
                   )}
 
                   {user.location && (
-                    <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
-                      <h4 className="font-bold text-gray-800 mb-3 flex items-center">
+                    <div className="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm">
+                      <h4 className="font-bold text-black mb-3 flex items-center">
                         <span className="text-xl mr-2">📍</span>
                         Location
                       </h4>
@@ -454,25 +453,25 @@ const PublicProfileModal = ({ isOpen, onClose, user }) => {
                 className="space-y-6"
               >
                 <div className="text-center mb-8">
-                  <h3 className="text-2xl font-bold text-gray-800 mb-2">📸 Trading Screenshots & Highlights</h3>
+                  <h3 className="text-2xl font-bold text-black mb-2">📸 Trading Screenshots & Highlights</h3>
                   <p className="text-gray-600">Showcase your best trades and achievements</p>
                 </div>
 
-                <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-8 border border-green-200">
+                <div className="bg-gray-50 border border-gray-200 rounded-2xl p-8">
                   <div className="text-center mb-6">
-                    <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <div className="w-16 h-16 bg-black rounded-full flex items-center justify-center mx-auto mb-4">
                       <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                       </svg>
                     </div>
-                    <h4 className="text-xl font-bold text-green-800 mb-2">Add Trading Screenshot</h4>
-                    <p className="text-green-600">Upload your P&L screenshots, trading achievements, or portfolio highlights</p>
+                    <h4 className="text-xl font-bold text-black mb-2">Add Trading Screenshot</h4>
+                    <p className="text-gray-600">Upload your P&L screenshots, trading achievements, or portfolio highlights</p>
                   </div>
 
                   <div className="space-y-6">
                     <div>
-                      <label className="block text-sm font-semibold text-green-800 mb-3">Upload Screenshot</label>
-                      <div className="border-2 border-dashed border-green-300 rounded-xl p-6 text-center hover:border-green-400 transition-all">
+                      <label className="block text-sm font-semibold text-black mb-3">Upload Screenshot</label>
+                      <div className="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:border-gray-400 transition-all">
                         <input
                           type="file"
                           accept="image/*"
@@ -482,16 +481,16 @@ const PublicProfileModal = ({ isOpen, onClose, user }) => {
                         />
                         <label htmlFor="screenshot-upload" className="cursor-pointer">
                           <div className="space-y-2">
-                            <svg className="w-12 h-12 text-green-400 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className="w-12 h-12 text-gray-400 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                             </svg>
-                            <p className="text-green-700 font-medium">Click to upload or drag and drop</p>
-                            <p className="text-green-600 text-sm">PNG, JPG, GIF up to 5MB</p>
+                            <p className="text-black font-medium">Click to upload or drag and drop</p>
+                            <p className="text-gray-600 text-sm">PNG, JPG, GIF up to 5MB</p>
                           </div>
                         </label>
                       </div>
                       {highlightImage && (
-                        <p className="text-sm text-green-600 mt-2 flex items-center">
+                        <p className="text-sm text-black mt-2 flex items-center">
                           <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                           </svg>
@@ -502,56 +501,56 @@ const PublicProfileModal = ({ isOpen, onClose, user }) => {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-semibold text-green-800 mb-2">Title</label>
+                        <label className="block text-sm font-semibold text-black mb-2">Title</label>
                         <input
                           type="text"
                           placeholder="e.g., My Best SOL Trade"
                           value={tradingHighlight.title}
                           onChange={(e) => setTradingHighlight({...tradingHighlight, title: e.target.value})}
-                          className="w-full border border-green-300 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                          className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-black focus:border-transparent"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-semibold text-green-800 mb-2">Date</label>
+                        <label className="block text-sm font-semibold text-black mb-2">Date</label>
                         <input
                           type="date"
                           value={tradingHighlight.date_achieved}
                           onChange={(e) => setTradingHighlight({...tradingHighlight, date_achieved: e.target.value})}
-                          className="w-full border border-green-300 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                          className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-black focus:border-transparent"
                         />
                       </div>
                     </div>
 
                     <div>
-                      <label className="block text-sm font-semibold text-green-800 mb-2">Description</label>
+                      <label className="block text-sm font-semibold text-black mb-2">Description</label>
                       <textarea
                         placeholder="Tell the story behind this trade..."
                         rows="3"
                         value={tradingHighlight.description}
                         onChange={(e) => setTradingHighlight({...tradingHighlight, description: e.target.value})}
-                        className="w-full border border-green-300 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                        className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-black focus:border-transparent"
                       />
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-semibold text-green-800 mb-2">Profit/Loss</label>
+                        <label className="block text-sm font-semibold text-black mb-2">Profit/Loss</label>
                         <input
                           type="text"
                           placeholder="e.g., +$5,000"
                           value={tradingHighlight.profit_loss}
                           onChange={(e) => setTradingHighlight({...tradingHighlight, profit_loss: e.target.value})}
-                          className="w-full border border-green-300 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                          className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-black focus:border-transparent"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-semibold text-green-800 mb-2">Percentage Gain</label>
+                        <label className="block text-sm font-semibold text-black mb-2">Percentage Gain</label>
                         <input
                           type="text"
                           placeholder="e.g., +250%"
                           value={tradingHighlight.percentage_gain}
                           onChange={(e) => setTradingHighlight({...tradingHighlight, percentage_gain: e.target.value})}
-                          className="w-full border border-green-300 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                          className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-black focus:border-transparent"
                         />
                       </div>
                     </div>
@@ -560,7 +559,7 @@ const PublicProfileModal = ({ isOpen, onClose, user }) => {
                       <button 
                         onClick={handleSaveTradingHighlight}
                         disabled={isUploading}
-                        className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 disabled:opacity-50 text-white px-8 py-3 rounded-xl transition-all duration-300 font-semibold shadow-lg transform hover:scale-105"
+                        className="bg-black hover:bg-gray-800 disabled:opacity-50 text-white px-8 py-3 rounded-xl transition-all duration-300 font-semibold shadow-lg transform hover:scale-105"
                       >
                         {isUploading ? (
                           <span className="flex items-center">
@@ -588,30 +587,30 @@ const PublicProfileModal = ({ isOpen, onClose, user }) => {
                 className="space-y-6"
               >
                 <div className="text-center mb-8">
-                  <h3 className="text-2xl font-bold text-gray-800 mb-2">🔗 Social Links & Connections</h3>
+                  <h3 className="text-2xl font-bold text-black mb-2">🔗 Social Links & Connections</h3>
                   <p className="text-gray-600">Connect with other traders across platforms</p>
                 </div>
 
-                <div className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-2xl p-8 border border-purple-200">
+                <div className="bg-gray-50 border border-gray-200 rounded-2xl p-8">
                   <div className="text-center mb-6">
-                    <div className="w-16 h-16 bg-purple-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <div className="w-16 h-16 bg-black rounded-full flex items-center justify-center mx-auto mb-4">
                       <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
                       </svg>
                     </div>
-                    <h4 className="text-xl font-bold text-purple-800 mb-2">Add Your Social Links</h4>
-                    <p className="text-purple-600">Let other traders connect with you on your preferred platforms</p>
+                    <h4 className="text-xl font-bold text-black mb-2">Add Your Social Links</h4>
+                    <p className="text-gray-600">Let other traders connect with you on your preferred platforms</p>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {[
-                      { key: 'twitter', label: 'Twitter', placeholder: '@yourusername', icon: '🐦', color: 'blue' },
-                      { key: 'discord', label: 'Discord', placeholder: 'username#1234', icon: '🎮', color: 'indigo' },
-                      { key: 'telegram', label: 'Telegram', placeholder: '@yourusername', icon: '✈️', color: 'cyan' },
-                      { key: 'website', label: 'Website', placeholder: 'https://yourwebsite.com', icon: '🌐', color: 'green' }
+                      { key: 'twitter', label: 'Twitter', placeholder: '@yourusername', icon: '🐦' },
+                      { key: 'discord', label: 'Discord', placeholder: 'username#1234', icon: '🎮' },
+                      { key: 'telegram', label: 'Telegram', placeholder: '@yourusername', icon: '✈️' },
+                      { key: 'website', label: 'Website', placeholder: 'https://yourwebsite.com', icon: '🌐' }
                     ].map((social) => (
                       <div key={social.key}>
-                        <label className="block text-sm font-semibold text-purple-800 mb-2 flex items-center">
+                        <label className="block text-sm font-semibold text-black mb-2 flex items-center">
                           <span className="mr-2">{social.icon}</span>
                           {social.label}
                         </label>
@@ -621,10 +620,10 @@ const PublicProfileModal = ({ isOpen, onClose, user }) => {
                             placeholder={social.placeholder}
                             value={socialLinks[social.key]}
                             onChange={(e) => setSocialLinks({...socialLinks, [social.key]: e.target.value})}
-                            className="w-full border border-purple-300 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent pl-12"
+                            className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-black focus:border-transparent pl-12"
                           />
-                          <div className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-6 h-6 bg-${social.color}-500 rounded-lg flex items-center justify-center`}>
-                            <span className="text-xs">{social.icon}</span>
+                          <div className="absolute left-3 top-1/2 transform -translate-y-1/2 w-6 h-6 bg-gray-800 rounded-lg flex items-center justify-center">
+                            <span className="text-xs text-white">{social.icon}</span>
                           </div>
                         </div>
                       </div>
@@ -634,7 +633,7 @@ const PublicProfileModal = ({ isOpen, onClose, user }) => {
                   <div className="flex justify-end mt-6">
                     <button 
                       onClick={handleSaveSocialLinks}
-                      className="bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white px-8 py-3 rounded-xl transition-all duration-300 font-semibold shadow-lg transform hover:scale-105"
+                      className="bg-black hover:bg-gray-800 text-white px-8 py-3 rounded-xl transition-all duration-300 font-semibold shadow-lg transform hover:scale-105"
                     >
                       Save Social Links
                     </button>
