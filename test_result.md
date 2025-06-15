@@ -106,6 +106,9 @@ backend:
       - working: true
         agent: "testing"
         comment: "✅ TESTED: Successfully verified the backend support for profile popup functionality. Created a comprehensive test that confirms: 1) User creation via email signup works correctly, 2) Profile setup process functions properly with all required fields, 3) The /api/user/{user_id} endpoint returns complete user data with all fields needed for the profile popup, 4) The profile_complete flag is correctly set to true after providing all required profile information, 5) Users with complete profiles appear in discovery results, 6) The backend API provides all necessary data for the profile popup to function."
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Successfully verified the enhanced public profile modal functionality. Created a comprehensive test that confirms: 1) The /api/public-profile/{username} endpoint returns complete user data for public profiles, 2) The social links functionality works correctly with the /api/update-social-links/{user_id} and /api/social-links/{user_id} endpoints, 3) The trading highlights functionality works correctly with the /api/save-trading-highlight/{user_id} and /api/trading-highlights/{user_id} endpoints, 4) The referral code generation for sharing works correctly with the /api/referrals/generate/{user_id} endpoint. All backend APIs required for the enhanced public profile modal are working correctly."
 
 frontend:
   - task: "Login Page Animations"
