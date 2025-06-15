@@ -152,6 +152,7 @@ function AppContent() {
   const [showPublicProfileModal, setShowPublicProfileModal] = useState(false);
   const [showProfilePopup, setShowProfilePopup] = useState(false);
   const [selectedProfileUser, setSelectedProfileUser] = useState(null);
+  const [profilePopupContext, setProfilePopupContext] = useState('matches');
   // Toast notification helper
   const showToastNotification = (message, type = 'info') => {
     setToastMessage(message);
