@@ -2201,6 +2201,105 @@ async def get_user_analytics(user_id: str):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to get analytics: {str(e)}")
 
+@app.delete("/api/user/{user_id}")
+async def delete_user_account(user_id: str):
+    """Delete user account and all associated data"""
+    try:
+        # Verify user exists
+        user = users_collection.find_one({"user_id": user_id})
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        # Delete all user-related data
+        # 1. Delete user profile
+        users_collection.delete_one({"user_id": user_id})
+        
+        # 2. Delete matches where user is involved
+        matches_collection.delete_many({
+            "$or": [
+                {"user1_id": user_id},
+                {"user2_id": user_id}
+            ]
+        })
+        
+        # 3. Delete messages sent by user
+        messages_collection.delete_many({"sender_id": user_id})
+        
+        # 4. Delete swipes made by user
+        swipes_collection.delete_many({"swiper_id": user_id})
+        
+        # 5. Delete likes received by user
+        likes_received_collection.delete_many({"user_id": user_id})
+        
+        # 6. Delete likes made by user
+        likes_received_collection.delete_many({"liked_by_user_id": user_id})
+        
+        # 7. Delete swipe history
+        swipe_history_collection.delete_many({"user_id": user_id})
+        
+        # 8. Delete profile images
+        profile_images_collection.delete_many({"user_id": user_id})
+        
+        # 9. Delete trading highlights
+        trading_highlights_collection.delete_many({"user_id": user_id})
+        
+        # 10. Delete social links
+        social_links_collection.delete_many({"user_id": user_id})
+        
+        # 11. Delete subscription
+        subscriptions_collection.delete_many({"user_id": user_id})
+        
+        # 12. Delete portfolio connections
+        portfolio_connections_collection.delete_many({"user_id": user_id})
+        
+        # 13. Delete trading signals (sent and received)
+        trading_signals_collection.delete_many({
+            "$or": [
+                {"sender_id": user_id},
+                {"recipient_ids": user_id}
+            ]
+        })
+        
+        # 14. Delete trading groups created by user
+        trading_groups_collection.delete_many({"creator_id": user_id})
+        
+        # 15. Remove user from trading groups
+        trading_groups_collection.update_many(
+            {"member_ids": user_id},
+            {"$pull": {"member_ids": user_id}}
+        )
+        
+        # 16. Delete trading events created by user
+        trading_calendar_collection.delete_many({"creator_id": user_id})
+        
+        # 17. Remove user from trading events
+        trading_calendar_collection.update_many(
+            {"attendee_ids": user_id},
+            {"$pull": {"attendee_ids": user_id}}
+        )
+        
+        # 18. Delete analytics
+        analytics_collection.delete_many({"user_id": user_id})
+        
+        # 19. Delete referrals
+        referrals_collection.delete_many({
+            "$or": [
+                {"referrer_id": user_id},
+                {"referred_id": user_id}
+            ]
+        })
+        
+        return {
+            "message": "Account deleted successfully",
+            "deleted_user_id": user_id,
+            "data_cleanup": "All associated data has been permanently removed"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to delete account: {str(e)}")
+
 @app.post("/api/subscription/upgrade/{user_id}")
 async def upgrade_subscription(user_id: str, plan_data: dict):
     """Upgrade user to premium subscription"""
