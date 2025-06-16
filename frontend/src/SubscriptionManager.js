@@ -717,6 +717,232 @@ const SubscriptionManager = ({ currentUser, onClose }) => {
           </motion.div>
         )}
 
+        {/* Password Section */}
+        {activeSection === 'password' && (
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="space-y-8"
+          >
+            <div>
+              <h3 className="text-3xl font-bold text-black mb-2">Password Management</h3>
+              <p className="text-gray-600">Update your account password and security settings</p>
+            </div>
+
+            {/* Change Password */}
+            <div className="bg-white border border-gray-200 rounded-2xl p-8">
+              <h4 className="text-xl font-bold text-black mb-6">Change Password</h4>
+              <form className="space-y-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-600 mb-2">Current Password</label>
+                  <input
+                    type="password"
+                    value={passwordForm.currentPassword}
+                    onChange={(e) => setPasswordForm(prev => ({ ...prev, currentPassword: e.target.value }))}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                    placeholder="Enter current password"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-600 mb-2">New Password</label>
+                  <input
+                    type="password"
+                    value={passwordForm.newPassword}
+                    onChange={(e) => setPasswordForm(prev => ({ ...prev, newPassword: e.target.value }))}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                    placeholder="Enter new password"
+                  />
+                  <p className="text-sm text-gray-500 mt-2">Password must be at least 8 characters long</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-600 mb-2">Confirm New Password</label>
+                  <input
+                    type="password"
+                    value={passwordForm.confirmPassword}
+                    onChange={(e) => setPasswordForm(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                    placeholder="Confirm new password"
+                  />
+                </div>
+                <AnimatedButton
+                  type="button"
+                  onClick={async () => {
+                    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+                      alert('Passwords do not match');
+                      return;
+                    }
+                    if (passwordForm.newPassword.length < 8) {
+                      alert('Password must be at least 8 characters long');
+                      return;
+                    }
+                    
+                    setIsProcessing(true);
+                    try {
+                      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/auth/change-password`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                          user_id: currentUser.user_id,
+                          current_password: passwordForm.currentPassword,
+                          new_password: passwordForm.newPassword
+                        })
+                      });
+                      
+                      if (response.ok) {
+                        alert('✅ Password updated successfully!');
+                        setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
+                      } else {
+                        const error = await response.json();
+                        alert(error.detail || 'Failed to update password');
+                      }
+                    } catch (error) {
+                      console.error('Error updating password:', error);
+                      alert('Failed to update password');
+                    } finally {
+                      setIsProcessing(false);
+                    }
+                  }}
+                  disabled={isProcessing || !passwordForm.currentPassword || !passwordForm.newPassword || !passwordForm.confirmPassword}
+                  className="w-full bg-black hover:bg-gray-800 text-white py-3 rounded-xl font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isProcessing ? 'Updating Password...' : 'Update Password'}
+                </AnimatedButton>
+              </form>
+            </div>
+
+            {/* Security Settings */}
+            <div className="bg-blue-50 border-2 border-blue-200 rounded-2xl p-8">
+              <h4 className="text-xl font-bold text-blue-800 mb-4">Security Settings</h4>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between p-4 bg-white rounded-xl">
+                  <div>
+                    <div className="font-semibold text-gray-700">Two-Factor Authentication</div>
+                    <div className="text-sm text-gray-500">Add an extra layer of security to your account</div>
+                  </div>
+                  <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-all">
+                    Coming Soon
+                  </button>
+                </div>
+                <div className="flex items-center justify-between p-4 bg-white rounded-xl">
+                  <div>
+                    <div className="font-semibold text-gray-700">Login Notifications</div>
+                    <div className="text-sm text-gray-500">Get notified when someone logs into your account</div>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" className="sr-only peer" />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
+        {/* Payment Methods Section */}
+        {activeSection === 'payments' && (
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="space-y-8"
+          >
+            <div>
+              <h3 className="text-3xl font-bold text-black mb-2">Payment Methods</h3>
+              <p className="text-gray-600">Manage your payment methods and billing preferences</p>
+            </div>
+
+            {/* Current Payment Methods */}
+            <div className="bg-white border border-gray-200 rounded-2xl p-8">
+              <div className="flex items-center justify-between mb-6">
+                <h4 className="text-xl font-bold text-black">Saved Payment Methods</h4>
+                <button className="bg-black hover:bg-gray-800 text-white px-4 py-2 rounded-lg font-medium transition-all">
+                  + Add Payment Method
+                </button>
+              </div>
+              
+              {paymentMethods.length === 0 ? (
+                <div className="text-center py-12">
+                  <div className="text-6xl mb-4">💳</div>
+                  <h5 className="text-xl font-semibold text-gray-700 mb-2">No Payment Methods</h5>
+                  <p className="text-gray-500 mb-6">Add a payment method to enable premium subscriptions</p>
+                  <div className="bg-gray-50 rounded-xl p-6">
+                    <div className="text-sm text-gray-600">
+                      <p className="mb-2"><strong>Secure Payment Processing:</strong></p>
+                      <ul className="space-y-1 text-left">
+                        <li>• Powered by Stripe (coming soon)</li>
+                        <li>• Bank-level encryption</li>
+                        <li>• PCI DSS compliant</li>
+                        <li>• No card details stored on our servers</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {paymentMethods.map((method, index) => (
+                    <div key={index} className="flex items-center justify-between p-4 border border-gray-200 rounded-xl">
+                      <div className="flex items-center space-x-4">
+                        <div className="text-2xl">
+                          {method.type === 'visa' && '💳'}
+                          {method.type === 'mastercard' && '💳'}
+                          {method.type === 'amex' && '💳'}
+                        </div>
+                        <div>
+                          <div className="font-semibold text-gray-700">•••• •••• •••• {method.last4}</div>
+                          <div className="text-sm text-gray-500">Expires {method.exp_month}/{method.exp_year}</div>
+                        </div>
+                        {method.default && (
+                          <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">Default</span>
+                        )}
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <button className="text-gray-600 hover:text-black font-medium">Edit</button>
+                        <button className="text-red-600 hover:text-red-700 font-medium">Remove</button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Billing History */}
+            <div className="bg-white border border-gray-200 rounded-2xl p-8">
+              <h4 className="text-xl font-bold text-black mb-6">Billing History</h4>
+              <div className="text-center py-8">
+                <div className="text-4xl mb-3">📄</div>
+                <p className="text-gray-500">No billing history available</p>
+                <p className="text-sm text-gray-400 mt-2">Your past invoices and payments will appear here</p>
+              </div>
+            </div>
+
+            {/* Payment Settings */}
+            <div className="bg-gray-50 border border-gray-200 rounded-2xl p-8">
+              <h4 className="text-xl font-bold text-black mb-6">Payment Settings</h4>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between p-4 bg-white rounded-xl">
+                  <div>
+                    <div className="font-semibold text-gray-700">Auto-renewal</div>
+                    <div className="text-sm text-gray-500">Automatically renew your subscription</div>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" defaultChecked className="sr-only peer" />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                  </label>
+                </div>
+                <div className="flex items-center justify-between p-4 bg-white rounded-xl">
+                  <div>
+                    <div className="font-semibold text-gray-700">Email Receipts</div>
+                    <div className="text-sm text-gray-500">Receive email confirmations for payments</div>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" defaultChecked className="sr-only peer" />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
         {/* Account Section */}
         {activeSection === 'account' && (
           <motion.div
