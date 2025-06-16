@@ -216,7 +216,7 @@ class ReferralStats(BaseModel):
 # Premium Subscription Models
 class SubscriptionPlan(BaseModel):
     user_id: str
-    plan_type: str  # "free", "basic_premium"
+    plan_type: str  # "free", "basic_premium", "pro_trader"
     status: str  # "active", "cancelled", "expired"
     expires_at: Optional[datetime] = None
 
@@ -229,6 +229,59 @@ class LikesReceived(BaseModel):
     user_id: str
     liked_by_user_id: str
     liked_at: datetime
+
+# TIER 2: Pro Trader Models
+class PortfolioConnection(BaseModel):
+    user_id: str
+    wallet_address: str
+    exchange_name: Optional[str] = ""  # "Binance", "Coinbase", "Phantom", etc.
+    verified: bool = False
+    portfolio_value: Optional[float] = 0.0
+    last_sync: Optional[datetime] = None
+
+class TradingSignal(BaseModel):
+    signal_id: str
+    sender_id: str
+    recipient_ids: List[str]  # Can send to multiple users
+    signal_type: str  # "entry", "exit", "alert", "analysis"
+    token_symbol: str
+    price_target: Optional[float] = None
+    stop_loss: Optional[float] = None
+    risk_level: str  # "low", "medium", "high"
+    message: str
+    encrypted: bool = True
+    expires_at: Optional[datetime] = None
+
+class TradingGroup(BaseModel):
+    group_id: str
+    creator_id: str
+    name: str
+    description: str
+    member_ids: List[str]
+    max_members: int = 10
+    is_private: bool = False
+    created_at: datetime
+
+class TradingEvent(BaseModel):
+    event_id: str
+    creator_id: str
+    title: str
+    description: str
+    event_type: str  # "trading_session", "market_analysis", "strategy_call"
+    start_time: datetime
+    duration_minutes: int
+    attendee_ids: List[str]
+    max_attendees: int = 10
+
+class UserAnalytics(BaseModel):
+    user_id: str
+    profile_views: int = 0
+    matches_made: int = 0
+    messages_sent: int = 0
+    signals_sent: int = 0
+    groups_created: int = 0
+    match_success_rate: float = 0.0
+    last_updated: datetime
 
 # Premium utility functions
 def get_user_subscription(user_id: str) -> dict:
