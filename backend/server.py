@@ -2720,6 +2720,9 @@ async def send_message(message_data: dict):
         # Save message to database
         messages_collection.insert_one(msg)
         
+        # Update analytics
+        update_user_analytics(message_data["sender_id"], "message_sent")
+        
         # Update match last message time
         matches_collection.update_one(
             {"match_id": message_data["match_id"]},
