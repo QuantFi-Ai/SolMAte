@@ -189,6 +189,8 @@ const SubscriptionManager = ({ currentUser, onClose }) => {
     { id: 'overview', label: 'Overview', icon: '📊' },
     { id: 'plans', label: 'Plans', icon: '💎' },
     { id: 'billing', label: 'Billing', icon: '🧾' },
+    { id: 'password', label: 'Password', icon: '🔐' },
+    { id: 'payments', label: 'Payment Methods', icon: '💳' },
     { id: 'account', label: 'Account', icon: '⚙️' }
   ];
 
