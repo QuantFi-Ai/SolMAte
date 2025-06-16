@@ -270,8 +270,10 @@ def test_password_change_feature():
     print("\n4️⃣ Testing invalid current password...")
     invalid_current = "WrongPassword123!"
     success, invalid_response = tester.test_change_password_invalid_current(user_id, invalid_current, "AnotherPassword789!")
-    if success:
-        print("❌ API accepted invalid current password")
+    # For this test, success means the API correctly rejected the invalid password (returned 401)
+    # The run_test method returns success=True if the status code matches expected_status
+    if not success:
+        print("❌ API did not correctly reject invalid current password")
         return False
     
     print("✅ API correctly rejected invalid current password")
