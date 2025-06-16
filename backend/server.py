@@ -1803,6 +1803,10 @@ async def discover_users(user_id: str, limit: int = 10, filters: dict = None):
     for user in potential_matches:
         user.pop('_id', None)
     
+    # Track profile views for analytics (for the users being discovered)
+    for user in potential_matches:
+        update_user_analytics(user["user_id"], "profile_view")
+    
     # Add premium indicator to response
     return {
         "users": potential_matches,
