@@ -2521,6 +2521,10 @@ async def swipe_user(swipe: SwipeAction):
             }
             matches_collection.insert_one(match_data)
             
+            # Update analytics for both users
+            update_user_analytics(swipe.swiper_id, "match_made")
+            update_user_analytics(swipe.target_id, "match_made")
+            
             # Notify both users via WebSocket if connected
             match_notification = {
                 "type": "new_match",
