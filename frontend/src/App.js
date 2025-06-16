@@ -47,6 +47,7 @@ function AppContent() {
   const [aiRecommendationsLoading, setAiRecommendationsLoading] = useState(false);
   const [discoveryMode, setDiscoveryMode] = useState('browse'); // 'browse' or 'ai'
   const [profileForm, setProfileForm] = useState({
+    display_name: '',
     bio: '',
     location: '',
     timezone: '',
