@@ -148,7 +148,10 @@ const PublicProfilePage = ({ username }) => {
               </div>
               
               {user.bio && (
-                <p className="text-gray-200 text-lg leading-relaxed mb-6">{user.bio}</p>
+                <div className="bg-white bg-opacity-10 rounded-xl p-4 mb-6">
+                  <h3 className="text-sm font-semibold text-white mb-2 opacity-80">About Me</h3>
+                  <p className="text-gray-200 text-lg leading-relaxed">{user.bio}</p>
+                </div>
               )}
               
               <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
