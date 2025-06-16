@@ -298,8 +298,9 @@ def test_password_change_feature():
         "new_password": "ValidPassword789!"
     }
     success, missing_response = tester.test_change_password_missing_fields(missing_user_id)
-    if success:
-        print("❌ API accepted request with missing user_id")
+    # For this test, success means the API correctly rejected the missing field (returned 400)
+    if not success:
+        print("❌ API did not correctly reject request with missing user_id")
         return False
     
     print("✅ API correctly rejected request with missing user_id")
@@ -310,8 +311,9 @@ def test_password_change_feature():
         "new_password": "ValidPassword789!"
     }
     success, missing_response = tester.test_change_password_missing_fields(missing_current)
-    if success:
-        print("❌ API accepted request with missing current_password")
+    # For this test, success means the API correctly rejected the missing field (returned 400)
+    if not success:
+        print("❌ API did not correctly reject request with missing current_password")
         return False
     
     print("✅ API correctly rejected request with missing current_password")
@@ -322,8 +324,9 @@ def test_password_change_feature():
         "current_password": new_password
     }
     success, missing_response = tester.test_change_password_missing_fields(missing_new)
-    if success:
-        print("❌ API accepted request with missing new_password")
+    # For this test, success means the API correctly rejected the missing field (returned 400)
+    if not success:
+        print("❌ API did not correctly reject request with missing new_password")
         return False
     
     print("✅ API correctly rejected request with missing new_password")
