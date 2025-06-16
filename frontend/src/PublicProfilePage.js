@@ -232,6 +232,22 @@ const PublicProfilePage = ({ username }) => {
           </div>
         </motion.div>
 
+        {/* About Section */}
+        {user.bio && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15 }}
+            className="bg-white border border-gray-200 rounded-2xl p-8 mb-8"
+          >
+            <h3 className="text-2xl font-bold text-black mb-4 flex items-center">
+              <span className="text-3xl mr-3">👤</span>
+              About {user.display_name}
+            </h3>
+            <p className="text-gray-700 text-lg leading-relaxed">{user.bio}</p>
+          </motion.div>
+        )}
+
         {/* Trading Highlights */}
         {tradingHighlights.length > 0 && (
           <motion.div
