@@ -207,6 +207,95 @@ class ReferralCode(BaseModel):
 class ReferralStats(BaseModel):
     user_id: str
 
+# Premium Subscription Models
+class SubscriptionPlan(BaseModel):
+    user_id: str
+    plan_type: str  # "free", "basic_premium"
+    status: str  # "active", "cancelled", "expired"
+    expires_at: Optional[datetime] = None
+
+class SwipeLimit(BaseModel):
+    user_id: str
+    daily_swipes_used: int = 0
+    last_reset_date: str
+
+class LikesReceived(BaseModel):
+    user_id: str
+    liked_by_user_id: str
+    liked_at: datetime
+
+# Premium utility functions
+def get_user_subscription(user_id: str) -> dict:
+    """Get user's current subscription status"""
+    subscription = subscriptions_collection.find_one({"user_id": user_id})
+    if not subscription:
+        # Create free tier entry if doesn't exist
+        free_sub = {
+            "user_id": user_id,
+            "plan_type": "free",
+            "status": "active",
+            "created_at": datetime.utcnow(),
+            "expires_at": None
+        }
+        subscriptions_collection.insert_one(free_sub)
+        return free_sub
+    
+    # Check if premium subscription is expired
+    if subscription.get("expires_at") and subscription["expires_at"] < datetime.utcnow():
+        # Downgrade to free
+        subscriptions_collection.update_one(
+            {"user_id": user_id},
+            {"$set": {"plan_type": "free", "status": "expired"}}
+        )
+        subscription["plan_type"] = "free"
+        subscription["status"] = "expired"
+    
+    return subscription
+
+def check_swipe_limit(user_id: str) -> dict:
+    """Check if user has reached daily swipe limit"""
+    subscription = get_user_subscription(user_id)
+    
+    # Premium users have unlimited swipes
+    if subscription["plan_type"] != "free":
+        return {"can_swipe": True, "swipes_remaining": "unlimited", "is_premium": True}
+    
+    # Check daily swipe count for free users
+    today = datetime.utcnow().strftime("%Y-%m-%d")
+    today_swipes = swipes_collection.count_documents({
+        "swiper_id": user_id,
+        "swiped_at": {
+            "$gte": datetime.strptime(today, "%Y-%m-%d"),
+            "$lt": datetime.strptime(today, "%Y-%m-%d") + timedelta(days=1)
+        }
+    })
+    
+    daily_limit = 20  # Free tier limit
+    swipes_remaining = max(0, daily_limit - today_swipes)
+    
+    return {
+        "can_swipe": swipes_remaining > 0,
+        "swipes_remaining": swipes_remaining,
+        "swipes_used": today_swipes,
+        "daily_limit": daily_limit,
+        "is_premium": False
+    }
+
+def can_see_likes(user_id: str) -> bool:
+    """Check if user can see who liked them"""
+    subscription = get_user_subscription(user_id)
+    return subscription["plan_type"] != "free"
+
+def can_rewind_swipe(user_id: str) -> bool:
+    """Check if user can rewind last swipe"""
+    subscription = get_user_subscription(user_id)
+    return subscription["plan_type"] != "free"
+
+def get_priority_boost(user_id: str) -> bool:
+    """Check if user gets priority in discovery"""
+    subscription = get_user_subscription(user_id)
+    return subscription["plan_type"] != "free"
+
 # Referral utility functions
 def generate_referral_code(user_id: str) -> str:
     """Generate a unique referral code for a user"""
