@@ -282,8 +282,9 @@ def test_password_change_feature():
     print("\n5️⃣ Testing password too short validation...")
     short_password = "short"
     success, short_response = tester.test_change_password_too_short(user_id, new_password, short_password)
-    if success:
-        print("❌ API accepted password that is too short")
+    # For this test, success means the API correctly rejected the short password (returned 400)
+    if not success:
+        print("❌ API did not correctly reject password that is too short")
         return False
     
     print("✅ API correctly rejected password that is too short")
