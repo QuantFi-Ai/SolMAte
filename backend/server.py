@@ -31,6 +31,9 @@ trading_highlights_collection = db.trading_highlights
 social_links_collection = db.social_links
 token_launch_profiles_collection = db.token_launch_profiles
 referrals_collection = db.referrals
+subscriptions_collection = db.subscriptions
+swipe_history_collection = db.swipe_history
+likes_received_collection = db.likes_received
 
 # Authentication utilities
 def hash_password(password: str) -> str:
