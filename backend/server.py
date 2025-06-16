@@ -84,7 +84,8 @@ def create_user_profile(user_data: dict) -> dict:
         "profile_complete": False,
         "created_at": datetime.utcnow(),
         "last_active": datetime.utcnow(),
-        "auth_method": user_data.get("auth_method", "email")  # "email", "wallet", "twitter", "demo"
+        "auth_method": user_data.get("auth_method", "email"),  # "email", "wallet", "twitter", "demo"
+        "subscription_plan": "free"  # Default to free tier
     }
 
 # FastAPI app
