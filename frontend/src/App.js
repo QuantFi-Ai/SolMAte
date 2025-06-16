@@ -156,7 +156,6 @@ function AppContent() {
   const [selectedProfileUser, setSelectedProfileUser] = useState(null);
   const [profilePopupContext, setProfilePopupContext] = useState('matches');
   const [showSubscriptionManager, setShowSubscriptionManager] = useState(false);
-  const [showSubscriptionManager, setShowSubscriptionManager] = useState(false);
   // Toast notification helper
   const showToastNotification = (message, type = 'info') => {
     setToastMessage(message);
