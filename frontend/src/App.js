@@ -22,7 +22,6 @@ import { ReferralDashboard, SupportModal } from './ReferralComponents';
 import PublicProfileModal from './PublicProfileModal';
 import PublicProfilePage from './PublicProfilePage';
 import SubscriptionManager from './SubscriptionManager';
-import SubscriptionManager from './SubscriptionManager';
 const API_BASE_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
 
 // Solana wallet configuration
