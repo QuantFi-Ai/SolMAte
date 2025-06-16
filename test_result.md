@@ -140,6 +140,21 @@ backend:
         agent: "testing"
         comment: "✅ TESTED: Pro Trader premium features are working correctly. Successfully verified: 1) Created test users and upgraded one to Pro Trader plan, 2) Connected wallet for portfolio integration, 3) Sent and received trading signals between users, 4) Created and joined trading groups, 5) Scheduled and retrieved trading events, 6) Verified all Pro Trader features require upgrade for free users. All endpoints return appropriate responses and data is correctly stored and retrieved from the database."
 
+  - task: "Password Change Feature"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implemented password change feature to allow users to update their passwords securely."
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Password change feature is working correctly. Successfully verified: 1) Created a test user via email signup, 2) Successfully changed password with valid current password and new password, 3) Verified login with new password works correctly, 4) Tested error handling for invalid current password (returns 401 Unauthorized), 5) Tested validation for password too short (returns 400 Bad Request), 6) Tested validation for missing fields (returns 400 Bad Request). All tests passed successfully, confirming that the password change feature is working as expected with proper validation and error handling."
+
 frontend:
   - task: "Login Page Animations"
     implemented: true
@@ -369,7 +384,7 @@ frontend:
 metadata:
   created_by: "testing_agent"
   version: "1.0"
-  test_sequence: 10
+  test_sequence: 11
   run_ui: true
 
 test_plan:
@@ -425,3 +440,5 @@ agent_communication:
     message: "Successfully tested the trading highlights save functionality. Created a comprehensive test that confirms: 1) User creation and profile setup works correctly, 2) The /api/save-trading-highlight/{user_id} endpoint successfully saves trading highlights with all required fields (title, description, profit/loss, percentage gain, and base64 image data), 3) The /api/trading-highlights/{user_id} endpoint correctly retrieves all saved highlights, 4) The API properly handles error cases like invalid user IDs, 5) The system can handle large image data (tested with 100KB base64 strings). All tests passed successfully, confirming that the trading highlights save functionality is working as expected. The implementation correctly stores and retrieves all the required data fields, and the API endpoints are functioning properly."
   - agent: "testing"
     message: "Successfully tested the Pro Trader premium features. Created a comprehensive test that confirms: 1) User creation and profile setup works correctly, 2) Upgrading to Pro Trader plan works correctly, 3) Portfolio connection with wallet address works correctly, 4) Trading signal sending and receiving between users works correctly, 5) Trading group creation and joining works correctly, 6) Trading event scheduling and retrieval works correctly, 7) All Pro Trader features correctly require upgrade for free users. All tests passed successfully, confirming that the Pro Trader premium features are working as expected. The implementation correctly handles all the required functionality, and the API endpoints are functioning properly."
+  - agent: "testing"
+    message: "Successfully tested the password change feature in SOLM8 5.0. Created a comprehensive test that confirms: 1) User creation via email signup works correctly, 2) The /api/auth/change-password endpoint successfully changes passwords with valid current password and new password, 3) Login with the new password works correctly, 4) The API correctly rejects invalid current passwords with a 401 Unauthorized response, 5) The API correctly validates new password length and rejects passwords that are too short with a 400 Bad Request response, 6) The API correctly validates that all required fields are present and rejects requests with missing fields with a 400 Bad Request response. All tests passed successfully, confirming that the password change feature is working as expected with proper validation and error handling."
