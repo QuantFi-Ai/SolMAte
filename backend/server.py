@@ -1687,18 +1687,44 @@ async def discover_users(user_id: str, limit: int = 10):
 @app.post("/api/swipe")
 async def swipe_user(swipe: SwipeAction):
     """Record a swipe action and check for matches"""
-    # Record the swipe
+    
+    # Check swipe limits for free users
+    swipe_status = check_swipe_limit(swipe.swiper_id)
+    if not swipe_status["can_swipe"]:
+        return {
+            "error": "daily_limit_reached",
+            "message": "You've reached your daily swipe limit. Upgrade to Premium for unlimited swipes!",
+            "swipes_remaining": 0,
+            "upgrade_required": True
+        }
+    
+    # Record the swipe with timestamp
     swipe_data = {
         "swipe_id": str(uuid.uuid4()),
         "swiper_id": swipe.swiper_id,
         "target_id": swipe.target_id,
         "action": swipe.action,
+        "swiped_at": datetime.utcnow(),
         "timestamp": datetime.utcnow()
     }
     swipes_collection.insert_one(swipe_data)
     
-    # If it's a like, check for mutual match
+    # Store for rewind functionality (premium feature)
+    swipe_history_collection.insert_one({
+        "user_id": swipe.swiper_id,
+        "swipe_data": swipe_data,
+        "can_rewind": can_rewind_swipe(swipe.swiper_id)
+    })
+    
+    # If it's a like, store in likes_received for premium "See Who Liked You" feature
     if swipe.action == "like":
+        likes_received_collection.insert_one({
+            "user_id": swipe.target_id,
+            "liked_by_user_id": swipe.swiper_id,
+            "liked_at": datetime.utcnow()
+        })
+        
+        # Check for mutual match
         mutual_like = swipes_collection.find_one({
             "swiper_id": swipe.target_id,
             "target_id": swipe.swiper_id,
@@ -1725,9 +1751,24 @@ async def swipe_user(swipe: SwipeAction):
             await manager.send_message(json.dumps(match_notification), swipe.swiper_id)
             await manager.send_message(json.dumps(match_notification), swipe.target_id)
             
-            return {"matched": True, "match_id": match_data["match_id"]}
+            # Update swipe status after successful swipe
+            updated_swipe_status = check_swipe_limit(swipe.swiper_id)
+            
+            return {
+                "matched": True, 
+                "match_id": match_data["match_id"],
+                "swipes_remaining": updated_swipe_status["swipes_remaining"],
+                "is_premium": updated_swipe_status["is_premium"]
+            }
     
-    return {"matched": False}
+    # Update swipe status after successful swipe
+    updated_swipe_status = check_swipe_limit(swipe.swiper_id)
+    
+    return {
+        "matched": False,
+        "swipes_remaining": updated_swipe_status["swipes_remaining"],
+        "is_premium": updated_swipe_status["is_premium"]
+    }
 
 @app.get("/api/matches/{user_id}")
 async def get_user_matches(user_id: str):
