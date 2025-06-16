@@ -1601,15 +1601,34 @@ async def get_subscription_status(user_id: str):
     subscription = get_user_subscription(user_id)
     swipe_status = check_swipe_limit(user_id)
     
+    # Define features by plan type
+    premium_features = {
+        "unlimited_swipes": subscription["plan_type"] != "free",
+        "see_who_liked_you": can_see_likes(user_id),
+        "rewind_swipes": can_rewind_swipe(user_id),
+        "priority_discovery": get_priority_boost(user_id),
+        "advanced_filters": subscription["plan_type"] != "free"
+    }
+    
+    # Pro Trader specific features
+    pro_trader_features = {
+        "portfolio_integration": can_connect_portfolio(user_id),
+        "trading_signals": can_send_trading_signals(user_id),
+        "group_chats": can_create_groups(user_id),
+        "trading_calendar": can_schedule_events(user_id),
+        "performance_analytics": can_view_analytics(user_id)
+    }
+    
     return {
         "subscription": subscription,
         "swipe_limits": swipe_status,
-        "premium_features": {
-            "unlimited_swipes": subscription["plan_type"] != "free",
-            "see_who_liked_you": can_see_likes(user_id),
-            "rewind_swipes": can_rewind_swipe(user_id),
-            "priority_discovery": get_priority_boost(user_id),
-            "advanced_filters": subscription["plan_type"] != "free"
+        "premium_features": premium_features,
+        "pro_trader_features": pro_trader_features,
+        "plan_info": {
+            "current_plan": subscription["plan_type"],
+            "is_free": subscription["plan_type"] == "free",
+            "is_basic_premium": subscription["plan_type"] == "basic_premium",
+            "is_pro_trader": subscription["plan_type"] == "pro_trader"
         }
     }
 
