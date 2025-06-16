@@ -1589,6 +1589,46 @@ async def validate_referral_code(referral_code: str):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to validate referral code: {str(e)}")
 
+@app.post("/api/auth/change-password")
+async def change_password(request_data: dict):
+    """Change user password"""
+    try:
+        user_id = request_data.get("user_id")
+        current_password = request_data.get("current_password")
+        new_password = request_data.get("new_password")
+        
+        if not all([user_id, current_password, new_password]):
+            raise HTTPException(status_code=400, detail="Missing required fields")
+        
+        # Find user
+        user = users_collection.find_one({"user_id": user_id})
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        # Verify current password
+        if not verify_password(current_password, user.get("password_hash", "")):
+            raise HTTPException(status_code=401, detail="Current password is incorrect")
+        
+        # Validate new password
+        if len(new_password) < 8:
+            raise HTTPException(status_code=400, detail="New password must be at least 8 characters long")
+        
+        # Hash new password
+        new_password_hash = hash_password(new_password)
+        
+        # Update password
+        users_collection.update_one(
+            {"user_id": user_id},
+            {"$set": {"password_hash": new_password_hash, "last_activity": datetime.utcnow()}}
+        )
+        
+        return {"message": "Password updated successfully"}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to change password: {str(e)}")
+
 @app.get("/api/health")
 async def health_check():
     return {"status": "healthy", "service": "Solm8 API"}
