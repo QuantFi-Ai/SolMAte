@@ -11,6 +11,12 @@ const SubscriptionManager = ({ currentUser, onClose }) => {
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
+  const [passwordForm, setPasswordForm] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
+  });
+  const [paymentMethods, setPaymentMethods] = useState([]);
 
   useEffect(() => {
     if (currentUser) {
