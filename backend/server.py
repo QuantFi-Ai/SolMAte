@@ -355,6 +355,79 @@ def get_priority_boost(user_id: str) -> bool:
     subscription = get_user_subscription(user_id)
     return subscription["plan_type"] != "free"
 
+def can_send_trading_signals(user_id: str) -> bool:
+    """Check if user can send trading signals (Pro Trader feature)"""
+    subscription = get_user_subscription(user_id)
+    return subscription["plan_type"] == "pro_trader"
+
+def can_create_groups(user_id: str) -> bool:
+    """Check if user can create trading groups (Pro Trader feature)"""
+    subscription = get_user_subscription(user_id)
+    return subscription["plan_type"] == "pro_trader"
+
+def can_schedule_events(user_id: str) -> bool:
+    """Check if user can schedule trading events (Pro Trader feature)"""
+    subscription = get_user_subscription(user_id)
+    return subscription["plan_type"] == "pro_trader"
+
+def can_view_analytics(user_id: str) -> bool:
+    """Check if user can view performance analytics (Pro Trader feature)"""
+    subscription = get_user_subscription(user_id)
+    return subscription["plan_type"] == "pro_trader"
+
+def can_connect_portfolio(user_id: str) -> bool:
+    """Check if user can connect portfolio (Pro Trader feature)"""
+    subscription = get_user_subscription(user_id)
+    return subscription["plan_type"] == "pro_trader"
+
+def update_user_analytics(user_id: str, action_type: str):
+    """Update user analytics for Pro Trader features"""
+    try:
+        current_analytics = analytics_collection.find_one({"user_id": user_id})
+        
+        if not current_analytics:
+            # Create new analytics entry
+            analytics_data = {
+                "user_id": user_id,
+                "profile_views": 0,
+                "matches_made": 0,
+                "messages_sent": 0,
+                "signals_sent": 0,
+                "groups_created": 0,
+                "match_success_rate": 0.0,
+                "last_updated": datetime.utcnow()
+            }
+            analytics_collection.insert_one(analytics_data)
+            current_analytics = analytics_data
+        
+        # Update based on action type
+        update_data = {"last_updated": datetime.utcnow()}
+        
+        if action_type == "profile_view":
+            update_data["profile_views"] = current_analytics.get("profile_views", 0) + 1
+        elif action_type == "match_made":
+            update_data["matches_made"] = current_analytics.get("matches_made", 0) + 1
+        elif action_type == "message_sent":
+            update_data["messages_sent"] = current_analytics.get("messages_sent", 0) + 1
+        elif action_type == "signal_sent":
+            update_data["signals_sent"] = current_analytics.get("signals_sent", 0) + 1
+        elif action_type == "group_created":
+            update_data["groups_created"] = current_analytics.get("groups_created", 0) + 1
+        
+        # Calculate match success rate
+        swipes_made = swipes_collection.count_documents({"swiper_id": user_id, "action": "like"})
+        matches_made = current_analytics.get("matches_made", 0)
+        if swipes_made > 0:
+            update_data["match_success_rate"] = round((matches_made / swipes_made) * 100, 2)
+        
+        analytics_collection.update_one(
+            {"user_id": user_id},
+            {"$set": update_data}
+        )
+        
+    except Exception as e:
+        print(f"Error updating analytics: {e}")
+
 # Referral utility functions
 def generate_referral_code(user_id: str) -> str:
     """Generate a unique referral code for a user"""
