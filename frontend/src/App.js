@@ -2200,15 +2200,27 @@ function AppContent() {
 
       {/* Support Modal */}
       <SupportModal
+        isOpen={showSupportModal}
+        onClose={() => setShowSupportModal(false)}
       />
+
+      {/* Subscription Manager */}
+      {showSubscriptionManager && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-3xl p-0 max-w-6xl w-full max-h-[95vh] overflow-hidden shadow-2xl border border-gray-200">
+            <SubscriptionManager
+              currentUser={currentUser}
+              onClose={() => setShowSubscriptionManager(false)}
+            />
+          </div>
+        </div>
+      )}
 
       {/* Public Profile Modal */}
       <PublicProfileModal
         isOpen={showPublicProfileModal}
         onClose={() => setShowPublicProfileModal(false)}
         user={currentUser}
-        isOpen={showSupportModal}
-        onClose={() => setShowSupportModal(false)}
       />
       <ToastNotification
         message={toastMessage}
