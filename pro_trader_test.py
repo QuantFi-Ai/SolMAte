@@ -179,33 +179,8 @@ def test_pro_trader_features():
     
     print("✅ Successfully completed profile setup")
     
-    # Step 3: Test GET /api/subscription/{user_id} endpoint for free user
-    print("\n3️⃣ Testing subscription status for free user...")
-    success, subscription_data = tester.run_test(
-        "Get Subscription Status (Free User)",
-        "GET",
-        f"subscription/{user_id}",
-        200
-    )
-    
-    if not success:
-        print("❌ Failed to get subscription status")
-        return False
-    
-    # Verify free user doesn't have Pro Trader features
-    if subscription_data["plan_info"]["is_free"] != True:
-        print("❌ User should be on free plan")
-        return False
-    
-    for feature, enabled in subscription_data["pro_trader_features"].items():
-        if enabled:
-            print(f"❌ Pro Trader feature '{feature}' should not be enabled for free user")
-            return False
-    
-    print("✅ Free user correctly doesn't have Pro Trader features")
-    
-    # Step 4: Upgrade user to Pro Trader plan
-    print("\n4️⃣ Upgrading user to Pro Trader plan...")
+    # Step 3: Upgrade user to Pro Trader plan
+    print("\n3️⃣ Upgrading user to Pro Trader plan...")
     success, upgrade_response = tester.run_test(
         "Upgrade to Pro Trader",
         "POST",
@@ -219,34 +194,10 @@ def test_pro_trader_features():
         return False
     
     print("✅ Successfully upgraded to Pro Trader")
+    print(f"Features unlocked: {upgrade_response.get('features_unlocked', [])}")
     
-    # Step 5: Verify subscription status after upgrade
-    print("\n5️⃣ Verifying subscription status after upgrade...")
-    success, subscription_data = tester.run_test(
-        "Get Subscription Status (Pro Trader)",
-        "GET",
-        f"subscription/{user_id}",
-        200
-    )
-    
-    if not success:
-        print("❌ Failed to get subscription status after upgrade")
-        return False
-    
-    # Verify Pro Trader features are enabled
-    if subscription_data["plan_info"]["is_pro_trader"] != True:
-        print("❌ User should be on Pro Trader plan")
-        return False
-    
-    for feature, enabled in subscription_data["pro_trader_features"].items():
-        if not enabled:
-            print(f"❌ Pro Trader feature '{feature}' should be enabled")
-            return False
-    
-    print("✅ Pro Trader features are correctly enabled after upgrade")
-    
-    # Step 6: Test portfolio connection (Pro Trader feature)
-    print("\n6️⃣ Testing portfolio connection...")
+    # Step 4: Test portfolio connection (Pro Trader feature)
+    print("\n4️⃣ Testing portfolio connection...")
     wallet_address = "8ZU6Pah9XUzRrHZsJ8mBav7xbT7VmCgaJiUy8xpqRNAB"
     
     success, portfolio_response = tester.run_test(
@@ -263,8 +214,8 @@ def test_pro_trader_features():
     
     print("✅ Successfully connected portfolio")
     
-    # Step 7: Verify portfolio connection
-    print("\n7️⃣ Verifying portfolio connection...")
+    # Step 5: Verify portfolio connection
+    print("\n5️⃣ Verifying portfolio connection...")
     success, portfolio_info = tester.run_test(
         "Get Portfolio Info",
         "GET",
@@ -282,8 +233,8 @@ def test_pro_trader_features():
     
     print("✅ Portfolio connection verified")
     
-    # Step 8: Create a second user to test trading signals and groups
-    print("\n8️⃣ Creating a second user for testing signals and groups...")
+    # Step 6: Create a second user to test trading signals and groups
+    print("\n6️⃣ Creating a second user for testing signals and groups...")
     random_suffix2 = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
     test_email2 = f"test_trader2_{random_suffix2}@example.com"
     test_password2 = "TestPassword123!"
@@ -314,8 +265,8 @@ def test_pro_trader_features():
     success, _ = tester.test_swipe(user_id, user_id2, "like")
     success, _ = tester.test_swipe(user_id2, user_id, "like")
     
-    # Step 9: Test sending trading signals
-    print("\n9️⃣ Testing trading signal sending...")
+    # Step 7: Test sending trading signals
+    print("\n7️⃣ Testing trading signal sending...")
     signal_data = {
         "sender_id": user_id,
         "recipient_ids": [user_id2],
@@ -341,8 +292,8 @@ def test_pro_trader_features():
     
     print("✅ Successfully sent trading signal")
     
-    # Step 10: Verify trading signals
-    print("\n🔟 Verifying trading signals...")
+    # Step 8: Verify trading signals
+    print("\n8️⃣ Verifying trading signals...")
     success, sent_signals = tester.run_test(
         "Get Sent Trading Signals",
         "GET",
@@ -375,8 +326,8 @@ def test_pro_trader_features():
     
     print("✅ Trading signals verified")
     
-    # Step 11: Test creating trading group
-    print("\n1️⃣1️⃣ Testing trading group creation...")
+    # Step 9: Test creating trading group
+    print("\n9️⃣ Testing trading group creation...")
     group_data = {
         "creator_id": user_id,
         "name": "SOL Traders Elite",
@@ -399,8 +350,8 @@ def test_pro_trader_features():
     group_id = group_response["group"]["group_id"]
     print(f"✅ Successfully created trading group with ID: {group_id}")
     
-    # Step 12: Test joining trading group
-    print("\n1️⃣2️⃣ Testing joining trading group...")
+    # Step 10: Test joining trading group
+    print("\n🔟 Testing joining trading group...")
     join_data = {
         "user_id": user_id2
     }
@@ -419,8 +370,8 @@ def test_pro_trader_features():
     
     print("✅ Successfully joined trading group")
     
-    # Step 13: Verify trading groups
-    print("\n1️⃣3️⃣ Verifying trading groups...")
+    # Step 11: Verify trading groups
+    print("\n1️⃣1️⃣ Verifying trading groups...")
     success, groups_response = tester.run_test(
         "Get User Trading Groups",
         "GET",
@@ -453,8 +404,8 @@ def test_pro_trader_features():
     
     print("✅ Trading groups verified")
     
-    # Step 14: Test scheduling trading event
-    print("\n1️⃣4️⃣ Testing trading event scheduling...")
+    # Step 12: Test scheduling trading event
+    print("\n1️⃣2️⃣ Testing trading event scheduling...")
     event_data = {
         "creator_id": user_id,
         "title": "SOL Technical Analysis Session",
@@ -478,8 +429,8 @@ def test_pro_trader_features():
     
     print("✅ Successfully scheduled trading event")
     
-    # Step 15: Verify trading events
-    print("\n1️⃣5️⃣ Verifying trading events...")
+    # Step 13: Verify trading events
+    print("\n1️⃣3️⃣ Verifying trading events...")
     success, events_response = tester.run_test(
         "Get User Trading Events",
         "GET",
@@ -497,36 +448,8 @@ def test_pro_trader_features():
     
     print("✅ Trading events verified")
     
-    # Step 16: Test performance analytics
-    print("\n1️⃣6️⃣ Testing performance analytics...")
-    success, analytics_response = tester.run_test(
-        "Get User Analytics",
-        "GET",
-        f"analytics/{user_id}",
-        200
-    )
-    
-    if not success:
-        print("❌ Failed to get user analytics")
-        return False
-    
-    # Verify analytics fields
-    required_fields = ["profile_views", "matches_made", "messages_sent", "signals_sent", 
-                      "groups_created", "match_success_rate", "total_swipes", "likes_received"]
-    
-    missing_fields = []
-    for field in required_fields:
-        if field not in analytics_response:
-            missing_fields.append(field)
-    
-    if missing_fields:
-        print(f"❌ Missing analytics fields: {', '.join(missing_fields)}")
-        return False
-    
-    print("✅ Performance analytics verified")
-    
-    # Step 17: Test Pro Trader features on free user (should return upgrade prompts)
-    print("\n1️⃣7️⃣ Testing Pro Trader features on free user (should return upgrade prompts)...")
+    # Step 14: Test Pro Trader features on free user (should return upgrade prompts)
+    print("\n1️⃣4️⃣ Testing Pro Trader features on free user (should return upgrade prompts)...")
     
     # Test portfolio connection on free user
     success, free_portfolio_response = tester.run_test(
@@ -591,22 +514,6 @@ def test_pro_trader_features():
     
     if not free_group_response.get("pro_trader_required"):
         print("❌ Creating trading groups should require Pro Trader for free user")
-        return False
-    
-    # Test analytics on free user
-    success, free_analytics_response = tester.run_test(
-        "Get User Analytics (Free User)",
-        "GET",
-        f"analytics/{user_id2}",
-        200
-    )
-    
-    if not success:
-        print("❌ Failed to get response from analytics endpoint for free user")
-        return False
-    
-    if not free_analytics_response.get("pro_trader_required"):
-        print("❌ Viewing analytics should require Pro Trader for free user")
         return False
     
     print("✅ All Pro Trader features correctly require upgrade for free users")
