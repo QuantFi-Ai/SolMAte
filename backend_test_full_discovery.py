@@ -5,7 +5,7 @@ import string
 import time
 
 # API Base URL
-API_BASE_URL = "https://2cb408cb-0812-4c97-821c-53c0d3b60524.preview.emergentagent.com"
+API_BASE_URL = "https://5ab0f635-9ff1-4325-81ed-c868d2618fac.preview.emergentagent.com"
 
 def print_separator():
     print("\n" + "="*80 + "\n")

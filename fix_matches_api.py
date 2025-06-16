@@ -30,7 +30,7 @@ def fix_matches_api_issue():
     print(f"Matches as user2: {len(matches_user2)}")
     
     # Check API response
-    base_url = 'https://2cb408cb-0812-4c97-821c-53c0d3b60524.preview.emergentagent.com'
+    base_url = 'https://5ab0f635-9ff1-4325-81ed-c868d2618fac.preview.emergentagent.com'
     response = requests.get(f'{base_url}/api/matches/{user_id}')
     api_matches = []
     

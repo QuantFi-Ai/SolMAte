@@ -5,7 +5,7 @@ import string
 from datetime import datetime
 
 class DiscoveryTester:
-    def __init__(self, base_url="https://2cb408cb-0812-4c97-821c-53c0d3b60524.preview.emergentagent.com"):
+    def __init__(self, base_url="https://5ab0f635-9ff1-4325-81ed-c868d2618fac.preview.emergentagent.com"):
         self.base_url = base_url
         self.test_users = []
         

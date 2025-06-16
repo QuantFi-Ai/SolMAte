@@ -11,7 +11,7 @@ client = MongoClient("mongodb://localhost:27017")
 db = client.solm8_db
 
 # API base URL
-BASE_URL = "https://2cb408cb-0812-4c97-821c-53c0d3b60524.preview.emergentagent.com/api"
+BASE_URL = "https://5ab0f635-9ff1-4325-81ed-c868d2618fac.preview.emergentagent.com/api"
 
 def print_separator():
     print("\n" + "="*80 + "\n")

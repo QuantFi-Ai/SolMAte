@@ -8,7 +8,7 @@ db = client.solm8_db
 users_collection = db.users
 
 # API base URL
-base_url = "https://2cb408cb-0812-4c97-821c-53c0d3b60524.preview.emergentagent.com/api"
+base_url = "https://5ab0f635-9ff1-4325-81ed-c868d2618fac.preview.emergentagent.com/api"
 
 def test_discovery(user_id):
     """Test discovery endpoint for a specific user"""

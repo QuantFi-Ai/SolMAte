@@ -24,7 +24,7 @@ def verify_matches():
     print(f"Profile complete: {user.get('profile_complete')}")
     
     # Check API response for matches
-    base_url = 'https://2cb408cb-0812-4c97-821c-53c0d3b60524.preview.emergentagent.com'
+    base_url = 'https://5ab0f635-9ff1-4325-81ed-c868d2618fac.preview.emergentagent.com'
     
     # Test 1: Get user matches
     print("\n🔍 Test 1: Get user matches")
