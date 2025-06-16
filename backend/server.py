@@ -1859,29 +1859,6 @@ async def get_ai_recommendations(user_id: str, limit: int = 10):
     # Return top matches
     return scored_matches[:limit]
 
-@app.get("/api/discover/{user_id}")
-async def discover_users(user_id: str, limit: int = 10):
-    """Get potential matches for swiping"""
-    current_user = users_collection.find_one({"user_id": user_id})
-    if not current_user:
-        raise HTTPException(status_code=404, detail="User not found")
-    
-    # Get users already swiped on
-    swiped_user_ids = [doc["target_id"] for doc in swipes_collection.find({"swiper_id": user_id})]
-    swiped_user_ids.append(user_id)  # Exclude self
-    
-    # Find users not swiped on yet with complete profiles, sorted by recent activity
-    potential_matches = list(users_collection.find({
-        "user_id": {"$nin": swiped_user_ids},
-        "profile_complete": True
-    }).sort("last_activity", -1).limit(limit))
-    
-    # Remove MongoDB _id fields
-    for user in potential_matches:
-        user.pop('_id', None)
-    
-    return potential_matches
-
 @app.post("/api/swipe")
 async def swipe_user(swipe: SwipeAction):
     """Record a swipe action and check for matches"""
