@@ -940,14 +940,24 @@ function AppContent() {
   };
 
   // Redirect to login if not authenticated (but don't interfere with session restoration)
-  if (!currentUser && currentView !== 'login') {
+  if (!currentUser && currentView !== 'login' && currentView !== 'home') {
     // Give session restoration a moment to work
     setTimeout(() => {
       if (!currentUser) {
-        setCurrentView('login');
+        setCurrentView('home');
       }
     }, 100);
     return null;
+  }
+
+  // Homepage View (Landing Page)
+  if (currentView === 'home') {
+    return (
+      <HomePage 
+        onGetStarted={() => setCurrentView('login')}
+        onLogin={() => setCurrentView('login')}
+      />
+    );
   }
 
   // Login View
