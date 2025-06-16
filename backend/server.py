@@ -1791,6 +1791,459 @@ async def discover_users(user_id: str, limit: int = 10, filters: dict = None):
         "applied_filters": filters if subscription["plan_type"] != "free" else None
     }
 
+# TIER 2: Pro Trader Endpoints
+
+@app.post("/api/portfolio/connect/{user_id}")
+async def connect_portfolio(user_id: str, portfolio_data: dict):
+    """Connect wallet/exchange for portfolio verification (Pro Trader feature)"""
+    if not can_connect_portfolio(user_id):
+        return {
+            "pro_trader_required": True,
+            "message": "Portfolio integration is a Pro Trader feature. Upgrade to connect your wallet/exchange!",
+            "upgrade_url": "/premium"
+        }
+    
+    try:
+        wallet_address = portfolio_data.get("wallet_address", "")
+        exchange_name = portfolio_data.get("exchange_name", "")
+        
+        if not wallet_address and not exchange_name:
+            raise HTTPException(status_code=400, detail="Either wallet address or exchange name is required")
+        
+        # Create portfolio connection
+        portfolio_connection = {
+            "user_id": user_id,
+            "wallet_address": wallet_address,
+            "exchange_name": exchange_name,
+            "verified": False,  # Would integrate with actual verification service
+            "portfolio_value": 0.0,  # Would fetch from actual portfolio
+            "last_sync": datetime.utcnow(),
+            "created_at": datetime.utcnow()
+        }
+        
+        # Upsert portfolio connection
+        portfolio_connections_collection.replace_one(
+            {"user_id": user_id},
+            portfolio_connection,
+            upsert=True
+        )
+        
+        # Update user profile with verified status
+        users_collection.update_one(
+            {"user_id": user_id},
+            {"$set": {"portfolio_verified": True, "last_active": datetime.utcnow()}}
+        )
+        
+        return {
+            "message": "Portfolio connected successfully!",
+            "verified": False,  # Would be True after actual verification
+            "next_steps": "Portfolio verification in progress. This may take a few minutes."
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to connect portfolio: {str(e)}")
+
+@app.get("/api/portfolio/{user_id}")
+async def get_portfolio_info(user_id: str):
+    """Get portfolio connection info"""
+    portfolio = portfolio_connections_collection.find_one({"user_id": user_id})
+    if portfolio:
+        portfolio.pop('_id', None)
+        return portfolio
+    
+    return {"connected": False, "message": "No portfolio connected"}
+
+@app.post("/api/trading-signal/send")
+async def send_trading_signal(signal_data: dict):
+    """Send trading signal to matched users (Pro Trader feature)"""
+    sender_id = signal_data.get("sender_id")
+    
+    if not can_send_trading_signals(sender_id):
+        return {
+            "pro_trader_required": True,
+            "message": "Trading signals are a Pro Trader feature. Upgrade to share alpha with your network!",
+            "upgrade_url": "/premium"
+        }
+    
+    try:
+        # Create trading signal
+        signal = {
+            "signal_id": str(uuid.uuid4()),
+            "sender_id": sender_id,
+            "recipient_ids": signal_data.get("recipient_ids", []),
+            "signal_type": signal_data.get("signal_type", "alert"),
+            "token_symbol": signal_data.get("token_symbol", ""),
+            "price_target": signal_data.get("price_target"),
+            "stop_loss": signal_data.get("stop_loss"),
+            "risk_level": signal_data.get("risk_level", "medium"),
+            "message": signal_data.get("message", ""),
+            "encrypted": True,
+            "expires_at": datetime.utcnow() + timedelta(hours=24),
+            "created_at": datetime.utcnow()
+        }
+        
+        trading_signals_collection.insert_one(signal)
+        
+        # Update analytics
+        update_user_analytics(sender_id, "signal_sent")
+        
+        # Notify recipients via WebSocket (if connected)
+        for recipient_id in signal["recipient_ids"]:
+            signal_notification = {
+                "type": "trading_signal",
+                "signal_id": signal["signal_id"],
+                "sender_id": sender_id,
+                "token_symbol": signal["token_symbol"],
+                "message": f"New trading signal for {signal['token_symbol']}"
+            }
+            await manager.send_message(json.dumps(signal_notification), recipient_id)
+        
+        signal.pop('_id', None)
+        return {
+            "message": "Trading signal sent successfully!",
+            "signal": signal,
+            "recipients_notified": len(signal["recipient_ids"])
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to send trading signal: {str(e)}")
+
+@app.get("/api/trading-signals/{user_id}")
+async def get_trading_signals(user_id: str, signal_type: str = "received"):
+    """Get trading signals for user (sent or received)"""
+    try:
+        if signal_type == "sent":
+            signals = list(trading_signals_collection.find({"sender_id": user_id}).sort("created_at", -1))
+        else:
+            signals = list(trading_signals_collection.find({"recipient_ids": user_id}).sort("created_at", -1))
+        
+        # Remove MongoDB _id and get sender info for received signals
+        enriched_signals = []
+        for signal in signals:
+            signal.pop('_id', None)
+            
+            # Get sender info
+            sender = users_collection.find_one({"user_id": signal["sender_id"]})
+            if sender:
+                signal["sender_info"] = {
+                    "display_name": sender["display_name"],
+                    "username": sender["username"],
+                    "avatar_url": sender["avatar_url"]
+                }
+            
+            enriched_signals.append(signal)
+        
+        return {
+            "signals": enriched_signals,
+            "count": len(enriched_signals),
+            "type": signal_type
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get trading signals: {str(e)}")
+
+@app.post("/api/trading-group/create")
+async def create_trading_group(group_data: dict):
+    """Create trading group (Pro Trader feature)"""
+    creator_id = group_data.get("creator_id")
+    
+    if not can_create_groups(creator_id):
+        return {
+            "pro_trader_required": True,
+            "message": "Trading groups are a Pro Trader feature. Upgrade to create groups with your trading network!",
+            "upgrade_url": "/premium"
+        }
+    
+    try:
+        # Check if user has reached group limit (5 groups for Pro Trader)
+        user_groups = trading_groups_collection.count_documents({"creator_id": creator_id})
+        if user_groups >= 5:
+            return {
+                "error": "group_limit_reached",
+                "message": "You've reached the maximum of 5 trading groups. Delete a group to create a new one.",
+                "current_groups": user_groups
+            }
+        
+        # Create trading group
+        group = {
+            "group_id": str(uuid.uuid4()),
+            "creator_id": creator_id,
+            "name": group_data.get("name", ""),
+            "description": group_data.get("description", ""),
+            "member_ids": [creator_id],  # Creator is automatically a member
+            "max_members": 10,
+            "is_private": group_data.get("is_private", False),
+            "created_at": datetime.utcnow()
+        }
+        
+        trading_groups_collection.insert_one(group)
+        
+        # Update analytics
+        update_user_analytics(creator_id, "group_created")
+        
+        group.pop('_id', None)
+        return {
+            "message": "Trading group created successfully!",
+            "group": group
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to create trading group: {str(e)}")
+
+@app.post("/api/trading-group/{group_id}/join")
+async def join_trading_group(group_id: str, user_data: dict):
+    """Join a trading group"""
+    user_id = user_data.get("user_id")
+    
+    try:
+        group = trading_groups_collection.find_one({"group_id": group_id})
+        if not group:
+            raise HTTPException(status_code=404, detail="Trading group not found")
+        
+        # Check if group is full
+        if len(group["member_ids"]) >= group["max_members"]:
+            return {
+                "error": "group_full",
+                "message": "This trading group is at maximum capacity",
+                "max_members": group["max_members"]
+            }
+        
+        # Check if user is already a member
+        if user_id in group["member_ids"]:
+            return {
+                "error": "already_member",
+                "message": "You are already a member of this group"
+            }
+        
+        # Add user to group
+        trading_groups_collection.update_one(
+            {"group_id": group_id},
+            {"$push": {"member_ids": user_id}}
+        )
+        
+        # Notify group members
+        for member_id in group["member_ids"]:
+            if member_id != user_id:
+                notification = {
+                    "type": "group_member_joined",
+                    "group_id": group_id,
+                    "group_name": group["name"],
+                    "new_member_id": user_id
+                }
+                await manager.send_message(json.dumps(notification), member_id)
+        
+        return {
+            "message": f"Successfully joined {group['name']}!",
+            "group_id": group_id,
+            "member_count": len(group["member_ids"]) + 1
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to join group: {str(e)}")
+
+@app.get("/api/trading-groups/{user_id}")
+async def get_user_trading_groups(user_id: str):
+    """Get trading groups for user"""
+    try:
+        # Get groups where user is a member
+        groups = list(trading_groups_collection.find({"member_ids": user_id}))
+        
+        enriched_groups = []
+        for group in groups:
+            group.pop('_id', None)
+            
+            # Get member info
+            members = []
+            for member_id in group["member_ids"]:
+                member = users_collection.find_one({"user_id": member_id})
+                if member:
+                    members.append({
+                        "user_id": member["user_id"],
+                        "display_name": member["display_name"],
+                        "username": member["username"],
+                        "avatar_url": member["avatar_url"]
+                    })
+            
+            group["members"] = members
+            group["member_count"] = len(members)
+            enriched_groups.append(group)
+        
+        return {
+            "groups": enriched_groups,
+            "count": len(enriched_groups)
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get trading groups: {str(e)}")
+
+@app.post("/api/trading-event/schedule")
+async def schedule_trading_event(event_data: dict):
+    """Schedule trading event (Pro Trader feature)"""
+    creator_id = event_data.get("creator_id")
+    
+    if not can_schedule_events(creator_id):
+        return {
+            "pro_trader_required": True,
+            "message": "Trading calendar is a Pro Trader feature. Upgrade to schedule trading sessions!",
+            "upgrade_url": "/premium"
+        }
+    
+    try:
+        # Create trading event
+        event = {
+            "event_id": str(uuid.uuid4()),
+            "creator_id": creator_id,
+            "title": event_data.get("title", ""),
+            "description": event_data.get("description", ""),
+            "event_type": event_data.get("event_type", "trading_session"),
+            "start_time": datetime.fromisoformat(event_data.get("start_time")),
+            "duration_minutes": event_data.get("duration_minutes", 60),
+            "attendee_ids": [creator_id],  # Creator is automatically an attendee
+            "max_attendees": 10,
+            "created_at": datetime.utcnow()
+        }
+        
+        trading_calendar_collection.insert_one(event)
+        
+        event.pop('_id', None)
+        return {
+            "message": "Trading event scheduled successfully!",
+            "event": event
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to schedule event: {str(e)}")
+
+@app.get("/api/trading-events/{user_id}")
+async def get_trading_events(user_id: str):
+    """Get trading events for user"""
+    try:
+        # Get events where user is creator or attendee
+        events = list(trading_calendar_collection.find({
+            "$or": [
+                {"creator_id": user_id},
+                {"attendee_ids": user_id}
+            ]
+        }).sort("start_time", 1))
+        
+        for event in events:
+            event.pop('_id', None)
+        
+        return {
+            "events": events,
+            "count": len(events)
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get trading events: {str(e)}")
+
+@app.get("/api/analytics/{user_id}")
+async def get_user_analytics(user_id: str):
+    """Get performance analytics (Pro Trader feature)"""
+    if not can_view_analytics(user_id):
+        return {
+            "pro_trader_required": True,
+            "message": "Performance analytics are a Pro Trader feature. Upgrade to track your trading network success!",
+            "upgrade_url": "/premium"
+        }
+    
+    try:
+        analytics = analytics_collection.find_one({"user_id": user_id})
+        if not analytics:
+            # Create empty analytics
+            analytics = {
+                "user_id": user_id,
+                "profile_views": 0,
+                "matches_made": 0,
+                "messages_sent": 0,
+                "signals_sent": 0,
+                "groups_created": 0,
+                "match_success_rate": 0.0,
+                "last_updated": datetime.utcnow()
+            }
+            analytics_collection.insert_one(analytics)
+        
+        analytics.pop('_id', None)
+        
+        # Add additional calculated metrics
+        total_swipes = swipes_collection.count_documents({"swiper_id": user_id})
+        total_likes_received = likes_received_collection.count_documents({"user_id": user_id})
+        
+        analytics["total_swipes"] = total_swipes
+        analytics["likes_received"] = total_likes_received
+        analytics["popularity_score"] = round((total_likes_received / max(total_swipes, 1)) * 100, 2)
+        
+        return analytics
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get analytics: {str(e)}")
+
+@app.post("/api/subscription/upgrade/{user_id}")
+async def upgrade_subscription(user_id: str, plan_data: dict):
+    """Upgrade user to premium subscription"""
+    try:
+        user = users_collection.find_one({"user_id": user_id})
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        # For demo, we'll just upgrade them directly
+        # In production, integrate with payment processor like Stripe
+        plan_type = plan_data.get("plan_type", "basic_premium")
+        
+        # Set pricing
+        pricing = {
+            "basic_premium": 9.99,
+            "pro_trader": 19.99
+        }
+        
+        subscription_data = {
+            "user_id": user_id,
+            "plan_type": plan_type,
+            "status": "active",
+            "created_at": datetime.utcnow(),
+            "expires_at": datetime.utcnow() + timedelta(days=30),  # 30-day subscription
+            "payment_method": "demo",
+            "amount": pricing.get(plan_type, 0)
+        }
+        
+        # Upsert subscription
+        subscriptions_collection.replace_one(
+            {"user_id": user_id},
+            subscription_data,
+            upsert=True
+        )
+        
+        # Define features by plan
+        features_unlocked = []
+        if plan_type == "basic_premium":
+            features_unlocked = [
+                "Unlimited swipes",
+                "See who liked you",
+                "Rewind last swipe",
+                "Advanced filters",
+                "Priority in discovery"
+            ]
+        elif plan_type == "pro_trader":
+            features_unlocked = [
+                "All Basic Premium features",
+                "Portfolio integration",
+                "Trading signal sharing",
+                "Group chats (up to 5 groups)",
+                "Trading calendar",
+                "Performance analytics"
+            ]
+        
+        return {
+            "message": f"Successfully upgraded to {plan_type.replace('_', ' ').title()}!",
+            "subscription": subscription_data,
+            "features_unlocked": features_unlocked
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to upgrade subscription: {str(e)}")
+
+
+
 @app.get("/api/login/twitter")
 async def login_twitter(request: Request):
     """Initiate Twitter OAuth login"""
