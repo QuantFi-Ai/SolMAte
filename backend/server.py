@@ -1461,6 +1461,204 @@ async def validate_referral_code(referral_code: str):
 async def health_check():
     return {"status": "healthy", "service": "Solm8 API"}
 
+# Premium Subscription Endpoints
+
+@app.get("/api/subscription/{user_id}")
+async def get_subscription_status(user_id: str):
+    """Get user's subscription status and limits"""
+    subscription = get_user_subscription(user_id)
+    swipe_status = check_swipe_limit(user_id)
+    
+    return {
+        "subscription": subscription,
+        "swipe_limits": swipe_status,
+        "premium_features": {
+            "unlimited_swipes": subscription["plan_type"] != "free",
+            "see_who_liked_you": can_see_likes(user_id),
+            "rewind_swipes": can_rewind_swipe(user_id),
+            "priority_discovery": get_priority_boost(user_id),
+            "advanced_filters": subscription["plan_type"] != "free"
+        }
+    }
+
+@app.post("/api/subscription/upgrade/{user_id}")
+async def upgrade_subscription(user_id: str, plan_data: dict):
+    """Upgrade user to premium subscription"""
+    try:
+        user = users_collection.find_one({"user_id": user_id})
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        # For demo, we'll just upgrade them directly
+        # In production, integrate with payment processor like Stripe
+        plan_type = plan_data.get("plan_type", "basic_premium")
+        
+        subscription_data = {
+            "user_id": user_id,
+            "plan_type": plan_type,
+            "status": "active",
+            "created_at": datetime.utcnow(),
+            "expires_at": datetime.utcnow() + timedelta(days=30),  # 30-day subscription
+            "payment_method": "demo",
+            "amount": 9.99 if plan_type == "basic_premium" else 0
+        }
+        
+        # Upsert subscription
+        subscriptions_collection.replace_one(
+            {"user_id": user_id},
+            subscription_data,
+            upsert=True
+        )
+        
+        return {
+            "message": "Successfully upgraded to Premium!",
+            "subscription": subscription_data,
+            "features_unlocked": [
+                "Unlimited swipes",
+                "See who liked you",
+                "Rewind last swipe",
+                "Advanced filters",
+                "Priority in discovery"
+            ]
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to upgrade subscription: {str(e)}")
+
+@app.get("/api/likes-received/{user_id}")
+async def get_likes_received(user_id: str):
+    """Get users who liked this user (Premium feature)"""
+    if not can_see_likes(user_id):
+        # Return teaser for free users
+        like_count = likes_received_collection.count_documents({"user_id": user_id})
+        return {
+            "premium_required": True,
+            "like_count": like_count,
+            "message": f"You have {like_count} likes! Upgrade to Premium to see who liked you.",
+            "upgrade_url": "/premium"
+        }
+    
+    # Get actual likes for premium users
+    likes = list(likes_received_collection.find({"user_id": user_id}).sort("liked_at", -1))
+    
+    # Get user details for each like
+    liked_users = []
+    for like in likes:
+        liked_user = users_collection.find_one({"user_id": like["liked_by_user_id"]})
+        if liked_user:
+            liked_user.pop('_id', None)
+            liked_users.append({
+                "user_id": liked_user["user_id"],
+                "username": liked_user["username"],
+                "display_name": liked_user["display_name"],
+                "avatar_url": liked_user["avatar_url"],
+                "bio": liked_user.get("bio", ""),
+                "trading_experience": liked_user.get("trading_experience", ""),
+                "preferred_tokens": liked_user.get("preferred_tokens", []),
+                "liked_at": like["liked_at"]
+            })
+    
+    return {
+        "premium_required": False,
+        "liked_users": liked_users,
+        "total_likes": len(liked_users)
+    }
+
+@app.post("/api/rewind-swipe/{user_id}")
+async def rewind_last_swipe(user_id: str):
+    """Rewind the last swipe (Premium feature)"""
+    if not can_rewind_swipe(user_id):
+        return {
+            "premium_required": True,
+            "message": "Rewind is a Premium feature. Upgrade to undo your last swipe!",
+            "upgrade_url": "/premium"
+        }
+    
+    # Get last swipe
+    last_swipe_history = swipe_history_collection.find_one(
+        {"user_id": user_id},
+        sort=[("_id", -1)]
+    )
+    
+    if not last_swipe_history:
+        return {"error": "No swipes to rewind"}
+    
+    last_swipe = last_swipe_history["swipe_data"]
+    
+    # Remove the swipe from swipes collection
+    swipes_collection.delete_one({"swipe_id": last_swipe["swipe_id"]})
+    
+    # Remove from likes_received if it was a like
+    if last_swipe["action"] == "like":
+        likes_received_collection.delete_one({
+            "user_id": last_swipe["target_id"],
+            "liked_by_user_id": last_swipe["swiper_id"]
+        })
+    
+    # Remove from swipe history
+    swipe_history_collection.delete_one({"_id": last_swipe_history["_id"]})
+    
+    # Get the target user info to return
+    target_user = users_collection.find_one({"user_id": last_swipe["target_id"]})
+    if target_user:
+        target_user.pop('_id', None)
+    
+    return {
+        "success": True,
+        "message": "Last swipe rewound successfully!",
+        "rewound_user": target_user,
+        "action_rewound": last_swipe["action"]
+    }
+
+@app.get("/api/discover/{user_id}")
+async def discover_users(user_id: str, limit: int = 10, filters: dict = None):
+    """Get potential matches for swiping with premium filters"""
+    current_user = users_collection.find_one({"user_id": user_id})
+    if not current_user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    subscription = get_user_subscription(user_id)
+    
+    # Get users already swiped on
+    swiped_user_ids = [doc["target_id"] for doc in swipes_collection.find({"swiper_id": user_id})]
+    swiped_user_ids.append(user_id)  # Exclude self
+    
+    # Base query
+    query = {
+        "user_id": {"$nin": swiped_user_ids},
+        "profile_complete": True
+    }
+    
+    # Apply premium filters if available
+    if subscription["plan_type"] != "free" and filters:
+        if filters.get("portfolio_size"):
+            query["portfolio_size"] = filters["portfolio_size"]
+        if filters.get("trading_experience"):
+            query["trading_experience"] = filters["trading_experience"]
+        if filters.get("preferred_tokens"):
+            query["preferred_tokens"] = {"$in": filters["preferred_tokens"]}
+        if filters.get("years_trading_min"):
+            query["years_trading"] = {"$gte": filters["years_trading_min"]}
+        if filters.get("location"):
+            query["location"] = {"$regex": filters["location"], "$options": "i"}
+    
+    # Premium users get priority (more recent activity first)
+    # Free users get standard sorting
+    sort_criteria = "last_activity" if subscription["plan_type"] != "free" else "created_at"
+    
+    potential_matches = list(users_collection.find(query).sort(sort_criteria, -1).limit(limit))
+    
+    # Remove MongoDB _id fields
+    for user in potential_matches:
+        user.pop('_id', None)
+    
+    # Add premium indicator to response
+    return {
+        "users": potential_matches,
+        "has_premium_filters": subscription["plan_type"] != "free",
+        "applied_filters": filters if subscription["plan_type"] != "free" else None
+    }
+
 @app.get("/api/login/twitter")
 async def login_twitter(request: Request):
     """Initiate Twitter OAuth login"""
