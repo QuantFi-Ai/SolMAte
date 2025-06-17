@@ -165,7 +165,7 @@ const HomePage = ({ onGetStarted, onLogin }) => {
           >
             Trading Is
             <br />
-            <span className="bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
+            <span className="text-gray-400">
               Lonely
             </span>
           </motion.h1>
