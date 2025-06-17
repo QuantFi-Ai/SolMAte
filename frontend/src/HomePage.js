@@ -375,6 +375,7 @@ const HomePage = ({ onGetStarted, onLogin }) => {
 
                 <AnimatedButton
                   onClick={onGetStarted}
+                  variant={plan.popular || plan.elite ? "secondary" : "primary"}
                   className={`w-full py-4 rounded-xl font-bold transition-all ${
                     plan.popular || plan.elite
                       ? 'bg-white hover:bg-gray-200 text-black'
