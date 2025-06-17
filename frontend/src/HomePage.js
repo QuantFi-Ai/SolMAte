@@ -189,7 +189,7 @@ const HomePage = ({ onGetStarted, onLogin }) => {
           >
             <AnimatedButton
               onClick={onGetStarted}
-              className="bg-white hover:bg-gray-200 text-black px-8 py-4 rounded-xl text-lg font-bold shadow-2xl transform hover:scale-105 transition-all border-2 border-white"
+              className="bg-white hover:bg-gray-200 !text-black px-8 py-4 rounded-xl text-lg font-bold shadow-2xl transform hover:scale-105 transition-all border-2 border-white"
             >
               End Trading Alone →
             </AnimatedButton>
