@@ -463,6 +463,7 @@ const HomePage = ({ onGetStarted, onLogin }) => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <AnimatedButton
                 onClick={onGetStarted}
+                variant="primary"
                 className="bg-black hover:bg-gray-800 text-white px-8 py-4 rounded-xl text-lg font-bold transform hover:scale-105 transition-all shadow-2xl"
               >
                 Find Your People Now
