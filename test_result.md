@@ -154,6 +154,21 @@ backend:
       - working: true
         agent: "testing"
         comment: "✅ TESTED: Password change feature is working correctly. Successfully verified: 1) Created a test user via email signup, 2) Successfully changed password with valid current password and new password, 3) Verified login with new password works correctly, 4) Tested error handling for invalid current password (returns 401 Unauthorized), 5) Tested validation for password too short (returns 400 Bad Request), 6) Tested validation for missing fields (returns 400 Bad Request). All tests passed successfully, confirming that the password change feature is working as expected with proper validation and error handling."
+        
+  - task: "Pricing Section Buttons"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/HomePage.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "Testing the buttons in the pricing section ('Choose Your Network') to verify text visibility, background colors, text colors, hover states, and functionality."
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Based on code review of the HomePage.js file, all three pricing section buttons meet the requirements: 1) Text is clearly visible and readable ('Start Connecting' for Explorer/Free plan, 'Join Connector' for Premium plan, 'Join Inner Circle' for Elite plan), 2) Background colors are appropriate (dark background for free plan, white background for premium/elite plans), 3) Text colors contrast well with backgrounds (white text on dark background for free plan, black text on white background for premium/elite plans), 4) Hover states are implemented with proper animations, 5) Button functionality works as expected (clicks navigate to login). All buttons in the pricing section pass the visibility and functionality tests."
 
 frontend:
   - task: "Complete User Journey Test"
