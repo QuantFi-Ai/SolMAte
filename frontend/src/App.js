@@ -938,7 +938,7 @@ function AppContent() {
   };
 
   // Redirect to login if not authenticated (but don't interfere with session restoration)
-  if (!currentUser && currentView !== 'login') {
+  if (!currentUser && currentView !== 'login' && currentView !== 'homepage') {
     // Give session restoration a moment to work
     setTimeout(() => {
       if (!currentUser) {
@@ -946,6 +946,160 @@ function AppContent() {
       }
     }, 100);
     return null;
+  }
+
+  // Homepage View
+  if (currentView === 'homepage') {
+    return (
+      <div className="min-h-screen bg-black text-white overflow-hidden">
+        {/* Navigation */}
+        <nav className="absolute top-0 left-0 right-0 z-10 p-6">
+          <div className="max-w-7xl mx-auto flex justify-between items-center">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6 }}
+            >
+              <h1 className="text-2xl font-bold">Solm8</h1>
+            </motion.div>
+            <motion.button
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              onClick={() => setCurrentView('login')}
+              className="px-6 py-2 border border-white/20 rounded-full hover:bg-white hover:text-black transition-all duration-300"
+            >
+              Sign In
+            </motion.button>
+          </div>
+        </nav>
+
+        {/* Hero Section */}
+        <div className="flex items-center justify-center min-h-screen px-6">
+          <div className="max-w-4xl mx-auto text-center">
+            <motion.h1
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.3 }}
+              className="text-6xl md:text-8xl font-bold mb-6 leading-tight"
+            >
+              Where Solana
+              <br />
+              <span className="bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
+                Traders Connect
+              </span>
+            </motion.h1>
+            
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.5 }}
+              className="text-xl md:text-2xl text-gray-300 mb-12 max-w-2xl mx-auto"
+            >
+              The exclusive social platform for Solana traders to find partners, share alpha, and build meaningful connections in the crypto space.
+            </motion.p>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.7 }}
+              className="flex flex-col sm:flex-row gap-4 justify-center items-center"
+            >
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setCurrentView('login')}
+                className="px-8 py-4 bg-white text-black rounded-full text-lg font-semibold hover:bg-gray-100 transition-all duration-300 shadow-lg"
+              >
+                Get Started
+              </motion.button>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="px-8 py-4 border border-white/20 rounded-full text-lg font-semibold hover:bg-white/10 transition-all duration-300"
+              >
+                Learn More
+              </motion.button>
+            </motion.div>
+          </div>
+        </div>
+
+        {/* Features Section */}
+        <div className="py-20 px-6">
+          <div className="max-w-6xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.9 }}
+              className="grid md:grid-cols-3 gap-8"
+            >
+              <div className="text-center p-6">
+                <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 715.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-semibold mb-2">Smart Matching</h3>
+                <p className="text-gray-400">AI-powered algorithm matches you with compatible traders based on your style and experience.</p>
+              </div>
+              
+              <div className="text-center p-6">
+                <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-semibold mb-2">Real-time Chat</h3>
+                <p className="text-gray-400">Secure messaging system to share insights, strategies, and build trading relationships.</p>
+              </div>
+              
+              <div className="text-center p-6">
+                <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-semibold mb-2">Portfolio Insights</h3>
+                <p className="text-gray-400">Share your trading stats and learn from successful traders in the community.</p>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+
+        {/* CTA Section */}
+        <div className="py-20 px-6 border-t border-white/10">
+          <div className="max-w-4xl mx-auto text-center">
+            <motion.h2
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 1.1 }}
+              className="text-4xl md:text-5xl font-bold mb-6"
+            >
+              Ready to level up your trading?
+            </motion.h2>
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 1.3 }}
+              className="text-xl text-gray-300 mb-8"
+            >
+              Join the exclusive community of Solana traders today.
+            </motion.p>
+            <motion.button
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 1.5 }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setCurrentView('login')}
+              className="px-10 py-4 bg-white text-black rounded-full text-lg font-bold hover:bg-gray-100 transition-all duration-300 shadow-xl"
+            >
+              Start Trading Smarter
+            </motion.button>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   // Login View
