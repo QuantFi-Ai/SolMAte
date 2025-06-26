@@ -3,7 +3,7 @@ import json
 from pymongo import MongoClient
 
 # API Base URL
-API_BASE_URL = "https://8134b81b-ad13-497e-ba8a-ecdf0793b0b4.preview.emergentagent.com"
+API_BASE_URL = "https://5f628bdb-f499-4e4d-ba90-973d0a8be29a.preview.emergentagent.com"
 MONGO_URL = "mongodb://localhost:27017"
 
 def print_separator():

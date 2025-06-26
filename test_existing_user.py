@@ -2,7 +2,7 @@ import requests
 import json
 
 # Base URL
-base_url = "https://8134b81b-ad13-497e-ba8a-ecdf0793b0b4.preview.emergentagent.com/api"
+base_url = "https://5f628bdb-f499-4e4d-ba90-973d0a8be29a.preview.emergentagent.com/api"
 
 # Test with a specific user ID
 user_id = "087e057e-0b48-4222-b994-7e4208962470"  # Use the User A ID from our previous test

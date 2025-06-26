@@ -1,7 +1,7 @@
 # SolMatch Navigation UX Test Report
 
 ## Overview
-This report summarizes the testing of the updated navigation UX in SolMatch. The tests were conducted on the application deployed at https://8134b81b-ad13-497e-ba8a-ecdf0793b0b4.preview.emergentagent.com.
+This report summarizes the testing of the updated navigation UX in SolMatch. The tests were conducted on the application deployed at https://5f628bdb-f499-4e4d-ba90-973d0a8be29a.preview.emergentagent.com.
 
 ## Test Methodology
 1. **Backend API Testing**: Verified all backend API endpoints using the existing `backend_test.py` script

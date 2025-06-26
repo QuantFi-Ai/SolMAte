@@ -1327,7 +1327,7 @@ async def get_referral_stats(user_id: str):
             "successful_signups": len([r for r in referred_users if r["profile_complete"]]),
             "pending_signups": len([r for r in referred_users if not r["profile_complete"]]),
             "referred_users": referred_users,
-            "referral_link": f"https://8134b81b-ad13-497e-ba8a-ecdf0793b0b4.preview.emergentagent.com/?ref={user_referral['referral_code']}" if user_referral else None
+            "referral_link": f"https://5f628bdb-f499-4e4d-ba90-973d0a8be29a.preview.emergentagent.com/?ref={user_referral['referral_code']}" if user_referral else None
         }
         
     except HTTPException:
@@ -1374,13 +1374,13 @@ async def login_twitter(request: Request):
     """Initiate Twitter OAuth login"""
     try:
         # Use the exact external URL for callback
-        callback_url = f"https://8134b81b-ad13-497e-ba8a-ecdf0793b0b4.preview.emergentagent.com/api/auth/twitter/callback"
+        callback_url = f"https://5f628bdb-f499-4e4d-ba90-973d0a8be29a.preview.emergentagent.com/api/auth/twitter/callback"
         return await oauth.twitter.authorize_redirect(request, callback_url)
     except Exception as e:
         print(f"Twitter OAuth error: {str(e)}")
         # For demo purposes, return a mock success for now
         mock_user_id = str(uuid.uuid4())
-        frontend_url = f"https://8134b81b-ad13-497e-ba8a-ecdf0793b0b4.preview.emergentagent.com/app?auth_success=true&user_id={mock_user_id}&demo=true"
+        frontend_url = f"https://5f628bdb-f499-4e4d-ba90-973d0a8be29a.preview.emergentagent.com/app?auth_success=true&user_id={mock_user_id}&demo=true"
         return RedirectResponse(url=frontend_url)
 
 @app.get("/api/auth/twitter/callback")
@@ -1422,11 +1422,11 @@ async def twitter_callback(request: Request):
             users_collection.insert_one(user_data)
         
         # Redirect to frontend with user data
-        frontend_url = f"https://8134b81b-ad13-497e-ba8a-ecdf0793b0b4.preview.emergentagent.com/app?auth_success=true&user_id={user_data['user_id']}"
+        frontend_url = f"https://5f628bdb-f499-4e4d-ba90-973d0a8be29a.preview.emergentagent.com/app?auth_success=true&user_id={user_data['user_id']}"
         return RedirectResponse(url=frontend_url)
         
     except Exception as e:
-        return RedirectResponse(url=f"https://8134b81b-ad13-497e-ba8a-ecdf0793b0b4.preview.emergentagent.com/app?auth_error=true")
+        return RedirectResponse(url=f"https://5f628bdb-f499-4e4d-ba90-973d0a8be29a.preview.emergentagent.com/app?auth_error=true")
 
 @app.post("/api/upload-profile-image/{user_id}")
 async def upload_profile_image(user_id: str, file: UploadFile = File(...)):
@@ -1456,7 +1456,7 @@ async def upload_profile_image(user_id: str, file: UploadFile = File(...)):
         profile_images_collection.insert_one(image_data)
         
         # Update user's avatar URL to point to our image endpoint
-        new_avatar_url = f"{os.environ.get('REACT_APP_BACKEND_URL', 'https://8134b81b-ad13-497e-ba8a-ecdf0793b0b4.preview.emergentagent.com')}/api/profile-image/{image_data['image_id']}"
+        new_avatar_url = f"{os.environ.get('REACT_APP_BACKEND_URL', 'https://5f628bdb-f499-4e4d-ba90-973d0a8be29a.preview.emergentagent.com')}/api/profile-image/{image_data['image_id']}"
         
         users_collection.update_one(
             {"user_id": user_id},
