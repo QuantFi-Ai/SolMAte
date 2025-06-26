@@ -26,7 +26,7 @@ const API_BASE_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001
 function AppContent() {
   // State management
   const [currentUser, setCurrentUser] = useState(null);
-  const [currentView, setCurrentView] = useState('login');
+  const [currentView, setCurrentView] = useState('homepage');
   const [discoveryCards, setDiscoveryCards] = useState([]);
   const [aiRecommendations, setAiRecommendations] = useState([]);
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
