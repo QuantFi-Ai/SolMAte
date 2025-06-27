@@ -1025,7 +1025,7 @@ function AppContent() {
         </div>
 
         {/* Features Section */}
-        <div className="py-20 px-6">
+        <div className="py-20 px-6" id="features-section">
           <div className="max-w-6xl mx-auto">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
