@@ -1016,6 +1016,11 @@ function AppContent() {
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
+                onClick={() => {
+                  document.getElementById('features-section')?.scrollIntoView({ 
+                    behavior: 'smooth' 
+                  });
+                }}
                 className="px-8 py-4 border border-white/20 rounded-full text-lg font-semibold hover:bg-white/10 transition-all duration-300"
               >
                 Learn More
