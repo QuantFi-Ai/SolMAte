@@ -20,7 +20,7 @@ import {
 } from './AnimatedComponents';
 import { ReferralDashboard, SupportModal } from './ReferralComponents';
 import PublicProfileModal from './PublicProfileModal';
-const API_BASE_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
+import { PrivacyPolicy, TermsOfService } from './LegalDocuments';
 
 // Solana wallet configuration
 function AppContent() {
