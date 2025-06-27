@@ -1328,6 +1328,67 @@ function AppContent() {
             </motion.button>
           </div>
         </div>
+
+        {/* Footer */}
+        <footer className="border-t border-white/10 py-12 px-6">
+          <div className="max-w-6xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 1.7 }}
+              className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0"
+            >
+              {/* Left side - Brand and Copyright */}
+              <div className="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-8">
+                <div className="text-2xl font-bold">Solm8</div>
+                <div className="text-gray-400 text-sm">
+                  © 2025 Solm8. All rights reserved.
+                </div>
+              </div>
+
+              {/* Right side - Contact and Links */}
+              <div className="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-6 text-sm">
+                <a 
+                  href="mailto:support@solm8.app" 
+                  className="text-gray-300 hover:text-white transition-colors duration-300 flex items-center space-x-1"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                  <span>support@solm8.app</span>
+                </a>
+                <div className="hidden md:block text-gray-600">|</div>
+                <button
+                  onClick={() => setCurrentView('login')}
+                  className="text-gray-300 hover:text-white transition-colors duration-300"
+                >
+                  Privacy Policy
+                </button>
+                <div className="hidden md:block text-gray-600">|</div>
+                <button
+                  onClick={() => setCurrentView('login')}
+                  className="text-gray-300 hover:text-white transition-colors duration-300"
+                >
+                  Terms of Service
+                </button>
+              </div>
+            </motion.div>
+
+            {/* Bottom section - Additional info */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 1.9 }}
+              className="mt-8 pt-8 border-t border-white/5 text-center"
+            >
+              <p className="text-gray-500 text-xs max-w-3xl mx-auto">
+                Solm8 is a social platform designed for Solana traders to connect, share insights, and build meaningful trading relationships. 
+                Trading cryptocurrencies involves substantial risk and may not be suitable for all investors. 
+                Please trade responsibly and only invest what you can afford to lose.
+              </p>
+            </motion.div>
+          </div>
+        </footer>
       </div>
     );
   }
