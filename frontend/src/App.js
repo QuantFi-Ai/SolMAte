@@ -1370,7 +1370,7 @@ function AppContent() {
                 </button>
                 <div className="hidden md:block text-gray-600">|</div>
                 <button
-                  onClick={() => setShowPrivacyPolicy(true)}
+                  onClick={() => setShowTermsOfService(true)}
                   className="text-gray-300 hover:text-white transition-colors duration-300"
                 >
                   Terms of Service
