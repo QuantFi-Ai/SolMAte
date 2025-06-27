@@ -1031,36 +1031,261 @@ function AppContent() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.9 }}
-              className="grid md:grid-cols-3 gap-8"
+              className="text-center mb-16"
             >
-              <div className="text-center p-6">
+              <h2 className="text-4xl md:text-5xl font-bold mb-6">Why Traders Choose Solm8</h2>
+              <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+                The only platform designed specifically for Solana traders to find meaningful connections, share strategies, and grow together.
+              </p>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 1.1 }}
+              className="grid md:grid-cols-3 gap-8 mb-20"
+            >
+              <div className="text-center p-6 border border-white/10 rounded-xl bg-white/5">
                 <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4">
                   <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 715.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                   </svg>
                 </div>
-                <h3 className="text-xl font-semibold mb-2">Smart Matching</h3>
-                <p className="text-gray-400">AI-powered algorithm matches you with compatible traders based on your style and experience.</p>
+                <h3 className="text-xl font-semibold mb-3">Smart Matching Algorithm</h3>
+                <p className="text-gray-400">Our AI analyzes your trading style, experience level, risk tolerance, and portfolio size to match you with compatible traders who share your interests and goals.</p>
               </div>
               
-              <div className="text-center p-6">
+              <div className="text-center p-6 border border-white/10 rounded-xl bg-white/5">
                 <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4">
                   <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                   </svg>
                 </div>
-                <h3 className="text-xl font-semibold mb-2">Real-time Chat</h3>
-                <p className="text-gray-400">Secure messaging system to share insights, strategies, and build trading relationships.</p>
+                <h3 className="text-xl font-semibold mb-3">Real-time Conversations</h3>
+                <p className="text-gray-400">Secure, encrypted messaging system designed for traders. Share alpha, discuss strategies, analyze charts, and build lasting trading partnerships.</p>
               </div>
               
-              <div className="text-center p-6">
+              <div className="text-center p-6 border border-white/10 rounded-xl bg-white/5">
                 <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4">
                   <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                   </svg>
                 </div>
-                <h3 className="text-xl font-semibold mb-2">Portfolio Insights</h3>
-                <p className="text-gray-400">Share your trading stats and learn from successful traders in the community.</p>
+                <h3 className="text-xl font-semibold mb-3">Portfolio & Performance</h3>
+                <p className="text-gray-400">Share your trading achievements, learn from successful strategies, and get insights from traders with proven track records in the Solana ecosystem.</p>
+              </div>
+            </motion.div>
+
+            {/* Social Connection Focus */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 1.3 }}
+              className="text-center mb-16"
+            >
+              <h2 className="text-3xl md:text-4xl font-bold mb-6">More Than Just Trading</h2>
+              <p className="text-lg text-gray-300 max-w-4xl mx-auto mb-8">
+                Solm8 is where the Solana trading community comes together. Find your trading partner, share alpha, learn from experts, and build relationships that go beyond just profit and loss.
+              </p>
+              <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                <div className="text-left p-6 border border-white/10 rounded-xl bg-white/5">
+                  <h4 className="text-xl font-semibold mb-3">🤝 Find Your Trading Partner</h4>
+                  <p className="text-gray-400">Connect with traders who complement your skills. Whether you're looking for someone to bounce ideas off or collaborate on investments, find your perfect match.</p>
+                </div>
+                <div className="text-left p-6 border border-white/10 rounded-xl bg-white/5">
+                  <h4 className="text-xl font-semibold mb-3">🚀 Share Alpha & Insights</h4>
+                  <p className="text-gray-400">Be part of an exclusive community where quality alpha is shared. From early token discoveries to market analysis, learn from the best.</p>
+                </div>
+                <div className="text-left p-6 border border-white/10 rounded-xl bg-white/5">
+                  <h4 className="text-xl font-semibold mb-3">📚 Learn & Teach</h4>
+                  <p className="text-gray-400">Mentor newcomers or learn from veterans. Our community thrives on knowledge sharing and helping each other grow as traders.</p>
+                </div>
+                <div className="text-left p-6 border border-white/10 rounded-xl bg-white/5">
+                  <h4 className="text-xl font-semibold mb-3">🌐 Build Your Network</h4>
+                  <p className="text-gray-400">Expand your circle with like-minded traders. Build relationships that can lead to investment opportunities, partnerships, and lifelong friendships.</p>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+
+        {/* App Screenshots Section */}
+        <div className="py-20 px-6 bg-white/5">
+          <div className="max-w-6xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 1.5 }}
+              className="text-center mb-16"
+            >
+              <h2 className="text-4xl md:text-5xl font-bold mb-6">See Solm8 in Action</h2>
+              <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+                Experience the sleek interface designed specifically for Solana traders
+              </p>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 1.7 }}
+              className="grid md:grid-cols-2 gap-8 mb-12"
+            >
+              {/* Discovery Interface Screenshot */}
+              <div className="space-y-4">
+                <div className="bg-gradient-to-br from-gray-900 to-black rounded-2xl p-6 border border-white/10">
+                  <div className="bg-white/10 rounded-xl p-4 mb-4">
+                    <div className="flex items-center space-x-3 mb-4">
+                      <div className="w-12 h-12 bg-white/20 rounded-full"></div>
+                      <div>
+                        <div className="h-3 bg-white/30 rounded w-24 mb-1"></div>
+                        <div className="h-2 bg-white/20 rounded w-16"></div>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <div className="h-2 bg-white/20 rounded w-full"></div>
+                      <div className="h-2 bg-white/20 rounded w-3/4"></div>
+                      <div className="h-2 bg-white/20 rounded w-1/2"></div>
+                    </div>
+                    <div className="flex space-x-4 mt-4">
+                      <div className="h-8 bg-red-500/30 rounded-full w-16"></div>
+                      <div className="h-8 bg-green-500/30 rounded-full w-16"></div>
+                    </div>
+                  </div>
+                </div>
+                <h3 className="text-xl font-semibold">Discovery Interface</h3>
+                <p className="text-gray-400">Swipe through trader profiles with detailed information about their experience, trading style, and preferences.</p>
+              </div>
+
+              {/* Chat Interface Screenshot */}
+              <div className="space-y-4">
+                <div className="bg-gradient-to-br from-gray-900 to-black rounded-2xl p-6 border border-white/10">
+                  <div className="bg-white/10 rounded-xl p-4">
+                    <div className="space-y-3">
+                      <div className="flex">
+                        <div className="bg-white/20 rounded-2xl rounded-bl-none p-2 max-w-xs">
+                          <div className="h-2 bg-white/40 rounded w-20"></div>
+                        </div>
+                      </div>
+                      <div className="flex justify-end">
+                        <div className="bg-blue-500/30 rounded-2xl rounded-br-none p-2 max-w-xs">
+                          <div className="h-2 bg-white/60 rounded w-24"></div>
+                        </div>
+                      </div>
+                      <div className="flex">
+                        <div className="bg-white/20 rounded-2xl rounded-bl-none p-2 max-w-xs">
+                          <div className="h-2 bg-white/40 rounded w-16"></div>
+                        </div>
+                      </div>
+                      <div className="flex justify-end">
+                        <div className="bg-blue-500/30 rounded-2xl rounded-br-none p-2 max-w-xs">
+                          <div className="h-2 bg-white/60 rounded w-20"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <h3 className="text-xl font-semibold">Secure Messaging</h3>
+                <p className="text-gray-400">Private, encrypted conversations with your matches. Share strategies, alpha, and build meaningful connections.</p>
+              </div>
+
+              {/* Profile Interface Screenshot */}
+              <div className="space-y-4">
+                <div className="bg-gradient-to-br from-gray-900 to-black rounded-2xl p-6 border border-white/10">
+                  <div className="bg-white/10 rounded-xl p-4">
+                    <div className="text-center mb-4">
+                      <div className="w-16 h-16 bg-white/30 rounded-full mx-auto mb-2"></div>
+                      <div className="h-3 bg-white/40 rounded w-20 mx-auto mb-1"></div>
+                      <div className="h-2 bg-white/20 rounded w-16 mx-auto"></div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="bg-white/10 rounded p-2">
+                        <div className="h-2 bg-white/30 rounded w-full mb-1"></div>
+                        <div className="h-1 bg-white/20 rounded w-3/4"></div>
+                      </div>
+                      <div className="bg-white/10 rounded p-2">
+                        <div className="h-2 bg-white/30 rounded w-full mb-1"></div>
+                        <div className="h-1 bg-white/20 rounded w-1/2"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <h3 className="text-xl font-semibold">Detailed Profiles</h3>
+                <p className="text-gray-400">Comprehensive trader profiles showing experience, preferred tokens, trading platforms, and more.</p>
+              </div>
+
+              {/* Matches Interface Screenshot */}
+              <div className="space-y-4">
+                <div className="bg-gradient-to-br from-gray-900 to-black rounded-2xl p-6 border border-white/10">
+                  <div className="bg-white/10 rounded-xl p-4">
+                    <div className="space-y-3">
+                      <div className="flex items-center space-x-3 p-2 bg-white/10 rounded">
+                        <div className="w-8 h-8 bg-white/30 rounded-full"></div>
+                        <div className="flex-1">
+                          <div className="h-2 bg-white/40 rounded w-20 mb-1"></div>
+                          <div className="h-1 bg-white/20 rounded w-16"></div>
+                        </div>
+                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                      </div>
+                      <div className="flex items-center space-x-3 p-2 bg-white/10 rounded">
+                        <div className="w-8 h-8 bg-white/30 rounded-full"></div>
+                        <div className="flex-1">
+                          <div className="h-2 bg-white/40 rounded w-24 mb-1"></div>
+                          <div className="h-1 bg-white/20 rounded w-20"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <h3 className="text-xl font-semibold">Your Matches</h3>
+                <p className="text-gray-400">See all your connections in one place. Track conversations and stay connected with your trading network.</p>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+
+        {/* How It Works Section */}
+        <div className="py-20 px-6">
+          <div className="max-w-6xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 1.9 }}
+              className="text-center mb-16"
+            >
+              <h2 className="text-4xl md:text-5xl font-bold mb-6">How It Works</h2>
+              <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+                Getting started with Solm8 is simple. Here's how to find your trading community:
+              </p>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 2.1 }}
+              className="grid md:grid-cols-4 gap-8"
+            >
+              <div className="text-center">
+                <div className="w-16 h-16 bg-white text-black rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">1</div>
+                <h3 className="text-xl font-semibold mb-2">Create Your Profile</h3>
+                <p className="text-gray-400">Tell us about your trading experience, style, and what you're looking for in a trading partner.</p>
+              </div>
+              
+              <div className="text-center">
+                <div className="w-16 h-16 bg-white text-black rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">2</div>
+                <h3 className="text-xl font-semibold mb-2">Discover Traders</h3>
+                <p className="text-gray-400">Browse through carefully curated profiles of Solana traders who match your criteria and interests.</p>
+              </div>
+              
+              <div className="text-center">
+                <div className="w-16 h-16 bg-white text-black rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">3</div>
+                <h3 className="text-xl font-semibold mb-2">Make Connections</h3>
+                <p className="text-gray-400">Like profiles that interest you. When it's mutual, you'll get matched and can start conversations.</p>
+              </div>
+              
+              <div className="text-center">
+                <div className="w-16 h-16 bg-white text-black rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">4</div>
+                <h3 className="text-xl font-semibold mb-2">Start Trading Together</h3>
+                <p className="text-gray-400">Share strategies, discuss opportunities, and build lasting partnerships in the Solana ecosystem.</p>
               </div>
             </motion.div>
           </div>
