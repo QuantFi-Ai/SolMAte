@@ -1394,6 +1394,10 @@ function AppContent() {
           </div>
         </footer>
 
+        {/* Legal Document Modals */}
+        <PrivacyPolicy isOpen={showPrivacyPolicy} onClose={() => setShowPrivacyPolicy(false)} />
+        <TermsOfService isOpen={showTermsOfService} onClose={() => setShowTermsOfService(false)} />
+
       </div>
     );
   }
