@@ -155,6 +155,10 @@ function AppContent() {
   const [showProfilePopup, setShowProfilePopup] = useState(false);
   const [selectedProfileUser, setSelectedProfileUser] = useState(null);
   const [profilePopupContext, setProfilePopupContext] = useState('matches');
+
+  // Legal document modals
+  const [showPrivacyPolicy, setShowPrivacyPolicy] = useState(false);
+  const [showTermsOfService, setShowTermsOfService] = useState(false);
   
   // Toast notification helper
   const showToastNotification = (message, type = 'info') => {
