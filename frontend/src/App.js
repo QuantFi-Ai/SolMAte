@@ -970,7 +970,7 @@ function AppContent() {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              onClick={() => setCurrentView('login')}
+              onClick={() => setShowPrivacyPolicy(true)}
               className="px-6 py-2 border border-white/20 rounded-full hover:bg-white hover:text-black transition-all duration-300"
             >
               Sign In
@@ -1012,7 +1012,7 @@ function AppContent() {
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                onClick={() => setCurrentView('login')}
+                onClick={() => setShowPrivacyPolicy(true)}
                 className="px-8 py-4 bg-white text-black rounded-full text-lg font-semibold hover:bg-gray-100 transition-all duration-300 shadow-lg"
               >
                 Get Started
@@ -1325,7 +1325,7 @@ function AppContent() {
               transition={{ duration: 0.8, delay: 1.5 }}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              onClick={() => setCurrentView('login')}
+              onClick={() => setShowPrivacyPolicy(true)}
               className="px-10 py-4 bg-white text-black rounded-full text-lg font-bold hover:bg-gray-100 transition-all duration-300 shadow-xl"
             >
               Start Trading Smarter
@@ -1363,14 +1363,14 @@ function AppContent() {
                 </a>
                 <div className="hidden md:block text-gray-600">|</div>
                 <button
-                  onClick={() => setCurrentView('login')}
+                  onClick={() => setShowPrivacyPolicy(true)}
                   className="text-gray-300 hover:text-white transition-colors duration-300"
                 >
                   Privacy Policy
                 </button>
                 <div className="hidden md:block text-gray-600">|</div>
                 <button
-                  onClick={() => setCurrentView('login')}
+                  onClick={() => setShowPrivacyPolicy(true)}
                   className="text-gray-300 hover:text-white transition-colors duration-300"
                 >
                   Terms of Service
