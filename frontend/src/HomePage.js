@@ -481,7 +481,9 @@ const HomePage = ({ onGetStarted, onLogin }) => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-4 gap-8">
             <div>
-              <div className="text-2xl font-bold text-white mb-4">SolM8</div>
+              <div className="flex items-center space-x-2 mb-4">
+                <img src="/logo.svg" alt="SolM8 Logo" className="h-6 w-auto" />
+              </div>
               <p className="text-gray-400">
                 Where trading relationships are born. End the isolation. Start the connection.
               </p>
