@@ -1,14 +1,13 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 60" width="120" height="60">
-  <defs>
-    <style>
-      .logo-text { fill: currentColor; font-family: 'Arial', sans-serif; font-weight: bold; font-size: 36px; }
-    </style>
-  </defs>
-  <!-- S curves that form the infinity-like logo -->
-  <path d="M15 45 C15 35, 25 30, 35 30 C45 30, 55 35, 55 45 C55 55, 45 60, 35 60 C25 60, 15 55, 15 45 Z" fill="currentColor"/>
-  <path d="M25 15 C25 25, 35 30, 45 30 C55 30, 65 25, 65 15 C65 5, 55 0, 45 0 C35 0, 25 5, 25 15 Z" fill="currentColor"/>
-  <path d="M65 15 C65 25, 75 30, 85 30 C95 30, 105 25, 105 15 C105 5, 95 0, 85 0 C75 0, 65 5, 65 15 Z" fill="currentColor"/>
-  <path d="M75 45 C75 35, 85 30, 95 30 C105 30, 115 35, 115 45 C115 55, 105 60, 95 60 C85 60, 75 55, 75 45 Z" fill="currentColor"/>
-  <!-- Connect the curves -->
-  <path d="M35 30 Q60 30 85 30" stroke="currentColor" stroke-width="4" fill="none"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 80" width="200" height="80">
+  <!-- Recreating the 96/S6 logo style from your image -->
+  <!-- Left curved S shape -->
+  <path d="M20 20 C20 10, 30 5, 40 5 C50 5, 60 10, 60 20 C60 30, 50 35, 40 35 C30 35, 20 40, 20 50 C20 60, 30 65, 40 65 C50 65, 60 60, 60 50" 
+        fill="none" stroke="white" stroke-width="8" stroke-linecap="round"/>
+  
+  <!-- Right curved 6 shape -->
+  <path d="M140 20 C140 10, 150 5, 160 5 C170 5, 180 10, 180 20 C180 30, 170 35, 160 35 C150 35, 140 40, 140 50 C140 60, 150 65, 160 65 C170 65, 180 60, 180 50 C180 40, 170 35, 160 35" 
+        fill="none" stroke="white" stroke-width="8" stroke-linecap="round"/>
+  
+  <!-- Bottom curl of the 6 -->
+  <circle cx="160" cy="50" r="15" fill="none" stroke="white" stroke-width="8"/>
 </svg>
