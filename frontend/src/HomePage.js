@@ -122,7 +122,7 @@ const HomePage = ({ onGetStarted, onLogin }) => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-3">
-              <img src="/logo.svg" alt="SolM8 Logo" className="h-8 w-auto" />
+              <img src="/logo.svg" alt="SolM8 Logo" className="h-8 w-auto filter brightness-0 invert" />
               <span className="bg-white text-black px-2 py-1 rounded text-xs font-bold">BETA</span>
             </div>
             <div className="flex items-center space-x-4">
