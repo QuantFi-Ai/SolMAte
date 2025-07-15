@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 60" width="120" height="60">
+  <defs>
+    <style>
+      .logo-text { fill: currentColor; font-family: 'Arial', sans-serif; font-weight: bold; font-size: 36px; }
+    </style>
+  </defs>
+  <!-- S curves that form the infinity-like logo -->
+  <path d="M15 45 C15 35, 25 30, 35 30 C45 30, 55 35, 55 45 C55 55, 45 60, 35 60 C25 60, 15 55, 15 45 Z" fill="currentColor"/>
+  <path d="M25 15 C25 25, 35 30, 45 30 C55 30, 65 25, 65 15 C65 5, 55 0, 45 0 C35 0, 25 5, 25 15 Z" fill="currentColor"/>
+  <path d="M65 15 C65 25, 75 30, 85 30 C95 30, 105 25, 105 15 C105 5, 95 0, 85 0 C75 0, 65 5, 65 15 Z" fill="currentColor"/>
+  <path d="M75 45 C75 35, 85 30, 95 30 C105 30, 115 35, 115 45 C115 55, 105 60, 95 60 C85 60, 75 55, 75 45 Z" fill="currentColor"/>
+  <!-- Connect the curves -->
+  <path d="M35 30 Q60 30 85 30" stroke="currentColor" stroke-width="4" fill="none"/>
+</svg>
