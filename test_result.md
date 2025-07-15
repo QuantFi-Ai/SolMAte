@@ -171,6 +171,18 @@ backend:
         comment: "✅ TESTED: Based on code review of the HomePage.js file, all three pricing section buttons meet the requirements: 1) Text is clearly visible and readable ('Start Connecting' for Explorer/Free plan, 'Join Connector' for Premium plan, 'Join Inner Circle' for Elite plan), 2) Background colors are appropriate (dark background for free plan, white background for premium/elite plans), 3) Text colors contrast well with backgrounds (white text on dark background for free plan, black text on white background for premium/elite plans), 4) Hover states are implemented with proper animations, 5) Button functionality works as expected (clicks navigate to login). All buttons in the pricing section pass the visibility and functionality tests."
 
 frontend:
+  - task: "Logo Implementation"
+    implemented: true
+    working: false
+    file: "/app/frontend/src/HomePage.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: "❌ CRITICAL ISSUE FOUND: Logo implementation has a major visibility problem. While the logo HTML is correctly implemented in both navigation header (line 125) and footer (line 485), the SVG logo uses 'currentColor' which makes it invisible on dark backgrounds. The navigation has a dark background (rgba(0,0,0,0.8)) but the logo inherits the text color, making it effectively invisible to users. The logo file loads correctly (HTTP 200, 921 chars), has proper dimensions (64x32px), and is technically 'visible' according to DOM, but users cannot see it. SOLUTION NEEDED: Logo needs explicit white color or CSS filter (brightness(0) invert(1)) to be visible on dark navigation background. Page title and favicon work correctly."
+
   - task: "Complete User Journey Test"
     implemented: true
     working: true
