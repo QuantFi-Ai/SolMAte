@@ -142,7 +142,43 @@ else:
         allow_headers=["*"],
     )
 
-# OAuth Configuration
+# Global exception handlers for production
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    """Handle validation errors gracefully"""
+    return JSONResponse(
+        status_code=422,
+        content={
+            "error": "Validation Error",
+            "details": exc.errors(),
+            "message": "The request data is invalid"
+        }
+    )
+
+@app.exception_handler(HTTPException)
+async def http_exception_handler(request: Request, exc: HTTPException):
+    """Handle HTTP exceptions gracefully"""
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={
+            "error": exc.detail,
+            "status_code": exc.status_code,
+            "timestamp": datetime.utcnow().isoformat()
+        }
+    )
+
+@app.exception_handler(Exception)
+async def general_exception_handler(request: Request, exc: Exception):
+    """Handle unexpected errors gracefully"""
+    print(f"Unexpected error: {exc}")
+    return JSONResponse(
+        status_code=500,
+        content={
+            "error": "Internal Server Error",
+            "message": "An unexpected error occurred",
+            "timestamp": datetime.utcnow().isoformat()
+        }
+    )
 config = Config()
 oauth = OAuth()
 
