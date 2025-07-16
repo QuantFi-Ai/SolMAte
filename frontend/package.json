@@ -56,12 +56,12 @@
     ]
   },
   "devDependencies": {
-    "autoprefixer": "^10.4.13",
-    "customize-cra": "^1.0.0",
-    "postcss": "^8.4.21",
-    "tailwindcss": "^3.2.7",
-    "webpack": "^5.99.9",
-    "yarn-deduplicate": "^6.0.2"
+    "autoprefixer": "10.4.13",
+    "customize-cra": "1.0.0",
+    "postcss": "8.4.21",
+    "tailwindcss": "3.2.7",
+    "webpack": "5.99.9",
+    "yarn-deduplicate": "6.0.2"
   },
   "resolutions": {
     "react": "18.2.0",
