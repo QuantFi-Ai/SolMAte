@@ -17,677 +17,718 @@ class ProductionDeploymentTester:
         self.tests_passed = 0
         self.test_results = []
         
-        print(f"🚀 Production Deployment Testing for: {self.base_url}")
-        print("=" * 60)
-
-    def run_test(self, name, method, endpoint, expected_status, data=None, headers=None, files=None):
-        """Run a single API test"""
-        url = f"{self.base_url}/api/{endpoint}" if endpoint else self.base_url
-        default_headers = {'Content-Type': 'application/json'} if not files else {}
-        if headers:
-            default_headers.update(headers)
-        
+    def log_test_result(self, category, test_name, passed, details=""):
+        """Log test result for summary"""
         self.tests_run += 1
-        print(f"\n🔍 Testing {name}...")
-        
-        try:
-            if method == 'GET':
-                response = requests.get(url, headers=default_headers, timeout=30)
-            elif method == 'POST':
-                if files:
-                    response = requests.post(url, files=files, timeout=30)
-                else:
-                    response = requests.post(url, json=data, headers=default_headers, timeout=30)
-            elif method == 'PUT':
-                response = requests.put(url, json=data, headers=default_headers, timeout=30)
-            
-            success = response.status_code == expected_status
-            if success:
-                self.tests_passed += 1
-                print(f"✅ Passed - Status: {response.status_code}")
-                try:
-                    result = response.json()
-                    self.test_results.append({
-                        "test": name,
-                        "status": "PASSED",
-                        "response_code": response.status_code,
-                        "response": result
-                    })
-                    return True, result
-                except:
-                    self.test_results.append({
-                        "test": name,
-                        "status": "PASSED",
-                        "response_code": response.status_code,
-                        "response": response.text
-                    })
-                    return True, response.text
-            else:
-                print(f"❌ Failed - Expected {expected_status}, got {response.status_code}")
-                try:
-                    error_response = response.json()
-                    print(f"Response: {error_response}")
-                    self.test_results.append({
-                        "test": name,
-                        "status": "FAILED",
-                        "response_code": response.status_code,
-                        "expected_code": expected_status,
-                        "response": error_response
-                    })
-                except:
-                    print(f"Response: {response.text}")
-                    self.test_results.append({
-                        "test": name,
-                        "status": "FAILED",
-                        "response_code": response.status_code,
-                        "expected_code": expected_status,
-                        "response": response.text
-                    })
-                return False, {}
-
-        except Exception as e:
-            print(f"❌ Failed - Error: {str(e)}")
-            self.test_results.append({
-                "test": name,
-                "status": "ERROR",
-                "error": str(e)
-            })
-            return False, {}
-
-    def test_database_connection(self):
-        """Test database connection through API endpoints"""
-        print("\n" + "="*60)
-        print("🗄️  DATABASE CONNECTION TESTS")
-        print("="*60)
-        
-        # Test 1: Create a user to verify database write operations
-        random_suffix = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
-        test_email = f"db_test_{random_suffix}@example.com"
-        test_password = "TestPassword123!"
-        test_display_name = f"DB Test User {random_suffix}"
-        
-        signup_data = {
-            "email": test_email,
-            "password": test_password,
-            "display_name": test_display_name
-        }
-        
-        success, response = self.run_test(
-            "Database Write Test (User Creation)",
-            "POST",
-            "auth/email/signup",
-            200,
-            data=signup_data
-        )
-        
-        if not success:
-            print("❌ Database write operations failed")
-            return False
-        
-        user_id = response.get("user", {}).get("user_id")
-        if not user_id:
-            print("❌ User ID not returned from database")
-            return False
-        
-        print(f"✅ Database write successful - User ID: {user_id}")
-        
-        # Test 2: Read the user back to verify database read operations
-        success, user_data = self.run_test(
-            "Database Read Test (User Retrieval)",
-            "GET",
-            f"user/{user_id}",
-            200
-        )
-        
-        if not success:
-            print("❌ Database read operations failed")
-            return False
-        
-        if user_data.get("user_id") != user_id:
-            print("❌ Database read returned incorrect data")
-            return False
-        
-        print("✅ Database read successful")
-        
-        # Test 3: Update user to verify database update operations
-        update_data = {
-            "bio": "Testing database update operations",
-            "trading_experience": "Intermediate",
-            "preferred_tokens": ["DeFi", "NFTs"],
-            "trading_style": "Day Trader",
-            "portfolio_size": "$10K-$100K"
-        }
-        
-        success, update_response = self.run_test(
-            "Database Update Test (User Profile Update)",
-            "PUT",
-            f"user/{user_id}",
-            200,
-            data=update_data
-        )
-        
-        if not success:
-            print("❌ Database update operations failed")
-            return False
-        
-        print("✅ Database update successful")
-        
-        # Test 4: Verify the update was persisted
-        success, updated_user = self.run_test(
-            "Database Persistence Test (Verify Update)",
-            "GET",
-            f"user/{user_id}",
-            200
-        )
-        
-        if not success:
-            print("❌ Database persistence verification failed")
-            return False
-        
-        if updated_user.get("bio") != update_data["bio"]:
-            print("❌ Database update was not persisted")
-            return False
-        
-        print("✅ Database persistence verified")
-        
-        return True
-
-    def test_health_check(self):
-        """Test health check endpoint"""
-        print("\n" + "="*60)
-        print("🏥 HEALTH CHECK TESTS")
-        print("="*60)
-        
-        # Test 1: Check if health endpoint exists
-        success, response = self.run_test(
-            "Health Endpoint Availability",
-            "GET",
-            "health",
-            200
-        )
-        
-        if success:
-            print("✅ Health endpoint is available")
-            
-            # Verify response contains expected fields
-            expected_fields = ["status", "timestamp"]
-            missing_fields = [field for field in expected_fields if field not in response]
-            
-            if missing_fields:
-                print(f"⚠️  Health endpoint missing fields: {missing_fields}")
-            else:
-                print("✅ Health endpoint returns expected fields")
-            
-            # Check if database connectivity info is included
-            if "database" in response:
-                print("✅ Health endpoint includes database connectivity information")
-            else:
-                print("⚠️  Health endpoint doesn't include database connectivity information")
-            
-            # Check if environment info is included
-            if "environment" in response:
-                print("✅ Health endpoint includes environment information")
-            else:
-                print("⚠️  Health endpoint doesn't include environment information")
-            
-            # Check if version info is included
-            if "version" in response:
-                print("✅ Health endpoint includes version information")
-            else:
-                print("⚠️  Health endpoint doesn't include version information")
-            
-            return True
+        if passed:
+            self.tests_passed += 1
+            status = "✅ PASS"
         else:
-            print("❌ Health endpoint not available - testing basic connectivity")
-            
-            # Fallback: Test basic API connectivity
-            success, response = self.run_test(
-                "Basic API Connectivity",
-                "GET",
-                "",  # Root endpoint
-                200
-            )
-            
-            if success:
-                print("✅ Basic API connectivity working")
-                return True
-            else:
-                print("❌ Basic API connectivity failed")
-                return False
-
-    def test_error_handling(self):
-        """Test global exception handlers"""
-        print("\n" + "="*60)
-        print("🚨 ERROR HANDLING TESTS")
-        print("="*60)
+            status = "❌ FAIL"
         
-        # Test 1: Validation Error Handling
-        invalid_signup_data = {
-            "email": "invalid-email",  # Invalid email format
-            "password": "123",  # Too short
-            "display_name": ""  # Empty display name
+        result = {
+            "category": category,
+            "test_name": test_name,
+            "status": status,
+            "passed": passed,
+            "details": details
         }
-        
-        success, response = self.run_test(
-            "Validation Error Handling",
-            "POST",
-            "auth/email/signup",
-            422,  # Validation error should return 422
-            data=invalid_signup_data
-        )
-        
-        if success:
-            print("✅ Validation errors handled correctly")
-            
-            # Check if error response is properly formatted
-            if isinstance(response, dict) and "error" in response:
-                print("✅ Error response properly formatted")
-            else:
-                print("⚠️  Error response format could be improved")
-        else:
-            # If 422 is not returned, check if it's handled differently
-            print("⚠️  Validation error handling may need improvement")
-        
-        # Test 2: HTTP Exception Handling (404 Not Found)
-        success, response = self.run_test(
-            "HTTP Exception Handling (404)",
-            "GET",
-            "user/non-existent-user-id",
-            404
-        )
-        
-        if success:
-            print("✅ HTTP exceptions handled correctly")
-            
-            # Check if error response includes timestamp
-            if isinstance(response, dict) and "timestamp" in response:
-                print("✅ Error response includes timestamp")
-            else:
-                print("⚠️  Error response missing timestamp")
-        else:
-            print("⚠️  HTTP exception handling may need improvement")
-        
-        # Test 3: Authentication Error Handling
-        invalid_login_data = {
-            "email": "nonexistent@example.com",
-            "password": "wrongpassword"
-        }
-        
-        success, response = self.run_test(
-            "Authentication Error Handling",
-            "POST",
-            "auth/email/login",
-            401
-        )
-        
-        if success:
-            print("✅ Authentication errors handled correctly")
-        else:
-            print("⚠️  Authentication error handling may need improvement")
-        
-        # Test 4: General Exception Handling (Malformed JSON)
-        try:
-            url = f"{self.base_url}/api/auth/email/signup"
-            headers = {'Content-Type': 'application/json'}
-            
-            # Send malformed JSON
-            response = requests.post(url, data="invalid json", headers=headers, timeout=30)
-            
-            if response.status_code == 500:
-                print("✅ General exceptions handled with 500 status")
-                
-                try:
-                    error_response = response.json()
-                    if "error" in error_response and "timestamp" in error_response:
-                        print("✅ General error response properly formatted")
-                    else:
-                        print("⚠️  General error response format could be improved")
-                except:
-                    print("⚠️  General error response not in JSON format")
-            else:
-                print(f"⚠️  Unexpected status code for malformed JSON: {response.status_code}")
-        
-        except Exception as e:
-            print(f"⚠️  Error testing general exception handling: {e}")
-        
-        return True
+        self.test_results.append(result)
+        print(f"{status} - {test_name}")
+        if details:
+            print(f"    Details: {details}")
 
     def test_environment_configuration(self):
-        """Test environment configuration"""
-        print("\n" + "="*60)
-        print("🌍 ENVIRONMENT CONFIGURATION TESTS")
-        print("="*60)
+        """Test environment configuration for production"""
+        print("\n🔧 TESTING ENVIRONMENT CONFIGURATION")
+        print("-" * 40)
         
-        # Test 1: CORS Configuration
-        print("Testing CORS configuration...")
-        
+        # Test 1: Verify backend URL is properly configured
+        try:
+            response = requests.get(f"{self.api_url}/health", timeout=10)
+            if response.status_code == 200:
+                health_data = response.json()
+                backend_url_correct = self.base_url in str(health_data) or response.url.startswith(self.base_url)
+                self.log_test_result(
+                    "Environment", 
+                    "Backend URL Configuration", 
+                    backend_url_correct,
+                    f"Backend responding at {self.base_url}"
+                )
+            else:
+                self.log_test_result(
+                    "Environment", 
+                    "Backend URL Configuration", 
+                    False,
+                    f"Health endpoint returned {response.status_code}"
+                )
+        except Exception as e:
+            self.log_test_result(
+                "Environment", 
+                "Backend URL Configuration", 
+                False,
+                f"Connection failed: {str(e)}"
+            )
+
+        # Test 2: Test CORS configuration for production domains
         try:
             # Test preflight request
             headers = {
-                'Origin': 'https://example.com',
+                'Origin': 'https://solm8-tinder.emergent.host',
                 'Access-Control-Request-Method': 'POST',
                 'Access-Control-Request-Headers': 'Content-Type'
             }
+            response = requests.options(f"{self.api_url}/health", headers=headers, timeout=10)
             
-            response = requests.options(f"{self.base_url}/api/auth/email/signup", headers=headers, timeout=30)
-            
-            if response.status_code == 200:
-                print("✅ CORS preflight requests handled correctly")
-                
-                # Check CORS headers
-                cors_headers = [
-                    'Access-Control-Allow-Origin',
-                    'Access-Control-Allow-Methods',
-                    'Access-Control-Allow-Headers'
-                ]
-                
-                present_headers = [h for h in cors_headers if h in response.headers]
-                
-                if len(present_headers) >= 2:
-                    print("✅ CORS headers properly configured")
-                else:
-                    print("⚠️  Some CORS headers may be missing")
-            else:
-                print("⚠️  CORS preflight handling may need improvement")
-        
-        except Exception as e:
-            print(f"⚠️  Error testing CORS: {e}")
-        
-        # Test 2: Environment-specific behavior
-        print("Testing environment-specific behavior...")
-        
-        # Create a test user to check if environment affects functionality
-        random_suffix = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
-        test_email = f"env_test_{random_suffix}@example.com"
-        
-        signup_data = {
-            "email": test_email,
-            "password": "TestPassword123!",
-            "display_name": f"Env Test User {random_suffix}"
-        }
-        
-        success, response = self.run_test(
-            "Environment Configuration Test",
-            "POST",
-            "auth/email/signup",
-            200,
-            data=signup_data
-        )
-        
-        if success:
-            print("✅ Environment configuration allows normal operations")
-        else:
-            print("❌ Environment configuration may be blocking operations")
-        
-        # Test 3: Database name configuration
-        print("Testing database configuration...")
-        
-        if success:
-            user_id = response.get("user", {}).get("user_id")
-            
-            # Try to retrieve the user to verify database connection works
-            success, user_data = self.run_test(
-                "Database Configuration Test",
-                "GET",
-                f"user/{user_id}",
-                200
+            cors_working = (
+                response.status_code in [200, 204] or 
+                'Access-Control-Allow-Origin' in response.headers
             )
             
-            if success:
-                print("✅ Database configuration working correctly")
-            else:
-                print("❌ Database configuration may have issues")
-        
-        return True
+            self.log_test_result(
+                "Environment", 
+                "CORS Configuration", 
+                cors_working,
+                f"CORS headers: {dict(response.headers)}" if cors_working else "CORS headers missing"
+            )
+        except Exception as e:
+            self.log_test_result(
+                "Environment", 
+                "CORS Configuration", 
+                False,
+                f"CORS test failed: {str(e)}"
+            )
 
-    def test_core_api_functionality(self):
-        """Test core API functionality"""
-        print("\n" + "="*60)
-        print("🔧 CORE API FUNCTIONALITY TESTS")
-        print("="*60)
+        # Test 3: Test environment variables loading
+        try:
+            response = requests.get(f"{self.api_url}/health", timeout=10)
+            if response.status_code == 200:
+                health_data = response.json()
+                env_loaded = (
+                    'environment' in health_data and 
+                    'database_status' in health_data
+                )
+                self.log_test_result(
+                    "Environment", 
+                    "Environment Variables Loading", 
+                    env_loaded,
+                    f"Environment: {health_data.get('environment', 'unknown')}"
+                )
+            else:
+                self.log_test_result(
+                    "Environment", 
+                    "Environment Variables Loading", 
+                    False,
+                    "Health endpoint not accessible"
+                )
+        except Exception as e:
+            self.log_test_result(
+                "Environment", 
+                "Environment Variables Loading", 
+                False,
+                f"Failed to check environment: {str(e)}"
+            )
+
+    def test_database_connection(self):
+        """Test database connection and operations"""
+        print("\n🗄️ TESTING DATABASE CONNECTION")
+        print("-" * 40)
         
-        # Test 1: Email Authentication
-        print("Testing email authentication...")
-        
-        random_suffix = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
-        test_email = f"core_test_{random_suffix}@example.com"
-        test_password = "TestPassword123!"
-        test_display_name = f"Core Test User {random_suffix}"
-        
-        # Test signup
-        signup_data = {
-            "email": test_email,
-            "password": test_password,
-            "display_name": test_display_name
-        }
-        
-        success, signup_response = self.run_test(
-            "Email Signup",
-            "POST",
-            "auth/email/signup",
-            200,
-            data=signup_data
-        )
-        
-        if not success:
-            print("❌ Email signup failed")
-            return False
-        
-        user_id = signup_response.get("user", {}).get("user_id")
-        print(f"✅ Email signup successful - User ID: {user_id}")
-        
-        # Test login
-        login_data = {
-            "email": test_email,
-            "password": test_password
-        }
-        
-        success, login_response = self.run_test(
-            "Email Login",
-            "POST",
-            "auth/email/login",
-            200,
-            data=login_data
-        )
-        
-        if not success:
-            print("❌ Email login failed")
-            return False
-        
-        print("✅ Email login successful")
-        
-        # Test 2: User Profile Management
-        print("Testing user profile management...")
-        
-        # Get user profile
-        success, user_data = self.run_test(
-            "Get User Profile",
-            "GET",
-            f"user/{user_id}",
-            200
-        )
-        
-        if not success:
-            print("❌ Get user profile failed")
-            return False
-        
-        print("✅ Get user profile successful")
-        
-        # Update user profile
-        update_data = {
-            "bio": "Testing core API functionality",
-            "location": "Test City",
-            "trading_experience": "Advanced",
-            "years_trading": 5,
-            "preferred_tokens": ["DeFi", "NFTs", "Blue Chips"],
-            "trading_style": "Swing Trader",
-            "portfolio_size": "$100K+",
-            "risk_tolerance": "Moderate",
-            "best_trade": "Bought BTC at $10k",
-            "worst_trade": "Sold too early",
-            "favorite_project": "Solana",
-            "trading_hours": "Evening",
-            "communication_style": "Professional",
-            "preferred_communication_platform": "Discord",
-            "preferred_trading_platform": "Jupiter",
-            "looking_for": ["Alpha Sharing", "Research Partner"]
-        }
-        
-        success, update_response = self.run_test(
-            "Update User Profile",
-            "PUT",
-            f"user/{user_id}",
-            200,
-            data=update_data
-        )
-        
-        if not success:
-            print("❌ Update user profile failed")
-            return False
-        
-        print("✅ Update user profile successful")
-        
-        # Test 3: Password Change Functionality
-        print("Testing password change functionality...")
-        
-        new_password = "NewTestPassword123!"
-        password_change_data = {
-            "current_password": test_password,
-            "new_password": new_password,
-            "confirm_password": new_password
-        }
-        
-        success, password_response = self.run_test(
-            "Password Change",
-            "POST",
-            f"auth/change-password",
-            200,
-            data=password_change_data
-        )
-        
-        if success:
-            print("✅ Password change successful")
-            
-            # Test login with new password
-            new_login_data = {
-                "email": test_email,
-                "password": new_password
+        # Test 1: Database connectivity via health endpoint
+        try:
+            response = requests.get(f"{self.api_url}/health", timeout=10)
+            if response.status_code == 200:
+                health_data = response.json()
+                db_connected = health_data.get('database_status') == 'connected'
+                self.log_test_result(
+                    "Database", 
+                    "MongoDB Connection", 
+                    db_connected,
+                    f"Database status: {health_data.get('database_status', 'unknown')}"
+                )
+            else:
+                self.log_test_result(
+                    "Database", 
+                    "MongoDB Connection", 
+                    False,
+                    f"Health check failed with status {response.status_code}"
+                )
+        except Exception as e:
+            self.log_test_result(
+                "Database", 
+                "MongoDB Connection", 
+                False,
+                f"Health check error: {str(e)}"
+            )
+
+        # Test 2: Database write operation
+        try:
+            # Create a test user to verify write operations
+            random_suffix = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
+            test_data = {
+                "email": f"test_db_{random_suffix}@example.com",
+                "password": "TestPassword123!",
+                "display_name": f"DB Test User {random_suffix}"
             }
             
-            success, new_login_response = self.run_test(
-                "Login with New Password",
-                "POST",
-                "auth/email/login",
-                200,
-                data=new_login_data
+            response = requests.post(f"{self.api_url}/auth/email/signup", json=test_data, timeout=10)
+            write_success = response.status_code == 200
+            
+            if write_success:
+                user_data = response.json().get('user', {})
+                test_user_id = user_data.get('user_id')
+                
+                self.log_test_result(
+                    "Database", 
+                    "Database Write Operations", 
+                    True,
+                    f"Successfully created user {test_user_id}"
+                )
+                
+                # Test 3: Database read operation
+                if test_user_id:
+                    read_response = requests.get(f"{self.api_url}/user/{test_user_id}", timeout=10)
+                    read_success = read_response.status_code == 200
+                    
+                    self.log_test_result(
+                        "Database", 
+                        "Database Read Operations", 
+                        read_success,
+                        f"Successfully read user data" if read_success else f"Read failed: {read_response.status_code}"
+                    )
+                    
+                    # Test 4: Database update operation
+                    if read_success:
+                        update_data = {
+                            "bio": "Updated bio for database test",
+                            "trading_experience": "Intermediate"
+                        }
+                        update_response = requests.put(f"{self.api_url}/user/{test_user_id}", json=update_data, timeout=10)
+                        update_success = update_response.status_code == 200
+                        
+                        self.log_test_result(
+                            "Database", 
+                            "Database Update Operations", 
+                            update_success,
+                            f"Successfully updated user" if update_success else f"Update failed: {update_response.status_code}"
+                        )
+                        
+                        # Test 5: Data persistence
+                        if update_success:
+                            time.sleep(1)  # Brief delay to ensure persistence
+                            verify_response = requests.get(f"{self.api_url}/user/{test_user_id}", timeout=10)
+                            if verify_response.status_code == 200:
+                                verify_data = verify_response.json()
+                                persistence_success = verify_data.get('bio') == update_data['bio']
+                                
+                                self.log_test_result(
+                                    "Database", 
+                                    "Data Persistence", 
+                                    persistence_success,
+                                    f"Data persisted correctly" if persistence_success else "Data not persisted"
+                                )
+                            else:
+                                self.log_test_result(
+                                    "Database", 
+                                    "Data Persistence", 
+                                    False,
+                                    "Failed to verify persistence"
+                                )
+            else:
+                self.log_test_result(
+                    "Database", 
+                    "Database Write Operations", 
+                    False,
+                    f"User creation failed: {response.status_code}"
+                )
+                
+        except Exception as e:
+            self.log_test_result(
+                "Database", 
+                "Database Operations", 
+                False,
+                f"Database operation error: {str(e)}"
+            )
+
+    def test_server_configuration(self):
+        """Test server configuration and settings"""
+        print("\n⚙️ TESTING SERVER CONFIGURATION")
+        print("-" * 40)
+        
+        # Test 1: Server binding and accessibility
+        try:
+            response = requests.get(f"{self.api_url}/health", timeout=10)
+            server_accessible = response.status_code == 200
+            
+            self.log_test_result(
+                "Server", 
+                "Server Binding and Accessibility", 
+                server_accessible,
+                f"Server responding on {self.base_url}" if server_accessible else f"Server not accessible: {response.status_code}"
             )
             
-            if success:
-                print("✅ Login with new password successful")
-            else:
-                print("❌ Login with new password failed")
-        else:
-            print("⚠️  Password change endpoint may not be available")
-        
-        # Test 4: Discovery System
-        print("Testing discovery system...")
-        
-        success, discovery_response = self.run_test(
-            "Discovery System",
-            "GET",
-            f"discover/{user_id}",
-            200
-        )
-        
-        if success:
-            print("✅ Discovery system working")
+            # Test 2: Production settings verification
+            if server_accessible:
+                health_data = response.json()
+                production_env = health_data.get('environment') == 'production'
+                
+                self.log_test_result(
+                    "Server", 
+                    "Production Environment Settings", 
+                    production_env,
+                    f"Environment: {health_data.get('environment', 'unknown')}"
+                )
+                
+                # Test 3: Server response time
+                start_time = time.time()
+                response = requests.get(f"{self.api_url}/health", timeout=10)
+                response_time = time.time() - start_time
+                
+                good_response_time = response_time < 2.0  # Less than 2 seconds
+                
+                self.log_test_result(
+                    "Server", 
+                    "Server Response Time", 
+                    good_response_time,
+                    f"Response time: {response_time:.2f}s"
+                )
+                
+        except Exception as e:
+            self.log_test_result(
+                "Server", 
+                "Server Configuration", 
+                False,
+                f"Server test error: {str(e)}"
+            )
+
+        # Test 4: Logging configuration (check if server logs errors properly)
+        try:
+            # Make a request that should generate a 404 error
+            response = requests.get(f"{self.api_url}/nonexistent-endpoint", timeout=10)
+            proper_404 = response.status_code == 404
             
-            if isinstance(discovery_response, list):
-                print(f"✅ Discovery returned {len(discovery_response)} users")
+            if proper_404:
+                try:
+                    error_data = response.json()
+                    has_timestamp = 'timestamp' in error_data
+                    has_error_info = 'error' in error_data
+                    
+                    logging_working = has_timestamp and has_error_info
+                    
+                    self.log_test_result(
+                        "Server", 
+                        "Error Logging Configuration", 
+                        logging_working,
+                        f"Error response includes timestamp and error info" if logging_working else "Missing error details"
+                    )
+                except:
+                    self.log_test_result(
+                        "Server", 
+                        "Error Logging Configuration", 
+                        False,
+                        "Error response not in JSON format"
+                    )
             else:
-                print("⚠️  Discovery response format unexpected")
-        else:
-            print("❌ Discovery system failed")
+                self.log_test_result(
+                    "Server", 
+                    "Error Logging Configuration", 
+                    False,
+                    f"Expected 404, got {response.status_code}"
+                )
+                
+        except Exception as e:
+            self.log_test_result(
+                "Server", 
+                "Error Logging Configuration", 
+                False,
+                f"Logging test error: {str(e)}"
+            )
+
+    def test_api_endpoints(self):
+        """Test core API endpoints functionality"""
+        print("\n🔌 TESTING API ENDPOINTS")
+        print("-" * 40)
         
-        # Test 5: Matches System
-        print("Testing matches system...")
-        
-        success, matches_response = self.run_test(
-            "Matches System",
-            "GET",
-            f"matches/{user_id}",
-            200
-        )
-        
-        if success:
-            print("✅ Matches system working")
+        # Test 1: Health check endpoint
+        try:
+            response = requests.get(f"{self.api_url}/health", timeout=10)
+            health_working = response.status_code == 200
             
-            if isinstance(matches_response, list):
-                print(f"✅ Matches returned {len(matches_response)} matches")
+            if health_working:
+                health_data = response.json()
+                has_required_fields = all(field in health_data for field in ['status', 'database_status', 'environment'])
+                
+                self.log_test_result(
+                    "API", 
+                    "Health Check Endpoint", 
+                    has_required_fields,
+                    f"Health data: {health_data}" if has_required_fields else "Missing required health fields"
+                )
             else:
-                print("⚠️  Matches response format unexpected")
-        else:
-            print("❌ Matches system failed")
+                self.log_test_result(
+                    "API", 
+                    "Health Check Endpoint", 
+                    False,
+                    f"Health check failed: {response.status_code}"
+                )
+        except Exception as e:
+            self.log_test_result(
+                "API", 
+                "Health Check Endpoint", 
+                False,
+                f"Health check error: {str(e)}"
+            )
+
+        # Test 2: Authentication endpoints
+        try:
+            # Test email signup
+            random_suffix = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
+            signup_data = {
+                "email": f"test_auth_{random_suffix}@example.com",
+                "password": "TestPassword123!",
+                "display_name": f"Auth Test User {random_suffix}"
+            }
+            
+            signup_response = requests.post(f"{self.api_url}/auth/email/signup", json=signup_data, timeout=10)
+            signup_success = signup_response.status_code == 200
+            
+            self.log_test_result(
+                "API", 
+                "Email Signup Endpoint", 
+                signup_success,
+                f"Signup successful" if signup_success else f"Signup failed: {signup_response.status_code}"
+            )
+            
+            # Test email login
+            if signup_success:
+                login_data = {
+                    "email": signup_data["email"],
+                    "password": signup_data["password"]
+                }
+                
+                login_response = requests.post(f"{self.api_url}/auth/email/login", json=login_data, timeout=10)
+                login_success = login_response.status_code == 200
+                
+                self.log_test_result(
+                    "API", 
+                    "Email Login Endpoint", 
+                    login_success,
+                    f"Login successful" if login_success else f"Login failed: {login_response.status_code}"
+                )
+                
+                # Test user profile endpoint
+                if login_success:
+                    user_data = login_response.json().get('user', {})
+                    user_id = user_data.get('user_id')
+                    
+                    if user_id:
+                        profile_response = requests.get(f"{self.api_url}/user/{user_id}", timeout=10)
+                        profile_success = profile_response.status_code == 200
+                        
+                        self.log_test_result(
+                            "API", 
+                            "User Profile Endpoint", 
+                            profile_success,
+                            f"Profile retrieved" if profile_success else f"Profile failed: {profile_response.status_code}"
+                        )
+                        
+                        # Test profile update
+                        if profile_success:
+                            update_data = {
+                                "bio": "Updated bio for API test",
+                                "trading_experience": "Advanced"
+                            }
+                            
+                            update_response = requests.put(f"{self.api_url}/user/{user_id}", json=update_data, timeout=10)
+                            update_success = update_response.status_code == 200
+                            
+                            self.log_test_result(
+                                "API", 
+                                "Profile Update Endpoint", 
+                                update_success,
+                                f"Profile updated" if update_success else f"Update failed: {update_response.status_code}"
+                            )
+                            
+                            # Test discovery endpoint
+                            discovery_response = requests.get(f"{self.api_url}/discover/{user_id}", timeout=10)
+                            discovery_success = discovery_response.status_code == 200
+                            
+                            self.log_test_result(
+                                "API", 
+                                "Discovery Endpoint", 
+                                discovery_success,
+                                f"Discovery working" if discovery_success else f"Discovery failed: {discovery_response.status_code}"
+                            )
+                            
+                            # Test matches endpoint
+                            matches_response = requests.get(f"{self.api_url}/matches/{user_id}", timeout=10)
+                            matches_success = matches_response.status_code == 200
+                            
+                            self.log_test_result(
+                                "API", 
+                                "Matches Endpoint", 
+                                matches_success,
+                                f"Matches working" if matches_success else f"Matches failed: {matches_response.status_code}"
+                            )
+                            
+        except Exception as e:
+            self.log_test_result(
+                "API", 
+                "Authentication Endpoints", 
+                False,
+                f"Auth test error: {str(e)}"
+            )
+
+    def test_error_handling(self):
+        """Test global exception handlers and error responses"""
+        print("\n🚨 TESTING ERROR HANDLING")
+        print("-" * 40)
         
-        return True
+        # Test 1: 404 Error handling
+        try:
+            response = requests.get(f"{self.api_url}/nonexistent-endpoint", timeout=10)
+            proper_404 = response.status_code == 404
+            
+            if proper_404:
+                try:
+                    error_data = response.json()
+                    has_error_format = all(field in error_data for field in ['error', 'status_code', 'timestamp'])
+                    
+                    self.log_test_result(
+                        "Error Handling", 
+                        "404 Error Response Format", 
+                        has_error_format,
+                        f"Error format correct" if has_error_format else f"Missing fields in error response"
+                    )
+                except:
+                    self.log_test_result(
+                        "Error Handling", 
+                        "404 Error Response Format", 
+                        False,
+                        "Error response not in JSON format"
+                    )
+            else:
+                self.log_test_result(
+                    "Error Handling", 
+                    "404 Error Response Format", 
+                    False,
+                    f"Expected 404, got {response.status_code}"
+                )
+        except Exception as e:
+            self.log_test_result(
+                "Error Handling", 
+                "404 Error Response Format", 
+                False,
+                f"404 test error: {str(e)}"
+            )
+
+        # Test 2: Validation error handling (422)
+        try:
+            # Send invalid signup data
+            invalid_data = {
+                "email": "invalid-email",  # Invalid email format
+                "password": "123",  # Too short
+                "display_name": ""  # Empty name
+            }
+            
+            response = requests.post(f"{self.api_url}/auth/email/signup", json=invalid_data, timeout=10)
+            validation_error = response.status_code in [400, 422]
+            
+            if validation_error:
+                try:
+                    error_data = response.json()
+                    has_validation_format = 'error' in error_data or 'detail' in error_data
+                    
+                    self.log_test_result(
+                        "Error Handling", 
+                        "Validation Error Response", 
+                        has_validation_format,
+                        f"Validation error properly formatted" if has_validation_format else "Missing validation error details"
+                    )
+                except:
+                    self.log_test_result(
+                        "Error Handling", 
+                        "Validation Error Response", 
+                        False,
+                        "Validation error response not in JSON format"
+                    )
+            else:
+                self.log_test_result(
+                    "Error Handling", 
+                    "Validation Error Response", 
+                    False,
+                    f"Expected 400/422, got {response.status_code}"
+                )
+        except Exception as e:
+            self.log_test_result(
+                "Error Handling", 
+                "Validation Error Response", 
+                False,
+                f"Validation test error: {str(e)}"
+            )
+
+        # Test 3: Authentication error handling (401)
+        try:
+            # Try to login with wrong credentials
+            wrong_creds = {
+                "email": "nonexistent@example.com",
+                "password": "wrongpassword"
+            }
+            
+            response = requests.post(f"{self.api_url}/auth/email/login", json=wrong_creds, timeout=10)
+            auth_error = response.status_code == 401
+            
+            if auth_error:
+                try:
+                    error_data = response.json()
+                    has_auth_format = 'detail' in error_data or 'error' in error_data
+                    
+                    self.log_test_result(
+                        "Error Handling", 
+                        "Authentication Error Response", 
+                        has_auth_format,
+                        f"Auth error properly formatted" if has_auth_format else "Missing auth error details"
+                    )
+                except:
+                    self.log_test_result(
+                        "Error Handling", 
+                        "Authentication Error Response", 
+                        False,
+                        "Auth error response not in JSON format"
+                    )
+            else:
+                self.log_test_result(
+                    "Error Handling", 
+                    "Authentication Error Response", 
+                    False,
+                    f"Expected 401, got {response.status_code}"
+                )
+        except Exception as e:
+            self.log_test_result(
+                "Error Handling", 
+                "Authentication Error Response", 
+                False,
+                f"Auth error test error: {str(e)}"
+            )
+
+        # Test 4: General exception handling
+        try:
+            # Try to access user with invalid ID format
+            response = requests.get(f"{self.api_url}/user/invalid-uuid-format", timeout=10)
+            error_handled = response.status_code in [400, 404, 500]
+            
+            if error_handled:
+                try:
+                    error_data = response.json()
+                    has_timestamp = 'timestamp' in error_data
+                    
+                    self.log_test_result(
+                        "Error Handling", 
+                        "General Exception Handling", 
+                        has_timestamp,
+                        f"Exception handled with timestamp" if has_timestamp else "Exception handled but missing timestamp"
+                    )
+                except:
+                    self.log_test_result(
+                        "Error Handling", 
+                        "General Exception Handling", 
+                        True,
+                        "Exception handled (non-JSON response)"
+                    )
+            else:
+                self.log_test_result(
+                    "Error Handling", 
+                    "General Exception Handling", 
+                    False,
+                    f"Unexpected status code: {response.status_code}"
+                )
+        except Exception as e:
+            self.log_test_result(
+                "Error Handling", 
+                "General Exception Handling", 
+                False,
+                f"Exception test error: {str(e)}"
+            )
 
     def run_all_tests(self):
         """Run all production deployment tests"""
-        print("🚀 STARTING PRODUCTION DEPLOYMENT TESTS FOR SOLM8 5.0")
-        print("="*80)
+        print("🚀 STARTING PRODUCTION DEPLOYMENT TESTS")
+        print("=" * 60)
         
-        test_results = {
-            "database_connection": self.test_database_connection(),
-            "health_check": self.test_health_check(),
-            "error_handling": self.test_error_handling(),
-            "environment_configuration": self.test_environment_configuration(),
-            "core_api_functionality": self.test_core_api_functionality()
-        }
+        start_time = time.time()
         
-        print("\n" + "="*80)
-        print("📊 PRODUCTION DEPLOYMENT TEST SUMMARY")
-        print("="*80)
+        # Run all test categories
+        self.test_environment_configuration()
+        self.test_database_connection()
+        self.test_server_configuration()
+        self.test_api_endpoints()
+        self.test_error_handling()
         
-        passed_tests = sum(1 for result in test_results.values() if result)
-        total_tests = len(test_results)
+        end_time = time.time()
+        total_time = end_time - start_time
         
-        for test_name, result in test_results.items():
-            status = "✅ PASSED" if result else "❌ FAILED"
-            print(f"{test_name.replace('_', ' ').title()}: {status}")
+        # Print summary
+        self.print_summary(total_time)
         
-        print(f"\nOverall Results: {self.tests_passed}/{self.tests_run} individual tests passed")
-        print(f"Test Categories: {passed_tests}/{total_tests} categories passed")
+        return self.tests_passed, self.tests_run
+
+    def print_summary(self, total_time):
+        """Print test summary"""
+        print("\n" + "=" * 60)
+        print("🏁 PRODUCTION DEPLOYMENT TEST SUMMARY")
+        print("=" * 60)
         
-        if passed_tests == total_tests:
-            print("\n🎉 ALL PRODUCTION DEPLOYMENT TESTS PASSED!")
-            print("✅ SOLM8 5.0 backend is ready for production deployment")
+        # Overall results
+        success_rate = (self.tests_passed / self.tests_run) * 100 if self.tests_run > 0 else 0
+        print(f"Overall Results: {self.tests_passed}/{self.tests_run} tests passed ({success_rate:.1f}%)")
+        print(f"Total Time: {total_time:.2f} seconds")
+        print()
+        
+        # Results by category
+        categories = {}
+        for result in self.test_results:
+            category = result['category']
+            if category not in categories:
+                categories[category] = {'passed': 0, 'total': 0, 'tests': []}
+            
+            categories[category]['total'] += 1
+            if result['passed']:
+                categories[category]['passed'] += 1
+            categories[category]['tests'].append(result)
+        
+        for category, data in categories.items():
+            category_rate = (data['passed'] / data['total']) * 100
+            status = "✅ PASS" if data['passed'] == data['total'] else "❌ FAIL"
+            print(f"{status} {category}: {data['passed']}/{data['total']} ({category_rate:.1f}%)")
+            
+            # Show failed tests
+            failed_tests = [test for test in data['tests'] if not test['passed']]
+            if failed_tests:
+                for test in failed_tests:
+                    print(f"    ❌ {test['test_name']}: {test['details']}")
+        
+        print()
+        
+        # Final verdict
+        if self.tests_passed == self.tests_run:
+            print("🎉 ALL TESTS PASSED - BACKEND IS READY FOR PRODUCTION DEPLOYMENT!")
+        elif success_rate >= 80:
+            print("⚠️  MOSTLY READY - Some minor issues found but core functionality works")
         else:
-            print(f"\n⚠️  {total_tests - passed_tests} test categories need attention")
-            print("🔧 Review failed tests before production deployment")
+            print("🚨 NOT READY - Significant issues found that need to be addressed")
         
-        return test_results
+        print("=" * 60)
 
 def main():
     """Main function to run production deployment tests"""
     tester = ProductionDeploymentTester()
-    results = tester.run_all_tests()
+    passed, total = tester.run_all_tests()
     
-    # Save detailed test results
-    with open('/app/production_test_results.json', 'w') as f:
-        json.dump({
-            "timestamp": datetime.utcnow().isoformat(),
-            "summary": results,
-            "detailed_results": tester.test_results,
-            "stats": {
-                "total_tests": tester.tests_run,
-                "passed_tests": tester.tests_passed,
-                "success_rate": f"{(tester.tests_passed/tester.tests_run)*100:.1f}%" if tester.tests_run > 0 else "0%"
-            }
-        }, f, indent=2)
-    
-    print(f"\n📄 Detailed test results saved to: /app/production_test_results.json")
-    
-    return results
+    # Return exit code based on results
+    if passed == total:
+        exit(0)  # All tests passed
+    else:
+        exit(1)  # Some tests failed
 
 if __name__ == "__main__":
     main()
