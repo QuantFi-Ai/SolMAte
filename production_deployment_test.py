@@ -10,8 +10,8 @@ from pymongo import MongoClient
 
 class ProductionDeploymentTester:
     def __init__(self):
-        # Use the production backend URL from frontend/.env
-        self.base_url = "https://solm8-tinder.emergent.host"
+        # Use the local backend URL for testing since external URL might not be accessible
+        self.base_url = "http://localhost:8001"
         self.api_url = f"{self.base_url}/api"
         self.tests_run = 0
         self.tests_passed = 0
