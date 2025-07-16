@@ -12,7 +12,6 @@
     "@babel/runtime": "^7.22.0",
     "tslib": "^2.6.2",
     "typescript": "^5.3.3",
-    "fastestsmallesttextencoderdecoder": "^1.0.22",
     "ws": "^8.18.0",
     "@types/react": "^18.0.0",
     "@testing-library/dom": "^8.20.0",
