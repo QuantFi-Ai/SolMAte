@@ -678,7 +678,7 @@ def main():
                 "passed_tests": tester.tests_passed,
                 "success_rate": f"{(tester.tests_passed/tester.tests_run)*100:.1f}%" if tester.tests_run > 0 else "0%"
             }
-        }, indent=2)
+        }, f, indent=2)
     
     print(f"\n📄 Detailed test results saved to: /app/production_test_results.json")
     
