@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@babel/core": "^7.22.0",
+    "@babel/preset-env": "^7.22.0",
     "@react-spring/web": "^10.0.1",
     "@solana/wallet-adapter-base": "^0.9.26",
     "@solana/wallet-adapter-react": "^0.15.38",
