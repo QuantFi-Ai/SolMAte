@@ -1667,7 +1667,35 @@ async def change_password(request_data: dict):
 
 @app.get("/api/health")
 async def health_check():
-    return {"status": "healthy", "service": "Solm8 API"}
+    """Enhanced health check for production deployment"""
+    try:
+        # Test database connectivity
+        client.admin.command('ping')
+        db_status = "healthy"
+        
+        # Get database info
+        db_info = {
+            "name": DB_NAME,
+            "connected": True,
+            "collections": len(db.list_collection_names())
+        }
+        
+    except Exception as e:
+        db_status = "unhealthy"
+        db_info = {
+            "name": DB_NAME,
+            "connected": False,
+            "error": str(e)
+        }
+    
+    return {
+        "status": "healthy" if db_status == "healthy" else "degraded",
+        "service": "Solm8 API",
+        "version": "1.0.0",
+        "environment": ENVIRONMENT,
+        "database": db_info,
+        "timestamp": datetime.utcnow().isoformat()
+    }
 
 # Premium Subscription Endpoints
 
