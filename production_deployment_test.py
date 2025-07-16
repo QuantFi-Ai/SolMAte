@@ -1,19 +1,24 @@
 import requests
-import unittest
-import uuid
 import os
 import json
+import time
+import uuid
 import random
 import string
-from datetime import datetime, timedelta
+from datetime import datetime
 from pymongo import MongoClient
 
 class ProductionDeploymentTester:
-    def __init__(self, base_url="https://5ab0f635-9ff1-4325-81ed-c868d2618fac.preview.emergentagent.com"):
-        self.base_url = base_url
+    def __init__(self):
+        # Use the production backend URL from frontend/.env
+        self.base_url = "https://solm8-tinder.emergent.host"
+        self.api_url = f"{self.base_url}/api"
         self.tests_run = 0
         self.tests_passed = 0
         self.test_results = []
+        
+        print(f"🚀 Production Deployment Testing for: {self.base_url}")
+        print("=" * 60)
 
     def run_test(self, name, method, endpoint, expected_status, data=None, headers=None, files=None):
         """Run a single API test"""
