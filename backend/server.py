@@ -7,7 +7,8 @@ from datetime import datetime, timedelta, timedelta
 from typing import List, Optional
 from fastapi import FastAPI, HTTPException, Request, WebSocket, WebSocketDisconnect, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import RedirectResponse
+from fastapi.responses import RedirectResponse, JSONResponse
+from fastapi.exceptions import RequestValidationError
 from pydantic import BaseModel, EmailStr
 from pymongo import MongoClient
 import asyncio
