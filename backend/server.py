@@ -3039,4 +3039,18 @@ async def websocket_endpoint(websocket: WebSocket, user_id: str):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8001)
+    
+    # Production server configuration
+    HOST = os.environ.get('HOST', '0.0.0.0')
+    PORT = int(os.environ.get('PORT', 8001))
+    WORKERS = int(os.environ.get('WORKERS', 1))
+    
+    # Production settings
+    uvicorn.run(
+        app, 
+        host=HOST, 
+        port=PORT,
+        workers=WORKERS,
+        log_level="info",
+        access_log=ENVIRONMENT == "development"
+    )
