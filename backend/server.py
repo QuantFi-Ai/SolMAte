@@ -18,8 +18,30 @@ import bcrypt
 
 # Database setup
 MONGO_URL = os.environ.get('MONGO_URL', 'mongodb://localhost:27017')
-client = MongoClient(MONGO_URL)
-db = client.solm8_db
+DB_NAME = os.environ.get('DB_NAME', 'solm8_db')
+
+# Handle MongoDB Atlas connection with proper SSL and authentication
+try:
+    if 'mongodb+srv://' in MONGO_URL or 'mongodb.net' in MONGO_URL:
+        # MongoDB Atlas connection
+        client = MongoClient(MONGO_URL, tls=True, tlsAllowInvalidCertificates=False)
+    else:
+        # Local MongoDB connection
+        client = MongoClient(MONGO_URL)
+    
+    # Test connection
+    client.admin.command('ping')
+    print(f"✅ MongoDB connected successfully to: {MONGO_URL}")
+    
+    # Use environment variable for database name
+    db = client[DB_NAME]
+    
+except Exception as e:
+    print(f"❌ MongoDB connection failed: {e}")
+    print(f"MONGO_URL: {MONGO_URL}")
+    print(f"DB_NAME: {DB_NAME}")
+    # Re-raise to prevent app from starting with broken DB
+    raise
 
 # Collections
 users_collection = db.users
